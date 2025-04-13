@@ -16,9 +16,17 @@ void	ft_cd(char *str)
 {
 	if (str == NULL)
 		if (chdir(getenv("HOME")) != -1)
+		{
+			oldpwd_update(env, getenv("PWD"));
+			pwd_update(env, getenv("HOME"));
 			return ;
+		}
 	if (chdir(str) != -1 && str != NULL)
+	{
+		oldpwd_update(env, getenv("PWD"));
+		pwd_update(env, str);
 		return ;
+	}
 	else
 		perror("chdir() error");
 }

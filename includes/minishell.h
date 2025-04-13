@@ -35,5 +35,8 @@ void	ft_env(char **envp);
 void	ft_exit(char **argv);
 int		ft_echo(int argc, char **argv);
 int		handle_builtins(char **arg, char **envp, int i);
+char	**env_dup(char **envp);
+void	oldpwd_update(char **env, char *new_oldpwd);
+void	pwd_update(char **env, char *new_pwd);
 
 #endif

@@ -17,8 +17,10 @@ int	main(int ac, char **av, char **envp)
 	char	*str;
 	char	**arg;
 	pid_t	pid;
+	char **env_cpy;
 
 	(void)ac, (void)av;
+	env_cpy = env_dup(envp);
 	while (1)
 	{
 		str = readline("\x1b[34m\nminishell$>\x1b[m");
@@ -26,7 +28,7 @@ int	main(int ac, char **av, char **envp)
 			exit(0);
 		add_history(str);
 		arg = ft_split(str, ' ');
-		if (!handle_builtins(arg, envp, ft_count_words(str, ' ')))
+		if (!handle_builtins(arg, env_cpy, ft_count_words(str, ' ')))
 		{
 			if ((pid = fork()) == 0)
 				exec_cmd(str, envp);
