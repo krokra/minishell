@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 19:48:55 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/14 20:43:10 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	ft_pwd(void)
 
 	buf = getcwd(NULL, 0);
 	if (buf != NULL)
-		printf("%s", buf);
+		printf("%s\n", buf);
 	else
 		perror("getcwd() error");
 	free(buf);

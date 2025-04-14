@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 11:00:46 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/14 20:45:48 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,19 @@ char	*path_of_cmd(char *cmd, char **paths)
 	}
 	ft_free(paths);
 	return (NULL);
+}
+
+char	*append_newline(char *str)
+{
+	char *new_str;
+	int len;
+
+	len = ft_strlen(str);
+	new_str = malloc(len + 2);
+	if (!new_str)
+		return (NULL);
+	ft_strlcpy(new_str, str, len + 1);
+	new_str[len] = '\n';
+	new_str[len + 1] = '\0';
+	return (new_str);
 }

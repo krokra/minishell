@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 19:46:28 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/14 20:41:08 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,15 @@ int	main(int ac, char **av, char **envp)
 		add_history(str);
 		if (str == NULL)
 		{
+			free(str);
 			printf("\n");
 			break ;
+		}
+		if (str[0] == '\n' || str[0] == '\0')
+		{
+			free(str);
+			printf("\n");
+			continue ;
 		}
 		readline_loop(str, env_cpy);
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 11:51:54 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/14 20:45:36 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,16 @@ void	exec_cmd(char *cmd, char **env)
 		if (cmdtab != NULL && cmdtab[0] != NULL)
 		{
 			ft_putstr_fd("command not found : ", 2);
-			ft_putstr_fd(cmdtab[0], 2);
+			ft_putstr_fd(append_newline(cmdtab[0]), 2);
 		}
 		free(path);
 		ft_free(cmdtab);
-		return ;
+		exit(1);
 	}
 	if (execve(path, cmdtab, env) == -1)
 	{
 		ft_putstr_fd("command not found : ", 2);
-		ft_putstr_fd(cmdtab[0], 2);
+		ft_putstr_fd(append_newline(cmdtab[0]), 2);
 		free(path);
 		ft_free(cmdtab);
 		exit(1);
