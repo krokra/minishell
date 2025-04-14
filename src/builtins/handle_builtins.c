@@ -17,7 +17,7 @@ int	handle_builtins(char **arg, char **envp, int i)
 	if (!arg || !arg[0])
 		return (0);
 	if (ft_strncmp(arg[0], "cd", 3) == 0)
-		ft_cd(arg[1]);
+		ft_cd(arg[1], envp);
 	else if (ft_strncmp(arg[0], "env", 4) == 0)
 		ft_env(envp);
 	else if (ft_strncmp(arg[0], "pwd", 4) == 0)
@@ -26,6 +26,10 @@ int	handle_builtins(char **arg, char **envp, int i)
 		ft_exit(arg);
 	else if (ft_strncmp(arg[0], "echo", 5) == 0)
 		ft_echo(i, arg + 1);
+	else if (ft_strncmp(arg[0], "export", 7) == 0)
+		ft_export(arg + 1, envp);
+	else if (ft_strncmp(arg[0], "unset", 6) == 0)
+		ft_unset(arg[1], envp);
 	else
 		return (0);
 	return (1);

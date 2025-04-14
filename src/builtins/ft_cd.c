@@ -12,7 +12,7 @@
 
 #include "../../includes/minishell.h"
 
-void	ft_cd(char *str)
+void	ft_cd(char *str, char **env)
 {
 	if (str == NULL)
 		if (chdir(getenv("HOME")) != -1)
