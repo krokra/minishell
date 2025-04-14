@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 11:59:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/14 19:46:28 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ int	main(int ac, char **av, char **envp)
     struct sigaction sa;
 
 	env_cpy = env_dup(envp);
-
+	(void)ac;
+	(void)av;
     sa.sa_handler = sigint_prompt;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
@@ -60,6 +61,12 @@ int	main(int ac, char **av, char **envp)
 	while (1)
 	{
 		str = readline("minishell$> ");
+		add_history(str);
+		if (str == NULL)
+		{
+			printf("\n");
+			break ;
+		}
 		readline_loop(str, env_cpy);
 	}
 	rl_clear_history();

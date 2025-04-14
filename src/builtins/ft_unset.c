@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_unset.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:01 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 09:28:12 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/14 19:34:16 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,11 @@
 void    ft_unset(char *name, char **env)
 {
     int		i;
+    int       len;
 
+    len = ft_strlen(name);
+    if (name == NULL || ft_strchr(name, '=') != NULL)
+        return ;
     i = 0;
     while (env[i] != NULL)
     {

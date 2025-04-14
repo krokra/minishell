@@ -11,6 +11,9 @@ SRCS := main.c \
 		src/builtins/ft_env.c \
 		src/builtins/ft_exit.c \
 		src/builtins/ft_echo.c \
+		src/builtins/ft_export.c \
+		src/builtins/ft_unset.c \
+		src/ft_getenv.c \
 		src/builtins/handle_builtins.c
 
 SRC := $(addprefix $(SRC_DIR), $(SRCS))

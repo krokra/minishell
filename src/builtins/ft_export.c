@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:27 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 09:28:28 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/14 19:33:25 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ char *export_var(char *name, char *value)
     return (var);
 }
 
-char **ft_export(char **env, char *arg)
+char    **ft_export(char **env, char *arg)
 {
     char    *name;
     char    *value;
@@ -109,4 +109,5 @@ char **ft_export(char **env, char *arg)
     }
     env[i] = var;
     env[i + 1] = NULL;
+    return (env);
 }

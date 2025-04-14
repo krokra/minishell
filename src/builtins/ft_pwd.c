@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 09:39:47 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/14 19:48:55 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,25 +20,24 @@ void	pwd_update(char **env, char *new_pwd)
 	i = -1;
 	pwd = malloc(ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
 	if  (!pwd)
-		return (NULL);
-	ft_strcpy(pwd, "PWD=");
-	ft_strcat(pwd, new_pwd);
+		return ;
+	ft_strlcpy(pwd, "PWD=", 5);
+	ft_strlcat(pwd, new_pwd, ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
 	while (env[++i] != NULL)
 	{
 		if (ft_strncmp(env[i], "PWD=", 4) == 0)
 		{
 			free(env[i]);
-			env[i] = pwd;
+			env[i] = ft_strdup(pwd);
 			free(pwd);
-			return (env);
+			return ;
 		}
 	}
 	while (env[++i] != NULL)
 		i++;
-	env[i] = pwd;
+	env[i] = ft_strdup(pwd);
 	env[i + 1] = NULL;
 	free(pwd);
-	return (env);
 }
 
 void	oldpwd_update(char **env, char *new_oldpwd)
@@ -47,30 +46,29 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 	int		i;
 
 	i = -1;
-	pwd = malloc(ft_strlen("OLDPWD=") + ft_strlen(new_pwd) + 1);
+	pwd = malloc(ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);
 	if  (!pwd)
-		return (NULL);
-	ft_strcpy(pwd, "OLDPWD=");
-	ft_strcat(pwd, new_pwd);
+		return ;
+	ft_strlcpy(pwd, "OLDPWD=", 8);
+	ft_strlcat(pwd, new_oldpwd, ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);	
 	while (env[++i] != NULL)
 	{
 		if (ft_strncmp(env[i], "OLDPWD=", 7) == 0)
 		{
 			free(env[i]);
-			env[i] = pwd;
+			env[i] = ft_strdup(pwd);
 			free(pwd);
-			return (env);
+			return ;
 		}
 	}
 	while (env[++i] != NULL)
 		i++;
-	env[i] = pwd;
+	env[i] = ft_strdup(pwd);
 	env[i + 1] = NULL;
 	free(pwd);
-	return (env);
 }
 
-void	ft_pwd(char **env)
+void	ft_pwd(void)
 {
 	char	*buf;
 
@@ -79,4 +77,5 @@ void	ft_pwd(char **env)
 		printf("%s", buf);
 	else
 		perror("getcwd() error");
+	free(buf);
 }
