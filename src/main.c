@@ -6,12 +6,29 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 20:41:08 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/15 13:55:31 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 #include <signal.h>
+
+void	disable_ctrl_backslash(void)
+{
+    struct termios term;
+
+    if (tcgetattr(STDIN_FILENO, &term) == -1)
+    {
+        perror("tcgetattr");
+        exit(EXIT_FAILURE);
+    }
+    term.c_cc[VQUIT] = 0;
+    if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
+    {
+        perror("tcsetattr");
+        exit(EXIT_FAILURE);
+    }
+}
 
 void	sigint_prompt(int sig)
 {
@@ -22,6 +39,20 @@ void	sigint_prompt(int sig)
 		rl_replace_line("", 0);
 		rl_redisplay();
 	}
+}
+
+void	signal_handler(void)
+{
+	struct sigaction sa;
+
+    sa.sa_handler = sigint_prompt;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGINT, &sa, NULL) == -1)
+    {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void	readline_loop(char *str, char **envp)
@@ -41,23 +72,8 @@ void	readline_loop(char *str, char **envp)
 	free(str);
 }
 
-int	main(int ac, char **av, char **envp)
+void	mainloop(char *str, char **envp)
 {
-	char	*str;
-	char **env_cpy;
-    struct sigaction sa;
-
-	env_cpy = env_dup(envp);
-	(void)ac;
-	(void)av;
-    sa.sa_handler = sigint_prompt;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-    {
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
 	while (1)
 	{
 		str = readline("minishell$> ");
@@ -74,7 +90,24 @@ int	main(int ac, char **av, char **envp)
 			printf("\n");
 			continue ;
 		}
-		readline_loop(str, env_cpy);
+		readline_loop(str, envp);
 	}
 	rl_clear_history();
+}
+
+int	main(int ac, char **av, char **envp)
+{
+	char	*str;
+	char **env_cpy;
+
+	env_cpy = env_dup(envp);
+	(void)ac;
+	(void)av;
+	disable_ctrl_backslash();
+	signal_handler();
+	str = NULL;
+	mainloop(str, env_cpy);
+	ft_free(env_cpy);
+	free(str);
+	return (0);
 }
