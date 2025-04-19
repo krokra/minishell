@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:27 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 19:33:25 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/18 18:48:46 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char *parse_export1(char *arg)
     int     i;
 
     i = 0;  
-    res = malloc(sizeof(char) * (export_len(arg) + 1));
+    res = (char *)malloc(sizeof(char) * (export_len(arg) + 1));
     if (!res)
     {
         free(res);
@@ -50,15 +50,16 @@ char *parse_export2(char *arg)
     char    *res;
 
     i = export_len(arg);
-    j = 0;
-    res = malloc (sizeof(char) * (ft_strlen(arg) - i + 1));
-    if (!res)
-    {
-        free(res);
+    if (arg[i] != '=')
         return (NULL);
-    }
+
+    j = 0;
+    res = (char *)malloc(sizeof(char) * (ft_strlen(arg) - i));
+    if (!res)
+        return (NULL);
+
     i++;
-    while (arg[i])
+    while (arg[i] != '\0')
     {
         res[j] = arg[i];
         i++;
@@ -82,32 +83,47 @@ char *export_var(char *name, char *value)
     }
     return (var);
 }
-
-char    **ft_export(char **env, char *arg)
+void    ft_export(char **env, char *arg)
 {
     char    *name;
     char    *value;
     char    *var;
     int     i;
 
-    i = -1;
+    i = 0;
     name = parse_export1(arg);
     value = parse_export2(arg);
-    var = export_var(name, value);
-    if (!name || !var || !value)
-        return (NULL);
-    while (env[++i] != NULL)
+    if (!name || !value)
     {
-        if (ft_strncmp(env[++i], name, export_len(arg)) == 0)
+        free(name);
+        return ;
+    }
+    var = export_var(name, value);
+    if (!var)
+    {
+        free(name);
+        free(value);
+        free(var);
+        return ;
+    }
+    while (env[i] != NULL)
+    {
+        if (ft_strncmp(env[i], name, ft_strlen(name)) == 0)
         {
-            free(env[++i]);
-            env[++i] = var;
+            free(env[i]);
+            env[i] = ft_strdup(var);
             free(name);
             free(value);
-            return (env);
+            free(var);
+            return ;
         }
+        i++;
     }
+    env = ft_realloc(env, sizeof(char *) * (i + 1), sizeof(char *) * (i + 2));
     env[i] = var;
     env[i + 1] = NULL;
-    return (env);
+    free(name);
+    free(new_env);
+    free(value);
+    free(var);
 }

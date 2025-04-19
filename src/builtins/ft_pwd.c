@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 20:43:10 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/18 18:38:38 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	pwd_update(char **env, char *new_pwd)
 	int		i;
 
 	i = -1;
-	pwd = malloc(ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
+	pwd = (char *)malloc(ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
 	if  (!pwd)
 		return ;
 	ft_strlcpy(pwd, "PWD=", 5);
@@ -46,7 +46,7 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 	int		i;
 
 	i = -1;
-	pwd = malloc(ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);
+	pwd = (char *)malloc(ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);
 	if  (!pwd)
 		return ;
 	ft_strlcpy(pwd, "OLDPWD=", 8);

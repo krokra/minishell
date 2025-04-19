@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 19:54:32 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/18 18:38:41 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,17 @@
 
 void	ft_pwd(void);
 void	ft_cd(char *str, char **env);
-void	ft_env(char **envp);
+void	ft_env(char **strs);
 void	ft_exit(char **argv);
 int		ft_echo(int argc, char **argv);
 int		handle_builtins(char **arg, char **envp, int i);
 char	**env_dup(char **envp);
 void	oldpwd_update(char **env, char *new_oldpwd);
 void	pwd_update(char **env, char *new_pwd);
-char **ft_export(char **env, char *arg);
+void    ft_export(char **env, char *arg);
 void    ft_unset(char *name, char **env);
-char *ft_getenv(char **env, char *name);
+char    *ft_getenv(char **env, char *name);
+int     export_len(char *arg);
+void    *ft_realloc(void *dst, size_t old_size, size_t new_size);
 
 #endif

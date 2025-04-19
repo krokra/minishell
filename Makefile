@@ -1,6 +1,6 @@
 CC := cc
 RM := rm -rf
-CFLAGS := -Wall -Werror -Wextra -g3
+CFLAGS := -Wall -Werror -Wextra -g3 -fsanitize=address
 NAME := minishell
 SRC_DIR := src/
 SRCS := main.c \
@@ -14,6 +14,7 @@ SRCS := main.c \
 		src/builtins/ft_export.c \
 		src/builtins/ft_unset.c \
 		src/ft_getenv.c \
+		src/ft_realloc.c \
 		src/builtins/handle_builtins.c
 
 SRC := $(addprefix $(SRC_DIR), $(SRCS))

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 20:45:36 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/18 11:08:27 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,7 @@ void	pipex(int argc, char **argv, char **env)
 	pid_t	pid1;
 	pid_t	pid2;
 
-	if (argc != 5)
-		wrong_args();
+	(void)argc;
 	if (pipe(pipefd) == -1)
 		exit(-1);
 	pid1 = fork();

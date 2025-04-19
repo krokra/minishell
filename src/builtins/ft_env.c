@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:49 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 10:19:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/18 18:38:49 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,14 @@ char	**env_dup(char **envp)
 	return (env_cpy);
 }
 
-void	ft_env(char **envp)
+void	ft_env(char **strs)
 {
-	char	*str;
+	int		i;
 
-	while (*envp != 0)
+	i = 0;
+	while (strs[i] != NULL)
 	{
-		str = *envp;
-		printf("%s\n", str);
-		envp++;
+		printf("%s\n", strs[i]);
+		i++;
 	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_builtins.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 11:18:48 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 19:36:39 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/18 18:39:03 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ int	handle_builtins(char **arg, char **envp, int i)
 		return (0);
 	if (ft_strncmp(arg[0], "cd", 3) == 0)
 		ft_cd(arg[1], envp);
+	else if (ft_strncmp(arg[0], "export", 7) == 0)
+		ft_export(envp, arg[1]);
 	else if (ft_strncmp(arg[0], "env", 4) == 0)
 		ft_env(envp);
 	else if (ft_strncmp(arg[0], "pwd", 4) == 0)
@@ -26,8 +28,6 @@ int	handle_builtins(char **arg, char **envp, int i)
 		ft_exit(arg);
 	else if (ft_strncmp(arg[0], "echo", 5) == 0)
 		ft_echo(i, arg + 1);
-	else if (ft_strncmp(arg[0], "export", 7) == 0)
-		ft_export(envp, arg[1]);
 	else if (ft_strncmp(arg[0], "unset", 6) == 0)
 		ft_unset(arg[1], envp);
 	else

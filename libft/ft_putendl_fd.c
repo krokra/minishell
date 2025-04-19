@@ -6,11 +6,10 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 16:44:51 by psirault          #+#    #+#             */
-/*   Updated: 2024/11/15 12:26:04 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/18 11:47:49 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include "libft.h"
 
 void	ft_putendl_fd(char *s, int fd)

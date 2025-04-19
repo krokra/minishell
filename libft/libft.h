@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 20:03:56 by psirault          #+#    #+#             */
-/*   Updated: 2025/03/04 10:23:36 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/18 11:48:37 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,6 @@ t_list		*ft_lstmap(t_list *lst, int*(*f)(int), void (*del)(int));
 void		ft_lstdelone(t_list *lst, void (*del)(int));
 t_list		*ft_lstavantlast(t_list *lst);
 void		ft_rev_int_tab(int *tab, int size);
-int			is_empty(char *str);
+int			is_str_empty(char *str);
 void		*ft_free(char **dest);
 #endif
