@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:27 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/18 18:48:46 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:54:01 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,12 +69,20 @@ char *parse_export2(char *arg)
     return (res);
 }
 
-char *export_var(char *name, char *value)
+char    *export_var(char *name, char *value)
 {
     char    *var;
+    char    *temp;
 
-    var = ft_strjoin(name, "=");
-    var = ft_strjoin(var, value);
+    temp = ft_strjoin(name, "=");
+    if (!temp)
+    {
+        free(name);
+        free(value);
+        return (NULL);
+    }
+    var = ft_strjoin(temp, value);
+    free(temp);
     if (!var)
     {
         free(name);
@@ -83,6 +91,7 @@ char *export_var(char *name, char *value)
     }
     return (var);
 }
+
 void    ft_export(char **env, char *arg)
 {
     char    *name;
@@ -119,11 +128,9 @@ void    ft_export(char **env, char *arg)
         }
         i++;
     }
-    env = ft_realloc(env, sizeof(char *) * (i + 1), sizeof(char *) * (i + 2));
-    env[i] = var;
+    env[i] = ft_strdup(var);
     env[i + 1] = NULL;
-    free(name);
-    free(new_env);
-    free(value);
     free(var);
+    free(name);
+    free(value);
 }

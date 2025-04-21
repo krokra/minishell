@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:47:27 by marvin            #+#    #+#             */
-/*   Updated: 2024/11/15 15:01:08 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:45:49 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,3 @@ char	*ft_strdup(const char *s)
 	tab[i] = '\0';
 	return (tab);
 }
-/*
-int	main()
-{
-	assert(strcmp("", strdup("")) == 0);
-}*/

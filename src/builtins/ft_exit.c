@@ -3,17 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   ft_exit.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:18 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 10:57:10 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/21 16:48:22 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-void	ft_exit(char **argv)
+void	ft_exit(char **argv, char **envp)
 {
 	ft_free(argv);
+	ft_free(envp);
 	exit(0);
 }

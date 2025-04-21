@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:11 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/14 20:45:28 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/21 16:57:54 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,5 +27,4 @@ void	exec_child(int *fd, char **argv, char **env);
 void	exec_parent(int *fd, char **argv, char **env);
 void	exec_cmd(char *cmd, char **env);
 void		pipex(int argc, char **argv, char **env);
-char	*append_newline(char *str);
 #endif
