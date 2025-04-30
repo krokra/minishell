@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:13:26 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/30 11:05:19 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	disable_ctrl_backslash(void)
 	}
 }
 
-void	readline_loop(char *str, char **envp)
+void	readline_loop(char *str, char **envp, t_token *tokens)
 {
 	char	**arg;
 	pid_t	pid;
@@ -39,16 +39,16 @@ void	readline_loop(char *str, char **envp)
 	if (!arg)
 	{
 		free(str);
+		free_tokens(tokens);
 		return ;
 	}
-	if (!handle_builtins(arg, envp, ft_count_words(str, ' ')))
+	if (!handle_builtins(arg, envp, ft_count_words(str, ' '), tokens))
 	{
 		pid = fork();
 		if (pid == 0)
 		{
-			ft_free(arg);
 			exec_cmd(str, envp);
-			ft_free(envp);
+			ft_exit(arg, envp, tokens);
 			free(str);
 			exit(0);
 		}
@@ -58,7 +58,7 @@ void	readline_loop(char *str, char **envp)
 	free(str);
 }
 
-void	mainloop(char *str, char **envp)
+void	mainloop(char *str, char **envp, t_token *tokens)
 {
 	while (1)
 	{
@@ -74,25 +74,30 @@ void	mainloop(char *str, char **envp)
 			free(str);
 			continue ;
 		}
-		readline_loop(str, envp);
+		quote_and_token_handling(str, find_first_quote(str), &tokens);
+		readline_loop(str, envp, tokens);
+		free_tokens(tokens);
 	}
 	free(str);
 }
 
 int	main(int ac, char **av, char **envp)
 {
-	char	*str;
-	char	**env_cpy;
+	char		*str;
+	char		**env_cpy;
+	t_token		*tokens;
 
+	tokens = NULL;
 	env_cpy = env_dup(envp);
 	(void)ac;
 	(void)av;
 	disable_ctrl_backslash();
 	signal_handler();
 	str = NULL;
-	mainloop(str, env_cpy);
+	mainloop(str, env_cpy, tokens);
 	ft_free(env_cpy);
 	free(str);
+	free_tokens(tokens);
 	rl_clear_history();
 	return (0);
 }
