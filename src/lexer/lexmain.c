@@ -58,7 +58,9 @@ static char	*read_until_quote_closed(char *line, int *quote)
 {
 	char	*input;
 	char	*tmp;
+	char	*old_line;
 
+	old_line = line;
 	while (*quote)
 	{
 		if (*quote == '"')
@@ -72,9 +74,10 @@ static char	*read_until_quote_closed(char *line, int *quote)
 		ft_memcpy(tmp, line, ft_strlen(line));
 		tmp[ft_strlen(line)] = '\0';
 		ft_strcat(tmp, input);
-		free(line);
-		line = tmp;
 		free(input);
+		if (line != old_line)
+			free(line);
+		line = tmp;
 		if (is_quote_closed(line, *quote))
 			*quote = 0;
 	}
@@ -83,11 +86,21 @@ static char	*read_until_quote_closed(char *line, int *quote)
 
 void	quote_and_token_handling(char *line, int quote, t_token **tokens)
 {
+	char	*result = NULL;
+
 	if (quote)
 	{
-		line = read_until_quote_closed(line, &quote);
-		if (!line)
+		result = read_until_quote_closed(line, &quote);
+		if (!result)
+		{
+			free(line);
 			return ;
+		}
+		line = result;
 	}
 	*tokens = lexer(line, quote);
+	if (result)
+		free(result);
+	else
+		free(line);
 }

@@ -25,7 +25,7 @@ int	verify_syntax(t_token *tokens)
 		if (current->type == T_PIPE && (!current->next || current->next->type != T_WORD || current->next->type == T_ENVVAR))
 			return (1);
 		if ((current->type == T_REDIR_IN || current->type == T_REDIR_OUT || current->type == T_APPEND)
-				&& (!current->next || (current->next->type != T_WORD || current->next->type != T_ENVVAR)))
+				&& (!current->next || (current->next->type != T_WORD && current->next->type != T_ENVVAR)))
 			return (1);
 		if (current->type == T_HEREDOC && (!current->next || current->next->type != T_WORD))
 			return (1);

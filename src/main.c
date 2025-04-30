@@ -104,6 +104,10 @@ int	main(int ac, char **av, char **envp)
 	ft_free(env_cpy);
 	free(str);
 	free_tokens(tokens);
+#ifdef __APPLE__
+	clear_history();
+#else
 	rl_clear_history();
+#endif
 	return (0);
 }
