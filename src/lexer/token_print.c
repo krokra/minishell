@@ -1,39 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_unset.c                                         :+:      :+:    :+:   */
+/*   token_print.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/08 09:28:01 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:16:10 by psirault         ###   ########.fr       */
+/*   Created: 2025/04/30 07:59:01 by psirault          #+#    #+#             */
+/*   Updated: 2025/04/30 08:10:51 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/minishell.h"
+#include "../../includes/lexer.h"
 
-void	ft_unset(char *name, char **env)
+void	print_tokens(t_token *tokens)
 {
-	int	i;
-	int	len;
+	t_token *current = tokens;
+	int i;
+    i = 0;
 
-	len = ft_strlen(name);
-	if (name == NULL || ft_strchr(name, '=') != NULL)
-		return ;
-	i = 0;
-	while (env[i] != NULL)
+	while (current)
 	{
-		if (ft_strncmp(env[i], name, ft_strlen(name)) == 0
-			&& env[i][len] == '=')
-		{
-			free(env[i]);
-			while (env[i] != NULL)
-			{
-				env[i] = env[i + 1];
-				i++;
-			}
-			break ;
-		}
-		i++;
+		printf("Token %d: [%s] quote: [%c] type: [%d]\n", i++, current->content,
+			current->quotes, current->type);
+		current = current->next;
 	}
 }

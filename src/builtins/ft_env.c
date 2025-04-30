@@ -3,41 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   ft_env.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:49 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/21 17:02:09 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/29 10:21:03 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-char **env_dup(char **envp)
+char	**env_dup(char **envp)
 {
-    char **new_env;
-    size_t i;
+	char	**new_env;
+	size_t	i;
 
 	i = 0;
 	new_env = (char **)malloc(sizeof(char *) * (MAX_ENV_VARS + 1));
-    if (new_env == NULL)
+	if (new_env == NULL)
 		return (NULL);
 	while (envp[i] != NULL)
 	{
-        new_env[i] = ft_strdup(envp[i]);
-        if (new_env[i] == NULL || i >= MAX_ENV_VARS - 1)
+		new_env[i] = ft_strdup(envp[i]);
+		if (new_env[i] == NULL || i >= MAX_ENV_VARS - 1)
 		{
-            ft_free(new_env);
-            return (NULL);
-        }
-        i++;
+			ft_free(new_env);
+			return (NULL);
+		}
+		i++;
 	}
-    new_env[i] = NULL;
-    return (new_env);
+	new_env[i] = NULL;
+	return (new_env);
 }
 
 void	ft_env(char **strs)
 {
-	int		i;
+	int	i;
 
 	i = 0;
 	while (strs[i] != NULL)

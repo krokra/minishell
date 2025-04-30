@@ -1,0 +1,93 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexmain.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
+/*   Updated: 2025/04/30 09:33:29 by psirault         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../../includes/lexer.h"
+
+int	find_first_quote(const char *str)
+{
+	int		i;
+	int		found;
+	char	quote;
+
+	i = 0;
+	found = 0;
+	quote = 0;
+	while (str[i])
+	{
+		if ((str[i] == '"' || str[i] == '\'') && !found)
+		{
+			quote = str[i];
+			found = 1;
+		}
+		else if (str[i] == quote && found)
+		{
+			found = 0;
+			quote = 0;
+		}
+		i++;
+	}
+	return (quote);
+}
+
+static int	is_quote_closed(const char *str, char quote)
+{
+	int	i;
+	int	found;
+
+	i = 0;
+	found = 0;
+	while (str[i])
+	{
+		if (str[i] == quote)
+			found = !found;
+		i++;
+	}
+	return (!found);
+}
+
+static char	*read_until_quote_closed(char *line, int *quote)
+{
+	char	*input;
+	char	*tmp;
+
+	while (*quote)
+	{
+		if (*quote == '"')
+			input = readline("dquote> ");
+		else
+			input = readline("quote> ");
+		if (!input)
+			return (NULL);
+		tmp = malloc(ft_strlen(line) + ft_strlen(input) + 2);
+		ft_memset(tmp, 0, ft_strlen(line) + ft_strlen(input) + 2);
+		ft_memcpy(tmp, line, ft_strlen(line));
+		tmp[ft_strlen(line)] = '\0';
+		ft_strcat(tmp, input);
+		line = tmp;
+		free(input);
+		if (is_quote_closed(line, *quote))
+			*quote = 0;
+	}
+	return (line);
+}
+
+void	quote_and_token_handling(char *line, int quote, t_token **tokens)
+{
+	if (quote)
+	{
+		line = read_until_quote_closed(line, &quote);
+		if (!line)
+			return ;
+	}
+	*tokens = lexer(line, quote);
+	print_tokens(*tokens);
+}

@@ -25,14 +25,14 @@ void	sigint_prompt(int sig)
 
 void	signal_handler(void)
 {
-	struct sigaction sa;
+	struct sigaction	sa;
 
-    sa.sa_handler = sigint_prompt;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-    {
-        perror("sigaction");
-        exit(EXIT_FAILURE);
-    }
+	sa.sa_handler = sigint_prompt;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	if (sigaction(SIGINT, &sa, NULL) == -1)
+	{
+		perror("sigaction");
+		exit(EXIT_FAILURE);
+	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/21 17:12:09 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/29 10:17:49 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	pwd_update(char **env, char *new_pwd)
 
 	i = -1;
 	pwd = (char *)malloc(ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
-	if  (!pwd)
+	if (!pwd)
 		return ;
 	ft_strlcpy(pwd, "PWD=", 5);
 	ft_strlcat(pwd, new_pwd, ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
@@ -47,10 +47,11 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 
 	i = -1;
 	pwd = (char *)malloc(ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);
-	if  (!pwd)
+	if (!pwd)
 		return ;
 	ft_strlcpy(pwd, "OLDPWD=", 8);
-	ft_strlcat(pwd, new_oldpwd, ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);	
+	ft_strlcat(pwd, new_oldpwd,
+		ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);
 	while (env[++i] != NULL)
 	{
 		if (ft_strncmp(env[i], "OLDPWD=", 7) == 0)

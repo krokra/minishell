@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   handle_builtins.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 11:18:48 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/21 16:47:34 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/30 08:35:16 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int	handle_builtins(char **arg, char **envp, int i)
+int	handle_builtins(char **arg, char **envp, int i, t_token *tokens)
 {
 	if (!arg || !arg[0])
 		return (0);
@@ -25,7 +25,7 @@ int	handle_builtins(char **arg, char **envp, int i)
 	else if (ft_strncmp(arg[0], "pwd", 4) == 0)
 		ft_pwd();
 	else if (ft_strncmp(arg[0], "exit", 5) == 0)
-		ft_exit(arg, envp);
+		ft_exit(arg, envp, tokens);
 	else if (ft_strncmp(arg[0], "echo", 5) == 0)
 		ft_echo(i, arg + 1);
 	else if (ft_strncmp(arg[0], "unset", 6) == 0)

@@ -16,10 +16,19 @@ SRCS := main.c \
 		src/ft_getenv.c \
 		src/ft_realloc.c \
 		src/signal_handling.c \
-		src/builtins/handle_builtins.c
+		src/builtins/export_utils.c \
+		src/builtins/handle_builtins.c \
+		src/lexer/lexer.c \
+		src/lexer/lexmain.c \
+		src/lexer/token_utils.c \
+		src/lexer/token_print.c \
+		src/lexer/token_parser.c \
+
+
 
 SRC := $(addprefix $(SRC_DIR), $(SRCS))
-INCLUDES := includes/minishell.h
+INCLUDES := includes/minishell.h \
+			includes/lexer.h
 OBJ := $(SRCS:.c=.o)
 
 all: $(NAME)

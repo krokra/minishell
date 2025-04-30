@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/21 16:56:26 by marvin           ###   ########.fr       */
+/*   Updated: 2025/04/29 10:09:21 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 void	wrong_args(void)
 {
-	ft_putstr_fd("use pipex as follows : ./pipex file1 \"cmd1\" \"cmd2\" file2", 2);
+	ft_putstr_fd("use pipex as follows : ./pipex file1", 2);
+	ft_putstr_fd(" \"cmd1\" \"cmd2\" file2", 2);
 	exit(1);
 }
 
