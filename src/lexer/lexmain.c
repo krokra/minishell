@@ -72,6 +72,7 @@ static char	*read_until_quote_closed(char *line, int *quote)
 		ft_memcpy(tmp, line, ft_strlen(line));
 		tmp[ft_strlen(line)] = '\0';
 		ft_strcat(tmp, input);
+		free(line);
 		line = tmp;
 		free(input);
 		if (is_quote_closed(line, *quote))
