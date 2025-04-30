@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/30 09:33:29 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/30 11:55:00 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,5 +89,4 @@ void	quote_and_token_handling(char *line, int quote, t_token **tokens)
 			return ;
 	}
 	*tokens = lexer(line, quote);
-	print_tokens(*tokens);
 }

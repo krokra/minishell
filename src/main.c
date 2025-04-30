@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/30 11:05:19 by psirault         ###   ########.fr       */
+/*   Updated: 2025/04/30 11:53:22 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,12 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 			continue ;
 		}
 		quote_and_token_handling(str, find_first_quote(str), &tokens);
+		if (syntax_checker(tokens))
+		{
+			free(str);
+			free_tokens(tokens);
+			continue ;
+		}
 		readline_loop(str, envp, tokens);
 		free_tokens(tokens);
 	}
