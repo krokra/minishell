@@ -20,8 +20,8 @@ void	print_tokens(t_token *tokens)
 
 	while (current)
 	{
-		printf("Token %d: [%s] quote: [%c] type: [%d]\n", i++, current->content,
-			current->quotes, current->type);
+		printf("Token %d: [%s] quote: [%c] type: [%d] index: [%d]\n", i++, current->content,
+			current->quotes, current->type, current->index);
 		current = current->next;
 	}
 }

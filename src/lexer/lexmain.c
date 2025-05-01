@@ -101,6 +101,6 @@ void	quote_and_token_handling(char *line, int quote, t_token **tokens)
 	*tokens = lexer(line, quote);
 	if (result)
 		free(result);
-	else
-		free(line);
+	/*else
+		free(line);*/
 }

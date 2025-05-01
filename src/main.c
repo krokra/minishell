@@ -77,6 +77,7 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 			continue ;
 		}
 		quote_and_token_handling(str, find_first_quote(str), &tokens);
+		print_tokens(tokens);
 		if (syntax_checker(tokens))
 		{
 			free(str);
@@ -105,7 +106,7 @@ int	main(int ac, char **av, char **envp)
 	mainloop(str, env_cpy, tokens);
 	ft_free(env_cpy);
 	free(str);
-	free_tokens(tokens);
+	//free_tokens(tokens);
 #ifdef __APPLE__
 	clear_history();
 #else

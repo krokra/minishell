@@ -49,14 +49,18 @@ t_token	*create_token(char *content, char quote)
 void	add_token(t_token **tokens, t_token *new)
 {
 	t_token *current;
+	static int count;
 
+	count = 0;
 	if (!*tokens)
 	{
 		*tokens = new;
+		new->index = count++;
 		return ;
 	}
 	current = *tokens;
 	while (current->next)
 		current = current->next;
 	current->next = new;
+	new->index = count++;
 }
