@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+//double leaks
+
 #include "../includes/minishell.h"
 #include <signal.h>
 
