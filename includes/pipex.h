@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:11 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/01 15:47:12 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/01 15:53:31 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include "minishell.h"
 # include "lexer.h"
 # include "../libft/libft.h"
+
+typedef struct s_token t_token;
 
 void	wrong_args(void);
 char	**ft_get_paths(char *var, char **env);
