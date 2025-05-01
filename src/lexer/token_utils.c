@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/30 10:08:42 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/01 15:21:28 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,17 @@ void	set_token_type(t_token *token)
 {
 	if (token->quotes == '"' || token->quotes == '\'')
 		token->type = T_WORD;
-	else if (strcmp(token->content, "|") == 0)
+	else if (ft_strncmp(token->content, "|", 2) == 0)
 		token->type = T_PIPE;
-	else if (strcmp(token->content, "<") == 0)
+	else if (ft_strncmp(token->content, "<", 2) == 0)
 		token->type = T_REDIR_IN;
-	else if (strcmp(token->content, ">") == 0)
+	else if (ft_strncmp(token->content, ">", 2) == 0)
 		token->type = T_REDIR_OUT;
-	else if (strcmp(token->content, ">>") == 0)
+	else if (ft_strncmp(token->content, ">>", 3) == 0)
 		token->type = T_APPEND;
-	else if (strcmp(token->content, "<<") == 0)
+	else if (ft_strncmp(token->content, "<<", 3) == 0)
 		token->type = T_HEREDOC;
-	else if (strcmp(token->content, "$") == 0)
+	else if (ft_strncmp(token->content, "$", 1) == 0)
 		token->type = T_ENVVAR;
 	else
 		token->type = T_WORD;
@@ -46,21 +46,32 @@ t_token	*create_token(char *content, char quote)
 	return (new);
 }
 
+void	set_index(t_token *tokens)
+{
+	t_token	*current;
+	int		i;
+
+	current = tokens;
+	i = 0;
+	while (current)
+	{
+		current->index = i++;
+		current = current->next;
+	}
+}
+
 void	add_token(t_token **tokens, t_token *new)
 {
 	t_token *current;
-	static int count;
 
-	count = 0;
 	if (!*tokens)
 	{
 		*tokens = new;
-		new->index = count++;
+		new->index = 0;
 		return ;
 	}
 	current = *tokens;
 	while (current->next)
 		current = current->next;
 	current->next = new;
-	new->index = count++;
 }

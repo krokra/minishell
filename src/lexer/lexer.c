@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:59 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/30 08:12:05 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/01 15:21:40 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ t_token	*lexer(char *input, int quote)
 		}
 		add_token(&tokens, new);
 	}
+	set_index(tokens);
 	return (tokens);
 }
 

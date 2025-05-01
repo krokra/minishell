@@ -45,5 +45,6 @@ char				*get_token(char *input, int *i, int *quote);
 void				set_token_type(t_token *token);
 void				quote_and_token_handling(char *line, int quote, t_token **tokens);
 int					find_first_quote(const char *str);
+void				set_index(t_token *tokens);
 
 #endif

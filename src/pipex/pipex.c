@@ -3,14 +3,43 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/21 17:27:57 by marvin           ###   ########.fr       */
+/*   Updated: 2025/05/01 15:46:55 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/pipex.h"
+
+void	exec_cmd_tokens(t_token *tokens, char *cmd, char **env)
+{
+	char	*path;
+	char	**cmdtab;
+
+	cmdtab = ft_split(cmd, ' ');
+	replace_env_vars(tokens, cmdtab, env);
+	path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
+	if (cmdtab == NULL || path == NULL)
+	{
+		if (cmdtab != NULL && cmdtab[0] != NULL)
+		{
+			ft_putstr_fd("command not found : ", 2);
+			ft_putstr_fd_nl(cmdtab[0], 2);
+		}
+		free(path);
+		ft_free(cmdtab);
+		return ;
+	}
+	if (execve(path, cmdtab, env) == -1)
+	{
+		ft_putstr_fd("command not found : ", 2);
+		ft_putstr_fd_nl(cmdtab[0], 2);
+		free(path);
+		ft_free(cmdtab);
+		return ;
+	}
+}
 
 void	exec_cmd(char *cmd, char **env)
 {

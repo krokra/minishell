@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/30 11:53:22 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/01 15:46:33 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,13 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
 		free_tokens(tokens);
 		return ;
 	}
+	replace_env_vars(tokens, arg, envp);
 	if (!handle_builtins(arg, envp, ft_count_words(str, ' '), tokens))
 	{
 		pid = fork();
 		if (pid == 0)
 		{
-			exec_cmd(str, envp);
+			exec_cmd_tokens(tokens, str, envp);
 			ft_exit(arg, envp, tokens);
 			free(str);
 			exit(0);
@@ -77,7 +78,7 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 			continue ;
 		}
 		quote_and_token_handling(str, find_first_quote(str), &tokens);
-		print_tokens(tokens);
+		// print_tokens(tokens);
 		if (syntax_checker(tokens))
 		{
 			free(str);
