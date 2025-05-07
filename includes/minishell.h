@@ -57,4 +57,5 @@ char	*parse_export1(char *arg);
 char	*parse_export2(char *arg);
 void	replace_by_value(char **arg, char **envp);
 void	replace_env_vars(t_token *tokens, char **args, char **envp);
+
 #endif

@@ -12,24 +12,26 @@
 
 #include "../../includes/lexer.h"
 
-void	set_token_type(t_token *token)
+void    set_token_type(t_token *token)
 {
-	if (token->quotes == '"' || token->quotes == '\'')
-		token->type = T_WORD;
-	else if (ft_strncmp(token->content, "|", 2) == 0)
-		token->type = T_PIPE;
-	else if (ft_strncmp(token->content, "<", 2) == 0)
-		token->type = T_REDIR_IN;
-	else if (ft_strncmp(token->content, ">", 2) == 0)
-		token->type = T_REDIR_OUT;
-	else if (ft_strncmp(token->content, ">>", 3) == 0)
-		token->type = T_APPEND;
-	else if (ft_strncmp(token->content, "<<", 3) == 0)
-		token->type = T_HEREDOC;
-	else if (ft_strncmp(token->content, "$", 1) == 0)
-		token->type = T_ENVVAR;
-	else
-		token->type = T_WORD;
+    if ((token->quotes == '"' || token->quotes == '\'') && token->content[1] != '$')
+        token->type = T_WORD;
+    else if (ft_strncmp(token->content, "|", 2) == 0)
+        token->type = T_PIPE;
+    else if (ft_strncmp(token->content, "<", 2) == 0)
+        token->type = T_REDIR_IN;
+    else if (ft_strncmp(token->content, ">", 2) == 0)
+        token->type = T_REDIR_OUT;
+    else if (ft_strncmp(token->content, ">>", 3) == 0)
+        token->type = T_APPEND;
+    else if (ft_strncmp(token->content, "<<", 3) == 0)
+        token->type = T_HEREDOC;
+    else if (ft_strncmp(token->content, "$", 1) == 0
+            || ft_strncmp(token->content, "\"$", 2) == 0
+            || ft_strncmp(token->content, "'$", 2) == 0)
+        token->type = T_ENVVAR;
+    else
+        token->type = T_WORD;
 }
 
 t_token	*create_token(char *content, char quote)
