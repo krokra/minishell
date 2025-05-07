@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/01 15:35:30 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/07 13:05:39 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,9 @@ int		handle_heredocs(t_token *tokens);
 void	ft_pwd(void);
 void	ft_cd(char *str, char **env);
 void	ft_env(char **strs);
-void	ft_exit(char **argv, char **envp, t_token *tokens);
-int		ft_echo(int argc, char **argv);
-int		handle_builtins(char **arg, char **envp, int i, t_token *tokens);
+void	ft_exit(char **envp, t_token *tokens);
+void	ft_echo(t_token *token);
+int		handle_builtins(char **envp, t_token *token);
 char	**env_dup(char **envp);
 void	oldpwd_update(char **env, char *new_oldpwd);
 void	pwd_update(char **env, char *new_pwd);
@@ -56,6 +56,7 @@ int		export_len(char *arg);
 char	*parse_export1(char *arg);
 char	*parse_export2(char *arg);
 void	replace_by_value(char **arg, char **envp);
-void	replace_env_vars(t_token *tokens, char **args, char **envp);
+void    replace_env_vars(t_token *tokens, char **envp);
+int     is_space(char c);
 
 #endif

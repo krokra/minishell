@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/01 15:46:55 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/07 13:10:01 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void	exec_cmd_tokens(t_token *tokens, char *cmd, char **env)
 	char	*path;
 	char	**cmdtab;
 
+	replace_env_vars(tokens, env);
 	cmdtab = ft_split(cmd, ' ');
-	replace_env_vars(tokens, cmdtab, env);
 	path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
 	if (cmdtab == NULL || path == NULL)
 	{

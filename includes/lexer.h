@@ -28,6 +28,7 @@ typedef struct s_token
 	int				index;
 	int				heredoc_pipe_read_fd;
 	struct s_token	*next;
+	struct s_token	*first;
 }					t_token;
 
 // Fonctions utils

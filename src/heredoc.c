@@ -53,9 +53,8 @@ int handle_heredocs(t_token *tokens)
                         close(pipe_fds[1]);
                         return(-1);
                     }
-                } 
-
-                if (close(pipe_fds[1]) == -1) {
+                }
+				if (close(pipe_fds[1]) == -1) {
                     perror("minishell: close heredoc pipe write-end");
                     close(pipe_fds[0]); 
                     return (-1);

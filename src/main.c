@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/01 15:46:33 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/07 13:05:08 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,38 +34,28 @@ void	disable_ctrl_backslash(void)
 
 void	readline_loop(char *str, char **envp, t_token *tokens)
 {
-	char	**arg;
 	pid_t	pid;
 
-	arg = ft_split(str, ' ');
-	if (!arg)
-	{
-		free(str);
-		free_tokens(tokens);
-		return ;
-	}
-	replace_env_vars(tokens, arg, envp);
+	replace_env_vars(tokens, envp);
 	if (handle_heredocs(tokens) == -1)
 	{
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
-		ft_free(arg);
 		free(str);
-		free_tokens(tokens); // Sera remis à NULL dans mainloop
+		free_tokens(tokens->first); // Sera remis à NULL dans mainloop
 		return;
 	}
-	if (!handle_builtins(arg, envp, ft_count_words(str, ' '), tokens))
-	{
+	if (!handle_builtins(envp, tokens))
+	{		
 		pid = fork();
 		if (pid == 0)
 		{
 			exec_cmd_tokens(tokens, str, envp);
-			ft_exit(arg, envp, tokens);
+			ft_exit(envp, tokens);
 			free(str);
 			exit(0);
 		}
 		waitpid(pid, NULL, 0);
 	}
-	ft_free(arg);
 	free(str);
 }
 
@@ -90,11 +80,11 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 		if (syntax_checker(tokens))
 		{
 			free(str);
-			free_tokens(tokens);
+			free_tokens(tokens->first);
 			continue ;
 		}
 		readline_loop(str, envp, tokens);
-		free_tokens(tokens);
+		free_tokens(tokens->first);
 	}
 	free(str);
 }

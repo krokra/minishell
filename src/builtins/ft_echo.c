@@ -6,29 +6,19 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/08 11:14:00 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/07 11:10:14 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-int	ft_echo(int argc, char **argv)
+void	ft_echo(t_token *token)
 {
-	int	i;
-
-	i = 0;
-	if (argc == 1)
-		return (printf("\n"));
-	if (ft_strncmp(argv[0], "-n", 3) == 0)
-		i++;
-	while (argv[i] != NULL)
+	while (token != NULL)
 	{
-		printf("%s ", argv[i]);
-		i++;
+		printf("%s ", token->content);
+		token = token->next;
 	}
-	if (ft_strncmp(argv[0], "-n", 3) == 0)
-		;
-	else
+	if (token == NULL)
 		printf("\n");
-	return (1);
 }
