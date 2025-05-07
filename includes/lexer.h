@@ -26,6 +26,7 @@ typedef struct s_token
 	char			quotes;
 	t_token_type	type;
 	int				index;
+	int				heredoc_pipe_read_fd;
 	struct s_token	*next;
 }					t_token;
 

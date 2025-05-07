@@ -45,6 +45,14 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
 		return ;
 	}
 	replace_env_vars(tokens, arg, envp);
+	if (handle_heredocs(tokens) == -1)
+	{
+		ft_putstr_fd("minishell: error handling heredocs\n", 2);
+		ft_free(arg);
+		free(str);
+		free_tokens(tokens); // Sera remis à NULL dans mainloop
+		return;
+	}
 	if (!handle_builtins(arg, envp, ft_count_words(str, ' '), tokens))
 	{
 		pid = fork();

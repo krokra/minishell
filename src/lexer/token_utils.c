@@ -41,6 +41,7 @@ t_token	*create_token(char *content, char quote)
 		return (NULL);
 	new->content = content;
 	new->quotes = quote;
+	new->heredoc_pipe_read_fd = -1;
 	new->next = NULL;
 	set_token_type(new);
 	return (new);
