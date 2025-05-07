@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/07 13:05:39 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/07 13:30:07 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,5 @@ char	*parse_export1(char *arg);
 char	*parse_export2(char *arg);
 void	replace_by_value(char **arg, char **envp);
 void    replace_env_vars(t_token *tokens, char **envp);
-int     is_space(char c);
 
 #endif

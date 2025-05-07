@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/07 13:05:08 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/07 13:54:55 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
 		pid = fork();
 		if (pid == 0)
 		{
-			exec_cmd_tokens(tokens, str, envp);
+			exec_cmd_tokens(tokens, envp);
 			ft_exit(envp, tokens);
 			free(str);
 			exit(0);

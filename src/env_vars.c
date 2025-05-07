@@ -82,7 +82,7 @@ static char *replace_vars_in_str(char *str, char **envp)
             str++;
         if (str > start)
         {
-            tmp = ft_substr(start, 0, str - start + 1);
+            tmp = ft_substr(start, 0, str - start);
             result = strjoin_and_free_s1(result, tmp);
             free(tmp);
         }
@@ -110,7 +110,7 @@ void replace_env_vars(t_token *tokens, char **envp)
 {
     while (tokens)
     {
-        if (tokens->type == T_WORD && tokens->content && tokens->content[0])
+        if ((tokens->type == T_ENVVAR || tokens->type == T_WORD) && tokens->content && tokens->content[0])
         {
             if (!remove_quotes(tokens->content))
             {
