@@ -34,8 +34,7 @@
 
 typedef struct s_token t_token;
 
-// Heredoc handling
-int		handle_heredocs(t_token *tokens);
+int		handle_heredocs(t_token *tokens, char **env);
 void	ft_pwd(void);
 void	ft_cd(char *str, char **env);
 void	ft_env(char **strs);

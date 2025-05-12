@@ -17,7 +17,9 @@ void    set_token_type(t_token *token)
     if ((token->quotes == '"' || token->quotes == '\'') && token->content[1] != '$')
         token->type = T_WORD;
     else if (ft_strncmp(token->content, "|", 2) == 0)
+	{
         token->type = T_PIPE;
+	}
     else if (ft_strncmp(token->content, "<", 2) == 0)
         token->type = T_REDIR_IN;
     else if (ft_strncmp(token->content, ">", 2) == 0)

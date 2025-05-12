@@ -19,49 +19,6 @@ static int	skip_spaces(char *input, int *i)
 	return (input[*i] != '\0');
 }
 
-static int  handle_quotes(char *input, int *i, int *quote)
-{
-	if (input[*i] == '"' || input[*i] == '\'')
-	{
-		*quote = input[*i];
-		(*i)++;
-		while (input[*i] && input[*i] != *quote)
-			(*i)++;
-		return (input[*i] != '\0');
-	}
-	return (1);
-}
-
-static int	handle_operators(char *input, int *i)
-{
-	if (input[*i] == '>' || input[*i] == '<' || input[*i] == '|')
-	{
-		(*i)++;
-		if (input[*i] == input[*i - 1])
-			(*i)++;
-		return (1);
-	}
-	return (0);
-}
-
-static int	handle_normal_word(char *input, int *i)
-{
-	while (input[*i] && input[*i] != ' ' && input[*i] != '\t'
-		&& input[*i] != '"' && input[*i] != '\'' && input[*i] != '>'
-		&& input[*i] != '<' && input[*i] != '|')
-		(*i)++;
-	return (1);
-}
-
-static int	handle_quotes_and_operators(char *input, int *i, int *quote)
-{
-	if (!handle_quotes(input, i, quote))
-		return (0);
-	if (!handle_operators(input, i))
-		handle_normal_word(input, i);
-	return (1);
-}
-
 static char	*create_token_string(char *input, int start, int end)
 {
 	char	*token;
@@ -82,20 +39,45 @@ static char	*create_token_string(char *input, int start, int end)
 	return (token);
 }
 
-char	*get_token(char *input, int *i, int *quote)
+char	*get_token(char *input, int *i, int *quote __attribute__((unused)))
 {
 	int	start;
-	int	current_quote;
+	int	in_quote = 0;
+	char	quote_char = 0;
 
-	current_quote = 0;
 	if (!skip_spaces(input, i))
 		return (NULL);
 	start = *i;
-	if (!handle_quotes_and_operators(input, i, &current_quote))
-		return (NULL);
-	if (current_quote)
+
+	// Si c'est un opérateur, on le prend tout de suite
+	if (input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
 	{
-		*quote = current_quote;
+		if (input[*i] == input[*i + 1]) // pour << ou >>
+			(*i)++;
+		(*i)++;
+		return (create_token_string(input, start, *i));
+	}
+
+	// Sinon, on lit un mot ou une séquence entre quotes
+	while (input[*i])
+	{
+		if (!in_quote && (input[*i] == ' ' || input[*i] == '\t' ||
+			input[*i] == '|' || input[*i] == '<' || input[*i] == '>'))
+			break;
+		if (!in_quote && (input[*i] == '"' || input[*i] == '\''))
+		{
+			in_quote = 1;
+			quote_char = input[*i];
+			(*i)++;
+			continue;
+		}
+		if (in_quote && input[*i] == quote_char)
+		{
+			in_quote = 0;
+			quote_char = 0;
+			(*i)++;
+			continue;
+		}
 		(*i)++;
 	}
 	return (create_token_string(input, start, *i));

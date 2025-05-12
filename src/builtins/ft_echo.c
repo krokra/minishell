@@ -14,11 +14,19 @@
 
 void	ft_echo(t_token *token)
 {
-	while (token != NULL)
+	int first_arg = 1;
+	while (token != NULL && 
+		   token->type != T_PIPE && 
+		   token->type != T_REDIR_IN &&
+		   token->type != T_REDIR_OUT &&
+		   token->type != T_APPEND &&
+		   token->type != T_HEREDOC)
 	{
-		printf("%s ", token->content);
+		if (!first_arg)
+			ft_putchar_fd(' ', 1);
+		ft_putstr_fd(token->content, 1);
+		first_arg = 0;
 		token = token->next;
 	}
-	if (token == NULL)
-		printf("\n");
+	ft_putchar_fd('\n', 1);
 }

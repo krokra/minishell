@@ -8,12 +8,25 @@
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
 /*   Updated: 2025/05/07 13:54:55 by psirault         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/* *************************************************************************
 
 //double leaks
 
 #include "../includes/minishell.h"
 #include <signal.h>
+
+// Nouvelle fonction helper
+static int has_pipe(t_token *tokens)
+{
+	t_token *current = tokens;
+	while (current != NULL)
+	{
+		if (current->type == T_PIPE)
+			return (1);
+		current = current->next;
+	}
+	return (0);
+}
 
 void	disable_ctrl_backslash(void)
 {
@@ -34,29 +47,28 @@ void	disable_ctrl_backslash(void)
 
 void	readline_loop(char *str, char **envp, t_token *tokens)
 {
-	pid_t	pid;
-
 	replace_env_vars(tokens, envp);
-	if (handle_heredocs(tokens) == -1)
+	if (handle_heredocs(tokens, envp) == -1)
 	{
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
 		free(str);
-		free_tokens(tokens->first); // Sera remis à NULL dans mainloop
+		free_tokens(tokens->first);
 		return;
 	}
-	if (!handle_builtins(envp, tokens))
-	{		
-		pid = fork();
-		if (pid == 0)
-		{
-			exec_cmd_tokens(tokens, envp);
-			ft_exit(envp, tokens);
-			free(str);
-			exit(0);
+
+	if (has_pipe(tokens->first)) // Vérifier sur tokens->first si la liste est chaînée via first
+	{
+		exec_cmd_tokens(tokens->first, envp);
+	}
+	else
+	{
+		if (!handle_builtins(envp, tokens->first))
+		{		
+			exec_cmd_tokens(tokens->first, envp);
 		}
-		waitpid(pid, NULL, 0);
 	}
 	free(str);
+	free_tokens(tokens->first);
 }
 
 void	mainloop(char *str, char **envp, t_token *tokens)
@@ -64,19 +76,18 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 	while (1)
 	{
 		str = readline("minishell$> ");
-		add_history(str);
 		if (str == NULL)
 		{
 			free(str);
 			break ;
 		}
+		add_history(str);
 		if (str[0] == '\n' || str[0] == '\0')
 		{
 			free(str);
 			continue ;
 		}
 		quote_and_token_handling(str, find_first_quote(str), &tokens);
-		// print_tokens(tokens);
 		if (syntax_checker(tokens))
 		{
 			free(str);
@@ -84,7 +95,6 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 			continue ;
 		}
 		readline_loop(str, envp, tokens);
-		free_tokens(tokens->first);
 	}
 	free(str);
 }

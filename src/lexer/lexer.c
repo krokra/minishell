@@ -14,35 +14,45 @@
 
 t_token	*lexer(char *input, int quote)
 {
-	t_token	*tokens;
-	t_token	*new;
-	char	*content;
+	t_token	*tokens_head;
+	t_token	*new_token;
+	char	*content_str;
 	int		i;
 
-	tokens = NULL;
+	tokens_head = NULL;
 	i = 0;
 	while (input[i])
 	{
-		content = get_token(input, &i, &quote);
-		if (!content)
+		content_str = get_token(input, &i, &quote);
+		if (!content_str)
 			break ;
-		new = create_token(content, quote);
-		if (!new)
+		new_token = create_token(content_str, quote);
+		if (!new_token)
 		{
-			free(content);
-			free_tokens(tokens->first);
+			free(content_str);
+			free_tokens(tokens_head);
 			return (NULL);
 		}
-		add_token(&tokens, new);
+		add_token(&tokens_head, new_token);
 	}
-	tokens->first = tokens;
-	set_index(tokens);
-	return (tokens);
+
+	if (tokens_head)
+	{
+		t_token *current = tokens_head;
+		while (current)
+		{
+			current->first = tokens_head;
+			current = current->next;
+		}
+	}
+	
+	set_index(tokens_head);
+	return (tokens_head);
 }
 
 void	free_tokens(t_token *tokens)
 {
-	t_token *tmp;
+	t_token	*tmp;
 
 	while (tokens)
 	{
