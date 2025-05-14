@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/07 14:00:56 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/14 11:37:46 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ void exec_cmd_tokens(t_token *tokens, char **env)
         if (pid == -1)
         {
             perror("minishell: fork");
+            close(last_heredoc_fd);
             return;
         }
         if (pid == 0)
@@ -119,13 +120,16 @@ void exec_cmd_tokens(t_token *tokens, char **env)
             if (dup2(last_heredoc_fd, STDIN_FILENO) == -1)
             {
                 perror("minishell: dup2 heredoc");
+                close(last_heredoc_fd);
                 exit(1);
             }
+            close(last_heredoc_fd);
             char **cmdtab = tokens_to_argv(tokens);
             if (cmdtab && cmdtab[0])
                 exec_cmd_common(cmdtab, env);
             exit(0);
         }
+        close(last_heredoc_fd);
         waitpid(pid, NULL, 0); 
         return;
     }
@@ -208,7 +212,6 @@ void exec_cmd_tokens(t_token *tokens, char **env)
             }
             break;
         }
-        close(pipefd[0]);
         current = current->next;
     }
 

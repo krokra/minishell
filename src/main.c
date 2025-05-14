@@ -91,12 +91,12 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
 		{
     		if (redir_applied && saved_stdout != -1)
     		{
-
+                close(saved_stdout);
     		}
-    	free(str);
-    	free_tokens(tokens->first);
-		return;
-}
+    		free(str);
+    		free_tokens(tokens->first);
+			return;
+		}
 		// Exécuter le builtin (ou la commande) pendant la redirection
 		if (!handle_builtins(envp, tokens->first))
 		{

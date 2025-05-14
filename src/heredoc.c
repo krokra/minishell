@@ -114,6 +114,5 @@ int handle_heredocs(t_token *tokens, char **env)
         }
         current_token = current_token->next;
     }
-
     return (0);
 }
