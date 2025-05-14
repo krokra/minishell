@@ -25,7 +25,8 @@ static int is_token_separator(t_token *token)
 
 static int count_arg_tokens(t_token *tokens)
 {
-    int count = 0;
+    int count;
+    count = 0;
     while (tokens && !is_token_separator(tokens))
     {
         if (is_token_argument(tokens)) count++;
@@ -36,13 +37,14 @@ static int count_arg_tokens(t_token *tokens)
 
 static char **tokens_to_argv(t_token *tokens)
 {
-    int arg_count = count_arg_tokens(tokens);
+    int arg_count;
+    char **argv;
+    int i;
+    arg_count = count_arg_tokens(tokens);
     if (arg_count == 0) return NULL;
-    
-    char **argv = malloc(sizeof(char *) * (arg_count + 1));
+    argv = malloc(sizeof(char *) * (arg_count + 1));
     if (!argv) return NULL;
-    
-    int i = 0;
+    i = 0;
     while (tokens && i < arg_count)
     {
         if (is_token_separator(tokens)) break;
@@ -86,16 +88,19 @@ void exec_cmd_tokens(t_token *tokens, char **env)
 {
     int pipefd[2];
     pid_t pid;
-    int last_heredoc_fd = -1;
-    t_token *current = tokens;
-    int prev_pipe_read = -1;
+    int last_heredoc_fd;
+    t_token *current;
+    int prev_pipe_read;
+    last_heredoc_fd = -1;
+    current = tokens;
+    prev_pipe_read = -1;
 
     // 1. Gestion des heredocs
     while (current)
     {
         if (current->type == T_HEREDOC) 
             last_heredoc_fd = current->heredoc_pipe_read_fd;
-        if (current->type == T_PIPE) 
+        if (current->type == T_PIPE)
             break;
         current = current->next;
     }
@@ -119,9 +124,9 @@ void exec_cmd_tokens(t_token *tokens, char **env)
             char **cmdtab = tokens_to_argv(tokens);
             if (cmdtab && cmdtab[0])
                 exec_cmd_common(cmdtab, env);
-            exit(0); // Assurez-vous de terminer le processus enfant après l'exécution
+            exit(0);
         }
-        waitpid(pid, NULL, 0);  // Attendre que le processus enfant termine avant de continuer
+        waitpid(pid, NULL, 0); 
         return;
     }
 
@@ -172,9 +177,8 @@ void exec_cmd_tokens(t_token *tokens, char **env)
                 close(pipefd[1]);
 
                 // Exécution de la commande (tokens pointe vers le début du segment actuel)
-                // D'abord, essayer comme un builtin
                 if (!handle_builtins(env, tokens)) 
-                { // Si ce n'est pas un builtin (ou si handle_builtins a renvoyé 0)
+                { 
                     char **cmdtab = tokens_to_argv(tokens);
                     if (cmdtab && cmdtab[0])
                     {
@@ -186,10 +190,6 @@ void exec_cmd_tokens(t_token *tokens, char **env)
                         exit(1); // Quitter si la commande est vide ou invalide
                     }
                 }
-                // Si handle_builtins a exécuté un builtin (comme echo, pwd, env), 
-                // il aura écrit sur le STDOUT (potentiellement pipé).
-                // Si c'était ft_exit, le processus enfant a déjà quitté.
-                // Dans les autres cas (echo, cd dans un subshell, etc.), l'enfant doit quitter ici.
                 exit(0); 
             }
 
@@ -208,6 +208,7 @@ void exec_cmd_tokens(t_token *tokens, char **env)
             }
             break;
         }
+        close(pipefd[0]);
         current = current->next;
     }
 
@@ -215,20 +216,19 @@ void exec_cmd_tokens(t_token *tokens, char **env)
     while (waitpid(-1, NULL, 0) > 0);
 }
 
-
 void exec_cmd(char *cmd, char **env)
 {
-    char **cmdtab = ft_split(cmd, ' ');
+    char **cmdtab;
+    cmdtab = ft_split(cmd, ' ');
     if (!cmdtab || !cmdtab[0]) return;
-
     exec_cmd_common(cmdtab, env);
 }
 
 void exec_child(int *pipefd, char **argv, char **env)
 {
-    int fd = open(argv[1], O_RDONLY, 0777);
+    int fd;
+    fd = open(argv[1], O_RDONLY, 0777);
     if (fd == -1 || argv[2][0] == '\0') return;
-    
     dup2(fd, 0);
     dup2(pipefd[1], 1);
     close(pipefd[0]);
@@ -239,9 +239,9 @@ void exec_child(int *pipefd, char **argv, char **env)
 
 void exec_parent(int *pipefd, char **argv, char **env)
 {
-    int fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    int fd;
+    fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
     if (fd == -1 || argv[3][0] == '\0') return;
-    
     dup2(fd, 1);
     dup2(pipefd[0], 0);
     close(pipefd[1]);
@@ -259,18 +259,17 @@ void fork_error(int *pipefd)
 
 void pipex(int argc, char **argv, char **env)
 {
-    (void)argc;  // Pour éviter l'erreur de compilation
     int pipefd[2];
+    pid_t pid1;
+    pid_t pid2;
+    (void)argc;  // Pour éviter l'erreur de compilation
     if (pipe(pipefd) == -1) exit(-1);
-    
-    pid_t pid1 = fork();
+    pid1 = fork();
     if (pid1 == -1) fork_error(pipefd);
     if (pid1 == 0) exec_child(pipefd, argv, env);
-
-    pid_t pid2 = fork();
+    pid2 = fork();
     if (pid2 == -1) fork_error(pipefd);
     if (pid2 == 0) exec_parent(pipefd, argv, env);
-
     close(pipefd[1]);
     close(pipefd[0]);
     waitpid(pid1, NULL, 0);

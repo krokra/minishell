@@ -25,7 +25,8 @@ SRCS := main.c \
 		src/lexer/token_parser.c \
 		src/token_syntax.c \
 		src/env_vars.c \
-		src/heredoc.c
+		src/heredoc.c \
+		src/redirections.c
 
 SRC := $(addprefix $(SRC_DIR), $(SRCS))
 INCLUDES := includes/minishell.h \

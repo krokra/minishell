@@ -16,6 +16,7 @@ static int	special_cases(char *str, char **env)
 {
 	char	*getenv;
 
+	getenv = NULL;
 	if (str == NULL || ft_strncmp(str, "~", 1) == 0)
 	{
 		getenv = ft_getenv(env, "HOME");

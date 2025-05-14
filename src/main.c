@@ -8,7 +8,7 @@
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
 /*   Updated: 2025/05/07 13:54:55 by psirault         ###   ########.fr       */
 /*                                                                            */
-/* *************************************************************************
+/* ************************************************************************** */
 
 //double leaks
 
@@ -18,7 +18,8 @@
 // Nouvelle fonction helper
 static int has_pipe(t_token *tokens)
 {
-	t_token *current = tokens;
+	t_token *current;
+	current = tokens;
 	while (current != NULL)
 	{
 		if (current->type == T_PIPE)
@@ -47,6 +48,11 @@ void	disable_ctrl_backslash(void)
 
 void	readline_loop(char *str, char **envp, t_token *tokens)
 {
+	int saved_stdout;
+	int redir_applied;
+	int last_redir;
+	t_token *redir;
+
 	replace_env_vars(tokens, envp);
 	if (handle_heredocs(tokens, envp) == -1)
 	{
@@ -55,16 +61,52 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
 		free_tokens(tokens->first);
 		return;
 	}
-
-	if (has_pipe(tokens->first)) // Vérifier sur tokens->first si la liste est chaînée via first
+	if (has_pipe(tokens->first))
 	{
 		exec_cmd_tokens(tokens->first, envp);
 	}
 	else
 	{
+		saved_stdout = -1;
+		redir_applied = 0;
+		redir = tokens->first;
+		while (redir)
+		{
+			last_redir = 0;
+			if (redir->type == T_APPEND)
+			{
+				if (saved_stdout == -1)
+					saved_stdout = dup(STDOUT_FILENO); //sauvergade sortie standard
+				if (handle_append_redirection(redir) < 0)
+				{
+					last_redir = 1; // si echou
+				}
+				else
+					last_redir = 0;
+				redir_applied = 1;
+			}
+			redir = redir->next;
+		}
+		if (last_redir < 0) //verifie si la redirection a echouer
+		{
+    		if (redir_applied && saved_stdout != -1)
+    		{
+
+    		}
+    	free(str);
+    	free_tokens(tokens->first);
+		return;
+}
+		// Exécuter le builtin (ou la commande) pendant la redirection
 		if (!handle_builtins(envp, tokens->first))
-		{		
+		{
 			exec_cmd_tokens(tokens->first, envp);
+		}
+		// Restaurer la sortie standard après
+		if (redir_applied && saved_stdout != -1)
+		{
+			dup2(saved_stdout, STDOUT_FILENO);
+			close(saved_stdout);
 		}
 	}
 	free(str);
@@ -91,8 +133,9 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 		if (syntax_checker(tokens))
 		{
 			free(str);
-			free_tokens(tokens->first);
-			continue ;
+			if (tokens != NULL)
+				free_tokens(tokens->first);
+			continue;
 		}
 		readline_loop(str, envp, tokens);
 	}

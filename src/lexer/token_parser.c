@@ -72,7 +72,7 @@ char	*get_token(char *input, int *i, int *quote __attribute__((unused)))
 			continue;
 		}
 		if (in_quote && input[*i] == quote_char)
-		{
+	{
 			in_quote = 0;
 			quote_char = 0;
 			(*i)++;
