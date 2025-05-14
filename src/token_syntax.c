@@ -36,6 +36,8 @@ int	verify_syntax(t_token *tokens)
 
 int	syntax_checker(t_token *tokens)
 {
+	if (tokens == NULL)
+		return (1);
 	if (verify_syntax(tokens))
 	{
 		printf("Syntax error\n");

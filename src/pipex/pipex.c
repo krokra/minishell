@@ -35,6 +35,16 @@ static int count_arg_tokens(t_token *tokens)
     return count;
 }
 
+static void cleanup(char **cmdtab, char **env, t_token *tokens)
+{
+    if (cmdtab)
+        ft_free(cmdtab);
+    if (env)
+        ft_free(env);
+    if (tokens)
+        free_tokens(tokens);
+}
+
 static char **tokens_to_argv(t_token *tokens)
 {
     int arg_count;
@@ -60,7 +70,7 @@ static char **tokens_to_argv(t_token *tokens)
     return argv;
 }
 
-static void exec_cmd_common(char **cmdtab, char **env)
+static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens)
 {
     char *path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
     if (!path)
@@ -68,7 +78,7 @@ static void exec_cmd_common(char **cmdtab, char **env)
         ft_putstr_fd("minishell: command not found: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
         free(path);
-        ft_free(cmdtab);
+        cleanup(cmdtab, env, tokens);
         exit(127);
     }
     if (execve(path, cmdtab, env) == -1)
@@ -76,7 +86,7 @@ static void exec_cmd_common(char **cmdtab, char **env)
         ft_putstr_fd("minishell: error executing command: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
         free(path);
-        ft_free(cmdtab);
+        cleanup(cmdtab, env, tokens);
         exit(126);
     }
     free(path);
@@ -121,12 +131,14 @@ void exec_cmd_tokens(t_token *tokens, char **env)
             {
                 perror("minishell: dup2 heredoc");
                 close(last_heredoc_fd);
+                cleanup(NULL, env, tokens);
                 exit(1);
             }
             close(last_heredoc_fd);
             char **cmdtab = tokens_to_argv(tokens);
             if (cmdtab && cmdtab[0])
-                exec_cmd_common(cmdtab, env);
+                exec_cmd_common(cmdtab, env, tokens);
+            cleanup(cmdtab, env, tokens);
             exit(0);
         }
         close(last_heredoc_fd);
@@ -185,15 +197,9 @@ void exec_cmd_tokens(t_token *tokens, char **env)
                 { 
                     char **cmdtab = tokens_to_argv(tokens);
                     if (cmdtab && cmdtab[0])
-                    {
-                        exec_cmd_common(cmdtab, env); // exec_cmd_common gère l'exit
-                    }
-                    else
-                    {
-                        if (cmdtab) ft_free(cmdtab); // Libérer si cmdtab a été alloué
-                        exit(1); // Quitter si la commande est vide ou invalide
-                    }
+                        exec_cmd_common(cmdtab, env, tokens); // exec_cmd_common gère l'exit
                 }
+                cleanup(NULL, env, tokens);
                 exit(0); 
             }
 
@@ -220,62 +226,62 @@ void exec_cmd_tokens(t_token *tokens, char **env)
     while (waitpid(-1, NULL, 0) > 0);
 }
 
-void exec_cmd(char *cmd, char **env)
-{
-    char **cmdtab;
-    cmdtab = ft_split(cmd, ' ');
-    if (!cmdtab || !cmdtab[0]) return;
-    exec_cmd_common(cmdtab, env);
-}
+// void exec_cmd(char *cmd, char **env, t_token *tokens)
+// {
+//     char **cmdtab;
+//     cmdtab = ft_split(cmd, ' ');
+//     if (!cmdtab || !cmdtab[0]) return;
+//     exec_cmd_common(cmdtab, env, tokens);
+// }
 
-void exec_child(int *pipefd, char **argv, char **env)
-{
-    int fd;
-    fd = open(argv[1], O_RDONLY, 0777);
-    if (fd == -1 || argv[2][0] == '\0') return;
-    dup2(fd, 0);
-    dup2(pipefd[1], 1);
-    close(pipefd[0]);
-    close(pipefd[1]);
-    close(fd);
-    exec_cmd(argv[2], env);
-}
+// void exec_child(int *pipefd, char **argv, char **env)
+// {
+//     int fd;
+//     fd = open(argv[1], O_RDONLY, 0777);
+//     if (fd == -1 || argv[2][0] == '\0') return;
+//     dup2(fd, 0);
+//     dup2(pipefd[1], 1);
+//     close(pipefd[0]);
+//     close(pipefd[1]);
+//     close(fd);
+//     exec_cmd(argv[2], env);
+// }
 
-void exec_parent(int *pipefd, char **argv, char **env)
-{
-    int fd;
-    fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-    if (fd == -1 || argv[3][0] == '\0') return;
-    dup2(fd, 1);
-    dup2(pipefd[0], 0);
-    close(pipefd[1]);
-    close(pipefd[0]);
-    close(fd);
-    exec_cmd(argv[3], env);
-}
+// void exec_parent(int *pipefd, char **argv, char **env)
+// {
+//     int fd;
+//     fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+//     if (fd == -1 || argv[3][0] == '\0') return;
+//     dup2(fd, 1);
+//     dup2(pipefd[0], 0);
+//     close(pipefd[1]);
+//     close(pipefd[0]);
+//     close(fd);
+//     exec_cmd(argv[3], env);
+// }
 
-void fork_error(int *pipefd)
-{
-    close(pipefd[0]);
-    close(pipefd[1]);
-    exit(-1);
-}
+// void fork_error(int *pipefd)
+// {
+//     close(pipefd[0]);
+//     close(pipefd[1]);
+//     exit(-1);
+// }
 
-void pipex(int argc, char **argv, char **env)
-{
-    int pipefd[2];
-    pid_t pid1;
-    pid_t pid2;
-    (void)argc;  // Pour éviter l'erreur de compilation
-    if (pipe(pipefd) == -1) exit(-1);
-    pid1 = fork();
-    if (pid1 == -1) fork_error(pipefd);
-    if (pid1 == 0) exec_child(pipefd, argv, env);
-    pid2 = fork();
-    if (pid2 == -1) fork_error(pipefd);
-    if (pid2 == 0) exec_parent(pipefd, argv, env);
-    close(pipefd[1]);
-    close(pipefd[0]);
-    waitpid(pid1, NULL, 0);
-    waitpid(pid2, NULL, 0);
-}
+// void pipex(int argc, char **argv, char **env)
+// {
+//     int pipefd[2];
+//     pid_t pid1;
+//     pid_t pid2;
+//     (void)argc;  // Pour éviter l'erreur de compilation
+//     if (pipe(pipefd) == -1) exit(-1);
+//     pid1 = fork();
+//     if (pid1 == -1) fork_error(pipefd);
+//     if (pid1 == 0) exec_child(pipefd, argv, env);
+//     pid2 = fork();
+//     if (pid2 == -1) fork_error(pipefd);
+//     if (pid2 == 0) exec_parent(pipefd, argv, env);
+//     close(pipefd[1]);
+//     close(pipefd[0]);
+//     waitpid(pid1, NULL, 0);
+//     waitpid(pid2, NULL, 0);
+// }

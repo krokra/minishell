@@ -7,6 +7,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
+# include <stdbool.h>
 # include "minishell.h"
 
 typedef enum e_token_type
@@ -29,6 +30,8 @@ typedef struct s_token
 	int				heredoc_pipe_read_fd;
 	struct s_token	*next;
 	struct s_token	*first;
+	int				exit_status;
+	int				status_getter;
 }					t_token;
 
 // Fonctions utils
