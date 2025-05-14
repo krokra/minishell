@@ -201,6 +201,7 @@ void exec_cmd_tokens(t_token *tokens, char **env)
             if (prev_pipe_read != -1)
                 close(prev_pipe_read);
             close(pipefd[1]);
+            close(pipefd[0]);
             prev_pipe_read = pipefd[0];
 
             // Mise à jour des tokens pour la prochaine commande
