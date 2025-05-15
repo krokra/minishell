@@ -21,13 +21,6 @@ typedef enum e_token_type
 	T_ENVVAR     // $
 }					t_token_type;
 
-typedef struct s_data
-{
-	int				exit_status;
-	int				status_getter;
-	t_token			*tokens;
-}					t_data;
-
 typedef struct s_token
 {
 	char			*content;
@@ -39,6 +32,14 @@ typedef struct s_token
 	struct s_token	*first;
 	int				prev_status;
 }					t_token;
+
+typedef struct s_data
+{
+	int				exit_status;
+	int				status_getter;
+	t_token			*tokens;
+}					t_data;
+
 
 // Fonctions utils
 char				*ft_strcat(char *dst, const char *src);
