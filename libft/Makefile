@@ -51,7 +51,8 @@ SRC := ft_isascii.c \
 			ft_rev_int_tab.c \
 			ft_is_int.c \
 			ft_count_words.c \
-			ft_strcat.c
+			ft_strcat.c \
+			ft_strcmp.c
 
 INCLUDES := libft.h
 

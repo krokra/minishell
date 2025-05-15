@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/14 11:37:46 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:14:01 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,9 @@ void exec_cmd_tokens(t_token *tokens, char **env)
             exit(0);
         }
         close(last_heredoc_fd);
-        waitpid(pid, NULL, 0); 
+        waitpid(pid, NULL, 0);
+        // if (WIFEXITED(tokens->status_getter))
+        //     tokens->exit_status = WEXITSTATUS(tokens->status_getter); 
         return;
     }
 
