@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/01 11:04:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/15 14:34:35 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,10 @@ static size_t get_var_name_len(char *str)
     return len;
 }
 
-static char *get_env_value(char *var_name, char **envp, t_token *tokens)
+static char *get_env_value(char *var_name, char **envp)
 {
     char *value;
 
-    if (var_name[0] == '?' && var_name[1] == '\0')
-        return (ft_itoa(tokens->exit_status));
     value = ft_getenv(envp, var_name);
     if (value)
         return (ft_strdup(value));
@@ -68,7 +66,7 @@ static char *get_env_value(char *var_name, char **envp, t_token *tokens)
         return (ft_strdup(""));
 }
 
-static char *replace_vars_in_str(char *str, char **envp, t_token *tokens)
+static char *replace_vars_in_str(char *str, char **envp)
 {
     char *result;
     char *start;
@@ -95,7 +93,7 @@ static char *replace_vars_in_str(char *str, char **envp, t_token *tokens)
             if (var_len > 0)
             {
                 var_name = ft_substr(str, 0, var_len);
-                value = get_env_value(var_name, envp, tokens);
+                value = get_env_value(var_name, envp);
                 result = strjoin_and_free_s1(result, value);
                 free(var_name);
                 free(value);
@@ -116,7 +114,7 @@ void replace_env_vars(t_token *tokens, char **envp)
         {
             if (!remove_quotes(tokens->content))
             {
-                char *new_content = replace_vars_in_str(tokens->content, envp, tokens);
+                char *new_content = replace_vars_in_str(tokens->content, envp);
                 free(tokens->content);
                 tokens->content = new_content;
             }
