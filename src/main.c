@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/07 13:54:55 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 13:38:36 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,30 +46,30 @@ void	disable_ctrl_backslash(void)
 	}
 }
 
-void	readline_loop(char *str, char **envp, t_token *tokens)
+void	readline_loop(char *str, char **envp, t_data *data)
 {
 	int saved_stdout;
 	int redir_applied;
 	int last_redir;
 	t_token *redir;
 
-	replace_env_vars(tokens, envp);
-	if (handle_heredocs(tokens, envp) == -1)
+	replace_env_vars(data->tokens, envp, data);
+	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
 		free(str);
-		free_tokens(tokens->first);
+		free_tokens(data->tokens->first);
 		return;
 	}
-	if (has_pipe(tokens->first))
+	if (has_pipe(data->tokens->first))
 	{
-		exec_cmd_tokens(tokens->first, envp);
+		exec_cmd_tokens(data, envp);
 	}
 	else
 	{
 		saved_stdout = -1;
 		redir_applied = 0;
-		redir = tokens->first;
+		redir = data->tokens->first;
 		while (redir)
 		{
 			last_redir = 0;
@@ -94,13 +94,13 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
                 close(saved_stdout);
     		}
     		free(str);
-    		free_tokens(tokens->first);
+    		free_tokens(data->tokens->first);
 			return;
 		}
 		// Exécuter le builtin (ou la commande) pendant la redirection
-		if (!handle_builtins(envp, tokens->first))
+		if (!handle_builtins(envp, data->tokens, data))
 		{
-			exec_cmd_tokens(tokens->first, envp);
+			exec_cmd_tokens(data, envp);
 		}
 		// Restaurer la sortie standard après
 		if (redir_applied && saved_stdout != -1)
@@ -110,10 +110,10 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
 		}
 	}
 	free(str);
-	free_tokens(tokens->first);
+	free_tokens(data->tokens->first);
 }
 
-void	mainloop(char *str, char **envp, t_token *tokens)
+void	mainloop(char *str, char **envp, t_data *data)
 {
 	while (1)
 	{
@@ -129,36 +129,46 @@ void	mainloop(char *str, char **envp, t_token *tokens)
 			free(str);
 			continue ;
 		}
-		quote_and_token_handling(str, find_first_quote(str), &tokens);
-		if (syntax_checker(tokens))
+		quote_and_token_handling(str, find_first_quote(str), &data);
+		if (syntax_checker(data->tokens))
 		{
 			free(str);
-			if (tokens != NULL)
-				free_tokens(tokens->first);
+			if (data->tokens != NULL)
+				free_tokens(data->tokens->first);
 			continue;
 		}
-		readline_loop(str, envp, tokens);
+		readline_loop(str, envp, data);
 	}
 	free(str);
 }
 
-int	main(int ac, char **av, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
 	char		*str;
 	char		**env_cpy;
 	t_token		*tokens;
+	t_data		*data;
 
+	data = malloc(sizeof(t_data));
+	if (!data)
+	{
+		perror("malloc");
+		return (1);
+	}
+	(void)argc;
+	(void)argv;
 	tokens = NULL;
+	data->tokens = tokens;
+	data->exit_status = 0;
+	data->status_getter = 0;
 	env_cpy = env_dup(envp);
-	(void)ac;
-	(void)av;
 	disable_ctrl_backslash();
 	signal_handler();
 	str = NULL;
-	mainloop(str, env_cpy, tokens);
+	mainloop(str, env_cpy, data);
 	ft_free(env_cpy);
 	free(str);
-	//free_tokens(tokens);
+	free(data);
 #ifdef __APPLE__
 	clear_history();
 #else

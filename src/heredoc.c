@@ -1,7 +1,7 @@
 #include "../includes/minishell.h"
 
 // Fonction pour traiter les variables dans une ligne de heredoc
-static char *process_heredoc_line(char *line, char **env)
+static char *process_heredoc_line(char *line, char **env, t_data *data)
 {
     char *processed_line;
     t_token *temp_token;
@@ -19,7 +19,7 @@ static char *process_heredoc_line(char *line, char **env)
     temp_token->type = T_WORD;
     temp_token->next = NULL;
     
-    replace_env_vars(temp_token, env);
+    replace_env_vars(temp_token, env, data);
     
     processed_line = ft_strdup(temp_token->content);
     
@@ -29,7 +29,7 @@ static char *process_heredoc_line(char *line, char **env)
     return (processed_line);
 }
 
-int handle_heredocs(t_token *tokens, char **env)
+int handle_heredocs(t_token *tokens, char **env, t_data *data)
 {
     t_token     *current_token;
     char        *delimiter_str;
@@ -70,7 +70,7 @@ int handle_heredocs(t_token *tokens, char **env)
                         break; 
                     }
 
-                    processed_line = process_heredoc_line(input_line, env);
+                    processed_line = process_heredoc_line(input_line, env, data);
                     free(input_line);
                     
                     if (!processed_line) {

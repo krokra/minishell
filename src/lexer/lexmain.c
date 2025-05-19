@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/30 11:55:00 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 12:58:19 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ static char	*read_until_quote_closed(char *line, int *quote)
 	return (line);
 }
 
-void	quote_and_token_handling(char *line, int quote, t_token **tokens)
+void	quote_and_token_handling(char *line, int quote, t_data **data)
 {
 	char	*result = NULL;
 
@@ -98,9 +98,7 @@ void	quote_and_token_handling(char *line, int quote, t_token **tokens)
 		}
 		line = result;
 	}
-	*tokens = lexer(line, quote);
+	(*data)->tokens = lexer(line, quote);
 	if (result)
 		free(result);
-	/*else
-		free(line);*/
 }

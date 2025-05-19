@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:49 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:21:03 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 12:53:23 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ char	**env_dup(char **envp)
 	return (new_env);
 }
 
-void	ft_env(char **strs)
+void	ft_env(char **strs, t_data *data)
 {
 	int	i;
 
@@ -45,4 +45,5 @@ void	ft_env(char **strs)
 		printf("%s\n", strs[i]);
 		i++;
 	}
+	data->exit_status = 0;
 }

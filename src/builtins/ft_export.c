@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:27 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:03:33 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 12:57:18 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ static void	update_or_add_env_var(char **env, char *name, char *val, char *var)
 	free_resources(name, val, var);
 }
 
-void	ft_export(char **env, char *arg)
+void	ft_export(char **env, char *arg, t_data *data)
 {
 	char	*name;
 	char	*value;
@@ -74,13 +74,16 @@ void	ft_export(char **env, char *arg)
 	if (!name || !value)
 	{
 		free(name);
+		data->exit_status = 1;
 		return ;
 	}
 	var = export_var(name, value);
 	if (!var)
 	{
 		free_resources(name, value, NULL);
+		data->exit_status = 1;
 		return ;
 	}
 	update_or_add_env_var(env, name, value, var);
+	data->exit_status = 0;
 }

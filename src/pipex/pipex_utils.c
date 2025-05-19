@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:09:21 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 13:01:30 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,25 +45,28 @@ char	**ft_get_paths(char *var, char **env)
 	return (NULL);
 }
 
-char	*path_of_cmd(char *cmd, char **paths)
+char *path_of_cmd(char *cmd, char **paths)
 {
-	int		i;
-	char	*str;
-	char	*str2;
+    char *path;
+    char *tmp;
+    int i;
 
-	i = 0;
-	if (!cmd || !paths)
-		return (NULL);
-	while (paths[i] != NULL)
-	{
-		str = ft_strjoin(paths[i], "/");
-		str2 = ft_strjoin(str, cmd);
-		if (access(str2, F_OK) != -1)
-			return (str2);
-		free(str);
-		free(str2);
-		i++;
-	}
-	ft_free(paths);
-	return (NULL);
+    i = 0;
+    if (!paths)
+        return (ft_strdup(cmd));
+    while (paths[i])
+    {
+        tmp = ft_strjoin(paths[i], "/");
+        path = ft_strjoin(tmp, cmd);
+        free(tmp);
+        if (access(path, F_OK | X_OK) == 0)
+        {
+            ft_free(paths);  // Free the paths array
+            return (path);
+        }
+        free(path);
+        i++;
+    }
+    ft_free(paths);  // Free the paths array if no valid path found
+    return (NULL);
 }
