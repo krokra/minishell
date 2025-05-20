@@ -54,6 +54,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	t_token *redir;
 	int	fd;
 
+	printf("[DEBUG] Avant handle_heredocs\n");
 	replace_env_vars(data->tokens, envp, data);
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
@@ -62,12 +63,15 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		free_tokens(data->tokens->first);
 		return;
 	}
+	printf("[DEBUG] Après handle_heredocs\n");
 	if (has_pipe(data->tokens->first))
 	{
+		printf("[DEBUG] has_pipe=1, appel exec_cmd_tokens\n");
 		exec_cmd_tokens(data, envp);
 	}
 	else
 	{
+		printf("[DEBUG] has_pipe=0\n");
 		saved_stdout = -1;
 		redir_applied = 0;
 		redir = data->tokens->first;
@@ -115,6 +119,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		// Exécuter le builtin (ou la commande) pendant la redirection
 		if (!handle_builtins(envp, data->tokens->first, data))
 		{
+			printf("[DEBUG] exec_cmd_tokens appelé dans else (pas de pipe)\n");
 			exec_cmd_tokens(data, envp);
 		}
 		// Restaurer la sortie standard après

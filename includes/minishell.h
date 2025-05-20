@@ -31,6 +31,7 @@
 # include <sys/wait.h>
 # include <sys/param.h>
 # include <limits.h>
+#include <fcntl.h>
 
 typedef struct s_token t_token;
 typedef struct s_data t_data;

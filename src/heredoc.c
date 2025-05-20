@@ -112,8 +112,6 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                 ft_putstr_fd("minishell: syntax error: heredoc operator needs a delimiter\n", 2);
                 return (-1);
             }
-            close(pipe_fds[0]);
-            close(pipe_fds[1]);
         }
         current_token = current_token->next;
     }
