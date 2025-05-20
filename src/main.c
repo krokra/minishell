@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/20 11:02:26 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:07:18 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	int redir_applied;
 	int last_redir;
 	t_token *redir;
+	int	fd;
 
 	replace_env_vars(data->tokens, envp, data);
 	if (handle_heredocs(data->tokens, envp, data) == -1)
@@ -88,12 +89,14 @@ void	readline_loop(char *str, char **envp, t_data *data)
 				}
 				else // T_REDIR_OUT
 				{
-					if (handle_redirections(redir) < 0)
+					fd = handle_redirections(redir);
+					if (fd < 0)
 					{
 						last_redir = 1; // si echou
 					}
 					else
 						last_redir = 0;
+					close(fd);
 				}
 				redir_applied = 1;
 			}

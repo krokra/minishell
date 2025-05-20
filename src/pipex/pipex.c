@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/20 11:09:30 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/20 13:10:26 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ static void handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
                     close(fd);
                     exit(1);
                 }
-                close(fd);
             }
+            close(fd);
         }
         current = current->next;
     }
@@ -80,7 +80,7 @@ static t_token *find_command_start_from_segment(t_token *current_segment_token)
             } else {
                 return NULL;
             }
-        } else if (current->type == T_WORD) {
+        } else if (current->type == T_WORD || current->type == T_ENVVAR) {
             return current;
         } else {
             return NULL;
@@ -289,7 +289,7 @@ void exec_cmd_tokens(t_data *data, char **env)
                 close(prev_pipe_read);
             close(pipefd[1]);
             prev_pipe_read = pipefd[0];
-
+            close(pipefd[0]);
             if (current->next)
             {
                 data->tokens = current->next;
@@ -299,6 +299,8 @@ void exec_cmd_tokens(t_data *data, char **env)
             break;
         }
         current = current->next;
+        if (prev_pipe_read != -1)
+            close(prev_pipe_read);
     }
 	while (waitpid(-1, &data->status_getter, 0) > 0);
 	if (WIFEXITED(data->status_getter))

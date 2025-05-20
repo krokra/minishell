@@ -3,7 +3,7 @@
 int handle_redirections(t_token *tokens)
 {
     int fd;
-
+    
     fd = 0;
     if (tokens->next == NULL || tokens->next->type != T_WORD)
     {
