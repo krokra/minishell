@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 13:38:52 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/20 10:49:22 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,5 +58,6 @@ char	*parse_export2(char *arg);
 void	replace_by_value(char **arg, char **envp);
 void	replace_env_vars(t_token *tokens, char **envp, t_data *data);
 int		handle_append_redirection(t_token *tokens);
+int		handle_redirections(t_token *tokens);
 
 #endif

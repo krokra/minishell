@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 13:38:36 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/20 11:02:26 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,16 +73,28 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		while (redir)
 		{
 			last_redir = 0;
-			if (redir->type == T_APPEND)
+			if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
 			{
 				if (saved_stdout == -1)
 					saved_stdout = dup(STDOUT_FILENO); //sauvergade sortie standard
-				if (handle_append_redirection(redir) < 0)
+				if (redir->type == T_APPEND)
 				{
-					last_redir = 1; // si echou
+					if (handle_append_redirection(redir) < 0)
+					{
+						last_redir = 1; // si echou
+					}
+					else
+						last_redir = 0;
 				}
-				else
-					last_redir = 0;
+				else // T_REDIR_OUT
+				{
+					if (handle_redirections(redir) < 0)
+					{
+						last_redir = 1; // si echou
+					}
+					else
+						last_redir = 0;
+				}
 				redir_applied = 1;
 			}
 			redir = redir->next;
@@ -98,7 +110,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			return;
 		}
 		// Exécuter le builtin (ou la commande) pendant la redirection
-		if (!handle_builtins(envp, data->tokens, data))
+		if (!handle_builtins(envp, data->tokens->first, data))
 		{
 			exec_cmd_tokens(data, envp);
 		}
