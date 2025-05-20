@@ -73,16 +73,28 @@ void	readline_loop(char *str, char **envp, t_token *tokens)
 		while (redir)
 		{
 			last_redir = 0;
-			if (redir->type == T_APPEND)
+			if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
 			{
 				if (saved_stdout == -1)
 					saved_stdout = dup(STDOUT_FILENO); //sauvergade sortie standard
-				if (handle_append_redirection(redir) < 0)
+				if (redir->type == T_APPEND)
 				{
-					last_redir = 1; // si echou
+					if (handle_append_redirection(redir) < 0)
+					{
+						last_redir = 1; // si echou
+					}
+					else
+						last_redir = 0;
 				}
-				else
-					last_redir = 0;
+				else // T_REDIR_OUT
+				{
+					if (handle_redirections(redir) < 0)
+					{
+						last_redir = 1; // si echou
+					}
+					else
+						last_redir = 0;
+				}
 				redir_applied = 1;
 			}
 			redir = redir->next;

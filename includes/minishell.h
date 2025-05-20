@@ -57,5 +57,6 @@ char	*parse_export2(char *arg);
 void	replace_by_value(char **arg, char **envp);
 void    replace_env_vars(t_token *tokens, char **envp);
 int		handle_append_redirection(t_token *tokens);
+int		handle_redirections(t_token *tokens);
 
 #endif

@@ -47,8 +47,6 @@ int handle_heredocs(t_token *tokens, char **env)
             if (current_token->next && current_token->next->type == T_WORD)
             {
                 delimiter_str = current_token->next->content;
-                printf("[DEBUG HEREDOC] Delimiter: [%s]\n", delimiter_str);
-
                 if (last_heredoc_fd != -1) {
                     close(last_heredoc_fd);
                     last_heredoc_fd = -1;
@@ -58,21 +56,15 @@ int handle_heredocs(t_token *tokens, char **env)
                     perror("minishell: pipe for heredoc");
                     return (-1);
                 }
-                printf("[DEBUG HEREDOC] Pipe created: read_fd=%d, write_fd=%d\n", pipe_fds[0], pipe_fds[1]);
-
                 while (1)
                 {
                     input_line = readline("> ");
                     if (input_line == NULL) {
-                        fprintf(stderr, "[DEBUG HEREDOC] readline returned NULL (EOF or error)\n");
                         close(pipe_fds[0]);
                         close(pipe_fds[1]);
                         return (-1);
                     }
-                    printf("[DEBUG HEREDOC] Read line: [%s]\n", input_line);
-
                     if (strcmp(input_line, delimiter_str) == 0) {
-                        printf("[DEBUG HEREDOC] Delimiter found. Exiting read loop.\n");
                         free(input_line);
                         break;
                     }
@@ -81,13 +73,10 @@ int handle_heredocs(t_token *tokens, char **env)
                     free(input_line);
                     
                     if (!processed_line) {
-                        fprintf(stderr, "[DEBUG HEREDOC] processed_line is NULL\n");
                         close(pipe_fds[0]);
                         close(pipe_fds[1]);
                         return (-1);
                     }
-                    printf("[DEBUG HEREDOC] Processed line to write: [%s]\n", processed_line);
-
                     if (write(pipe_fds[1], processed_line, strlen(processed_line)) == -1) {
                         perror("minishell: write to heredoc pipe");
                         free(processed_line);
@@ -105,8 +94,6 @@ int handle_heredocs(t_token *tokens, char **env)
                     
                     free(processed_line);
                 }
-
-                printf("[DEBUG HEREDOC] Closing pipe_fds[1] = %d\n", pipe_fds[1]);
                 if (close(pipe_fds[1]) == -1) {
                     perror("minishell: close heredoc pipe write-end");
                     close(pipe_fds[0]);
@@ -115,7 +102,6 @@ int handle_heredocs(t_token *tokens, char **env)
 
                 last_heredoc_fd = pipe_fds[0];
                 current_token->heredoc_pipe_read_fd = pipe_fds[0];
-                printf("[DEBUG HEREDOC] Stored read_fd = %d in token.\n", pipe_fds[0]);
             }
             else
             {

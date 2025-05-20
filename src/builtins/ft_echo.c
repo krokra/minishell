@@ -23,10 +23,10 @@ void	ft_echo(t_token *token)
 		   token->type != T_HEREDOC)
 	{
 		if (!first_arg)
-			ft_putchar_fd(' ', 1);
-		ft_putstr_fd(token->content, 1);
+			write(STDOUT_FILENO, " ", 1);
+		write(STDOUT_FILENO, token->content, ft_strlen(token->content));
 		first_arg = 0;
 		token = token->next;
 	}
-	ft_putchar_fd('\n', 1);
+	write(STDOUT_FILENO, "\n", 1);
 }

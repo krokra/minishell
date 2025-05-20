@@ -12,36 +12,79 @@
 
 #include "../../includes/pipex.h"
 
+static void handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
+{
+    t_token *current = tokens;
+    int fd;
+
+    while (current && current->type != T_PIPE)
+    {
+        if (current->type == T_REDIR_IN)
+        {
+            if (current->next && current->next->type == T_WORD)
+            {
+                fd = open(current->next->content, O_RDONLY);
+                if (fd == -1)
+                {
+                    perror("minishell: open");
+                    exit(1);
+                }
+                if (dup2(fd, STDIN_FILENO) == -1)
+                {
+                    perror("minishell: dup2");
+                    close(fd);
+                    exit(1);
+                }
+                close(fd);
+                if (*prev_pipe_read != -1)
+                {
+                    close(*prev_pipe_read);
+                    *prev_pipe_read = -1;
+                }
+            }
+        }
+        else if (current->type == T_REDIR_OUT)
+        {
+            if (current->next && current->next->type == T_WORD)
+            {
+                fd = open(current->next->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                if (fd == -1)
+                {
+                    perror("minishell: open");
+                    exit(1);
+                }
+                if (dup2(fd, STDOUT_FILENO) == -1)
+                {
+                    perror("minishell: dup2");
+                    close(fd);
+                    exit(1);
+                }
+                close(fd);
+            }
+        }
+        current = current->next;
+    }
+}
+
 static t_token *find_command_start_from_segment(t_token *current_segment_token) {
     t_token *current = current_segment_token;
 
     while (current != NULL && current->type != T_PIPE) {
-        // Check for redirection types that consume the next token if it's a T_WORD
         if (current->type == T_REDIR_IN || current->type == T_REDIR_OUT ||
             current->type == T_APPEND || current->type == T_HEREDOC) {
-            
-            // Check if there's a next token and if it's a T_WORD (filename/delimiter)
             if (current->next != NULL && current->next->type == T_WORD) {
-                current = current->next->next; // Move past the operator AND its T_WORD argument
-                continue; // Restart loop with the token after the redirection sequence
+                current = current->next->next;
+                continue;
             } else {
-                // Syntax error (e.g., ">" at end of command, or ">> |", or "<< EOF no_command")
-                // Parser should ideally catch this. If execution reaches here with such a token,
-                // it means there's no valid command following this broken redirection.
-                return NULL; 
+                return NULL;
             }
         } else if (current->type == T_WORD) {
-            // If it's not a redirection operator we're currently on, and it's a T_WORD,
-            // this is the command.
             return current;
         } else {
-            // If it's some other token type that's not a command or a known redirection operator
-            // (e.g., an unexpected T_PIPE that segment_scanner should have stopped at, or another separator),
-            // then it's not a command.
-            return NULL; 
+            return NULL;
         }
     }
-    return NULL; // Reached end of segment (or pipe) without finding a T_WORD command.
+    return NULL;
 }
 
 static int is_token_argument(t_token *token)
@@ -57,11 +100,11 @@ static int is_token_separator(t_token *token)
 
 static int count_arg_tokens(t_token *tokens)
 {
-    int count;
-    count = 0;
+    int count = 0;
     while (tokens && !is_token_separator(tokens))
     {
-        if (is_token_argument(tokens)) count++;
+        if (is_token_argument(tokens)) 
+            count++;
         tokens = tokens->next;
     }
     return count;
@@ -79,21 +122,24 @@ static void cleanup(char **cmdtab, char **env, t_token *tokens)
 
 static char **tokens_to_argv(t_token *tokens)
 {
-    int arg_count;
-    char **argv;
-    int i;
-    arg_count = count_arg_tokens(tokens);
-    if (arg_count == 0) return NULL;
-    argv = malloc(sizeof(char *) * (arg_count + 1));
-    if (!argv) return NULL;
-    i = 0;
+    int arg_count = count_arg_tokens(tokens);
+    if (arg_count == 0) 
+        return NULL;
+    
+    char **argv = malloc(sizeof(char *) * (arg_count + 1));
+    if (!argv) 
+        return NULL;
+    
+    int i = 0;
     while (tokens && i < arg_count)
     {
-        if (is_token_separator(tokens)) break;
+        if (is_token_separator(tokens)) 
+            break;
         if (is_token_argument(tokens))
         {
             argv[i] = ft_strdup(tokens->content);
-            if (!argv[i]) return NULL;
+            if (!argv[i]) 
+                return NULL;
             i++;
         }
         tokens = tokens->next;
@@ -130,13 +176,9 @@ void exec_cmd_tokens(t_token *tokens, char **env)
 {
     int pipefd[2];
     pid_t pid;
-    t_token *current;
-    int prev_pipe_read;
-    current = tokens;
-    prev_pipe_read = -1;
+    t_token *current = tokens;
+    int prev_pipe_read = -1;
 
-    // 3. Gestion des pipes multiples
-    current = tokens;
     while (current)
     {
         if (current->type == T_PIPE || current->next == NULL)
@@ -158,35 +200,32 @@ void exec_cmd_tokens(t_token *tokens, char **env)
 
             if (pid == 0)
             {
-                int current_segment_heredoc_fd;
-                t_token *segment_scanner;
+                int current_segment_heredoc_fd = -1;
+                t_token *segment_scanner = tokens;
 
-                current_segment_heredoc_fd = -1;
-                segment_scanner = tokens; // 'tokens' here is the start of the current command segment
-
-                // Scan for heredoc for the current command segment
-                while(segment_scanner != NULL && segment_scanner->type != T_PIPE) {
-                    if (segment_scanner->type == T_HEREDOC && segment_scanner->heredoc_pipe_read_fd != -1) {
-                        if (current_segment_heredoc_fd != -1) {
-                            close(current_segment_heredoc_fd); // Close previous if multiple for this segment
-                        }
+                while(segment_scanner != NULL && segment_scanner->type != T_PIPE) 
+                {
+                    if (segment_scanner->type == T_HEREDOC && segment_scanner->heredoc_pipe_read_fd != -1) 
+                    {
+                        if (current_segment_heredoc_fd != -1)
+                            close(current_segment_heredoc_fd);
                         current_segment_heredoc_fd = segment_scanner->heredoc_pipe_read_fd;
                     }
-                    // Also need to check for T_REDIR_IN here for proper precedence if < file is implemented
-                    // For now, only considering heredoc
                     segment_scanner = segment_scanner->next;
                 }
 
-                // Configuration des entrées/sorties
-                if (current_segment_heredoc_fd != -1) {
-                    if (dup2(current_segment_heredoc_fd, STDIN_FILENO) == -1) {
+                if (current_segment_heredoc_fd != -1) 
+                {
+                    if (dup2(current_segment_heredoc_fd, STDIN_FILENO) == -1) 
+                    {
                         perror("minishell: dup2 heredoc stdin");
-                        close(current_segment_heredoc_fd); // Ensure fd is closed on error
+                        close(current_segment_heredoc_fd);
                         exit(1);
                     }
-                    close(current_segment_heredoc_fd); // Close original fd after successful dup
-                    if (prev_pipe_read != -1) {
-                        close(prev_pipe_read); // Heredoc takes precedence over pipe input
+                    close(current_segment_heredoc_fd);
+                    if (prev_pipe_read != -1) 
+                    {
+                        close(prev_pipe_read);
                         prev_pipe_read = -1;
                     }
                 }
@@ -200,6 +239,8 @@ void exec_cmd_tokens(t_token *tokens, char **env)
                     close(prev_pipe_read);
                 }
 
+                handle_pipe_redirections(tokens, &prev_pipe_read);
+
                 if (current->next != NULL)
                 {
                     if (dup2(pipefd[1], STDOUT_FILENO) == -1)
@@ -212,41 +253,34 @@ void exec_cmd_tokens(t_token *tokens, char **env)
                 close(pipefd[0]);
                 close(pipefd[1]);
 
-                t_token *actual_cmd_tokens;
-                actual_cmd_tokens = find_command_start_from_segment(tokens); // 'tokens' is start of current segment
+                t_token *actual_cmd_tokens = find_command_start_from_segment(tokens);
 
-                if (actual_cmd_tokens == NULL) {
-                    // No command found, segment might be only I/O redirections (e.g., "> out < in")
-                    // or a syntax error like ">>" at the end.
-                    // Exit gracefully. If redirections failed, perror would have been called.
-                    cleanup(NULL, env, tokens); // Cleanup original segment tokens
-                    exit(0); 
+                if (actual_cmd_tokens == NULL) 
+                {
+                    cleanup(NULL, env, tokens);
+                    exit(0);
                 }
 
-                // Exécution de la commande (actual_cmd_tokens pointe vers le début de la commande réelle)
-                if (!handle_builtins(env, actual_cmd_tokens)) 
+                if (handle_builtins(env, actual_cmd_tokens)) 
+                {
+                    cleanup(NULL, env, tokens);
+                    exit(0);
+                }
+                else 
                 { 
                     char **cmdtab = tokens_to_argv(actual_cmd_tokens);
                     if (cmdtab && cmdtab[0])
-                        exec_cmd_common(cmdtab, env, tokens); // exec_cmd_common uses original 'tokens' for its own full cleanup context
-                    // else: If cmdtab is NULL but actual_cmd_tokens was not, tokens_to_argv failed for a supposedly valid command start.
-                    // This would be an internal error or an unhandled edge case in tokens_to_argv.
-                    // exec_cmd_common handles exit, so if it's not called, we need to exit.
-                    // However, if cmdtab is NULL, perhaps we should exit with an error or 0 depending on policy.
-                    // For now, if exec_cmd_common is not called because cmdtab is invalid, the process will fall through.
+                        exec_cmd_common(cmdtab, env, tokens);
                 }
-                cleanup(NULL, env, tokens); // General cleanup for the child process, using original segment tokens
-                exit(0); 
+                cleanup(NULL, env, tokens);
+                exit(0);
             }
 
-            // Dans le parent
             if (prev_pipe_read != -1)
                 close(prev_pipe_read);
             close(pipefd[1]);
-            close(pipefd[0]);
             prev_pipe_read = pipefd[0];
 
-            // Mise à jour des tokens pour la prochaine commande
             if (current->next)
             {
                 tokens = current->next;
@@ -258,7 +292,6 @@ void exec_cmd_tokens(t_token *tokens, char **env)
         current = current->next;
     }
 
-    // Attente de la fin de tous les processus
     while (waitpid(-1, NULL, 0) > 0);
 }
 
