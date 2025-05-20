@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lexer.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
+/*   Updated: 2025/05/19 12:38:11 by psirault         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef LEXER_H
 # define LEXER_H
 
@@ -9,6 +21,8 @@
 # include <unistd.h>
 # include <stdbool.h>
 # include "minishell.h"
+
+typedef struct s_data t_data;
 
 typedef enum e_token_type
 {
@@ -30,7 +44,11 @@ typedef struct s_token
 	int				heredoc_pipe_read_fd;
 	struct s_token	*next;
 	struct s_token	*first;
+<<<<<<< HEAD
 	int				prev_status;
+=======
+	t_data			*data;
+>>>>>>> 55534cf (data struct + exit statuses done)
 }					t_token;
 
 typedef struct s_data
@@ -39,7 +57,10 @@ typedef struct s_data
 	int				status_getter;
 	t_token			*tokens;
 }					t_data;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 55534cf (data struct + exit statuses done)
 
 // Fonctions utils
 char				*ft_strcat(char *dst, const char *src);
@@ -55,7 +76,7 @@ t_token				*create_token(char *content, char quote);
 void				add_token(t_token **tokens, t_token *new);
 char				*get_token(char *input, int *i, int *quote);
 void				set_token_type(t_token *token);
-void				quote_and_token_handling(char *line, int quote, t_token **tokens);
+void				quote_and_token_handling(char *line, int quote, t_data **data);
 int					find_first_quote(const char *str);
 void				set_index(t_token *tokens);
 

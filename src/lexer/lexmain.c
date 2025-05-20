@@ -6,7 +6,11 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/05/15 14:01:03 by psirault         ###   ########.fr       */
+=======
+/*   Updated: 2025/05/19 12:58:19 by psirault         ###   ########.fr       */
+>>>>>>> 55534cf (data struct + exit statuses done)
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,10 +88,11 @@ static char	*read_until_quote_closed(char *line, int *quote)
 	return (line);
 }
 
-void	quote_and_token_handling(char *line, int quote, t_token **tokens)
+void	quote_and_token_handling(char *line, int quote, t_data **data)
 {
 	char	*result = NULL;
 
+<<<<<<< HEAD
     if (quote)
     {
         result = read_until_quote_closed(line, &quote);
@@ -101,4 +106,19 @@ void	quote_and_token_handling(char *line, int quote, t_token **tokens)
     *tokens = lexer(line, quote);
 	if (result)
         free(result);
+=======
+	if (quote)
+	{
+		result = read_until_quote_closed(line, &quote);
+		if (!result)
+		{
+			free(line);
+			return ;
+		}
+		line = result;
+	}
+	(*data)->tokens = lexer(line, quote);
+	if (result)
+		free(result);
+>>>>>>> 55534cf (data struct + exit statuses done)
 }

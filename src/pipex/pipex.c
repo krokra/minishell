@@ -6,7 +6,11 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/05/15 14:14:01 by psirault         ###   ########.fr       */
+=======
+/*   Updated: 2025/05/19 13:34:02 by psirault         ###   ########.fr       */
+>>>>>>> 55534cf (data struct + exit statuses done)
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +114,10 @@ static int count_arg_tokens(t_token *tokens)
     return count;
 }
 
-static void cleanup(char **cmdtab, char **env, t_token *tokens)
+static void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 {
+	if (data)
+		free(data);
     if (cmdtab)
         ft_free(cmdtab);
     if (env)
@@ -148,15 +154,14 @@ static char **tokens_to_argv(t_token *tokens)
     return argv;
 }
 
-static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens)
+static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens, t_data *data)
 {
     char *path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
     if (!path)
     {
         ft_putstr_fd("minishell: command not found: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
-        free(path);
-        cleanup(cmdtab, env, tokens);
+        cleanup(cmdtab, env, tokens->first, data);
         exit(127);
     }
     if (execve(path, cmdtab, env) == -1)
@@ -164,21 +169,74 @@ static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens)
         ft_putstr_fd("minishell: error executing command: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
         free(path);
-        cleanup(cmdtab, env, tokens);
+        cleanup(cmdtab, env, tokens->first, data);
         exit(126);
     }
-    free(path);
-    ft_free(cmdtab);
-    exit(0);
 }
 
-void exec_cmd_tokens(t_token *tokens, char **env)
+void exec_cmd_tokens(t_data *data, char **env)
 {
     int pipefd[2];
     pid_t pid;
+<<<<<<< HEAD
     t_token *current = tokens;
     int prev_pipe_read = -1;
 
+=======
+    int last_heredoc_fd;
+    t_token *current;
+    int prev_pipe_read;
+    last_heredoc_fd = -1;
+    current = data->tokens;
+    prev_pipe_read = -1;
+
+    // 1. Gestion des heredocs
+    while (current)
+    {
+        if (current->type == T_HEREDOC) 
+            last_heredoc_fd = current->heredoc_pipe_read_fd;
+        if (current->type == T_PIPE)
+            break;
+        current = current->next;
+    }
+
+    // 2. Si on a un heredoc, le gérer
+    if (last_heredoc_fd != -1)
+    {
+        pid = fork();
+        if (pid == -1)
+        {
+            perror("minishell: fork");
+            close(last_heredoc_fd);
+            return;
+        }
+        if (pid == 0)
+        {
+            if (dup2(last_heredoc_fd, STDIN_FILENO) == -1)
+            {
+                perror("minishell: dup2 heredoc");
+                close(last_heredoc_fd);
+                cleanup(NULL, env, data->tokens, data);
+                exit(1);
+            }
+            close(last_heredoc_fd);
+            char **cmdtab = tokens_to_argv(data->tokens);
+            if (cmdtab && cmdtab[0])
+                exec_cmd_common(cmdtab, env, data->tokens, data);
+            cleanup(cmdtab, env, data->tokens, data);
+            exit(0);
+        }
+        close(last_heredoc_fd);
+        waitpid(pid, &data->status_getter, 0);
+		if (WIFEXITED(data->status_getter))
+			data->exit_status = WEXITSTATUS(data->status_getter);
+		printf("exit status: %d\n", data->exit_status);
+        return;
+    }
+
+    // 3. Gestion des pipes multiples
+    current = data->tokens;
+>>>>>>> 55534cf (data struct + exit statuses done)
     while (current)
     {
         if (current->type == T_PIPE || current->next == NULL)
@@ -253,6 +311,7 @@ void exec_cmd_tokens(t_token *tokens, char **env)
                 close(pipefd[0]);
                 close(pipefd[1]);
 
+<<<<<<< HEAD
                 t_token *actual_cmd_tokens = find_command_start_from_segment(tokens);
 
                 if (actual_cmd_tokens == NULL) 
@@ -274,6 +333,17 @@ void exec_cmd_tokens(t_token *tokens, char **env)
                 }
                 cleanup(NULL, env, tokens);
                 exit(0);
+=======
+                // Exécution de la commande (tokens pointe vers le début du segment actuel)
+                if (!handle_builtins(env, data->tokens, data)) 
+                { 
+                    char **cmdtab = tokens_to_argv(data->tokens);
+                    if (cmdtab && cmdtab[0])
+                        exec_cmd_common(cmdtab, env, data->tokens, data); // exec_cmd_common gère l'exit
+                }
+                cleanup(NULL, env, data->tokens, data);
+                exit(0); 
+>>>>>>> 55534cf (data struct + exit statuses done)
             }
 
             if (prev_pipe_read != -1)
@@ -283,8 +353,8 @@ void exec_cmd_tokens(t_token *tokens, char **env)
 
             if (current->next)
             {
-                tokens = current->next;
-                current = tokens;
+                data->tokens = current->next;
+                current = data->tokens;
                 continue;
             }
             break;
@@ -292,7 +362,14 @@ void exec_cmd_tokens(t_token *tokens, char **env)
         current = current->next;
     }
 
+<<<<<<< HEAD
     while (waitpid(-1, NULL, 0) > 0);
+=======
+    // Attente de la fin de tous les processus
+	while (waitpid(-1, &data->status_getter, 0) > 0);
+	if (WIFEXITED(data->status_getter))
+		data->exit_status = WEXITSTATUS(data->status_getter);
+>>>>>>> 55534cf (data struct + exit statuses done)
 }
 
 // void exec_cmd(char *cmd, char **env, t_token *tokens)

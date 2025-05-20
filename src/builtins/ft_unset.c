@@ -6,13 +6,13 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:01 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:16:10 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 12:50:21 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-void	ft_unset(char *name, char **env)
+void	ft_unset(char *name, char **env, t_data *data)
 {
 	int	i;
 	int	len;
@@ -32,8 +32,10 @@ void	ft_unset(char *name, char **env)
 				env[i] = env[i + 1];
 				i++;
 			}
+			data->exit_status = 0;
 			break ;
 		}
 		i++;
 	}
+	data->exit_status = 1;
 }

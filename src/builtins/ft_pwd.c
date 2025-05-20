@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:17:49 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 12:48:28 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,20 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 	free(pwd);
 }
 
-void	ft_pwd(void)
+void	ft_pwd(t_data *data)
 {
 	char	*buf;
 
 	buf = getcwd(NULL, 0);
 	if (buf != NULL)
+	{
 		printf("%s\n", buf);
+		data->exit_status = 0;
+	}
 	else
+	{
 		perror("getcwd() error");
+		data->exit_status = 1;
+	}
 	free(buf);
 }

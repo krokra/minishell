@@ -6,7 +6,11 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/05/15 14:34:35 by psirault         ###   ########.fr       */
+=======
+/*   Updated: 2025/05/19 13:34:31 by psirault         ###   ########.fr       */
+>>>>>>> 55534cf (data struct + exit statuses done)
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,10 +59,19 @@ static size_t get_var_name_len(char *str)
     return len;
 }
 
+<<<<<<< HEAD
 static char *get_env_value(char *var_name, char **envp)
 {
     char *value;
 
+=======
+static char *get_env_value(char *var_name, char **envp, t_data *data)
+{
+    char *value;
+
+    if (var_name[0] == '?' && var_name[1] == '\0')
+        return (ft_itoa(data->exit_status));
+>>>>>>> 55534cf (data struct + exit statuses done)
     value = ft_getenv(envp, var_name);
     if (value)
         return (ft_strdup(value));
@@ -66,7 +79,11 @@ static char *get_env_value(char *var_name, char **envp)
         return (ft_strdup(""));
 }
 
+<<<<<<< HEAD
 static char *replace_vars_in_str(char *str, char **envp)
+=======
+static char *replace_vars_in_str(char *str, char **envp, t_data *data)
+>>>>>>> 55534cf (data struct + exit statuses done)
 {
     char *result;
     char *start;
@@ -93,7 +110,11 @@ static char *replace_vars_in_str(char *str, char **envp)
             if (var_len > 0)
             {
                 var_name = ft_substr(str, 0, var_len);
+<<<<<<< HEAD
                 value = get_env_value(var_name, envp);
+=======
+                value = get_env_value(var_name, envp, data);
+>>>>>>> 55534cf (data struct + exit statuses done)
                 result = strjoin_and_free_s1(result, value);
                 free(var_name);
                 free(value);
@@ -103,10 +124,10 @@ static char *replace_vars_in_str(char *str, char **envp)
                 result = strjoin_and_free_s1(result, "$");
         }
     }
-    return result;
+    return (result);
 }
 
-void replace_env_vars(t_token *tokens, char **envp)
+void replace_env_vars(t_token *tokens, char **envp, t_data *data)
 {
     while (tokens)
     {
@@ -114,7 +135,11 @@ void replace_env_vars(t_token *tokens, char **envp)
         {
             if (!remove_quotes(tokens->content))
             {
+<<<<<<< HEAD
                 char *new_content = replace_vars_in_str(tokens->content, envp);
+=======
+                char *new_content = replace_vars_in_str(tokens->content, envp, data);
+>>>>>>> 55534cf (data struct + exit statuses done)
                 free(tokens->content);
                 tokens->content = new_content;
             }

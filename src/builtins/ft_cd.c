@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:58 by psirault          #+#    #+#             */
-/*   Updated: 2025/04/29 10:20:08 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/19 12:51:19 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int	special_cases(char *str, char **env)
 	return (0);
 }
 
-void	ft_cd(char *str, char **env)
+void	ft_cd(char *str, char **env, t_data *data)
 {
 	char	*pwd;
 
@@ -48,12 +48,14 @@ void	ft_cd(char *str, char **env)
 	if (pwd == NULL)
 	{
 		perror("getcwd() error");
+		data->exit_status = 1;
 		return ;
 	}
 	if ((str == NULL || ft_strncmp(str, "~", 1) == 0
 			|| ft_strncmp(str, "-", 1) == 0) && special_cases(str, env) != 0)
 	{
 		free(pwd);
+		data->exit_status = 0;
 		return ;
 	}
 	else if (chdir(str) != -1 && str != NULL)
@@ -62,8 +64,12 @@ void	ft_cd(char *str, char **env)
 		pwd = getcwd(NULL, 0);
 		pwd_update(env, pwd);
 		free(pwd);
+		data->exit_status = 0;
 		return ;
 	}
 	else
+	{
 		perror("chdir() error");
+		data->exit_status = 1;
+	}
 }
