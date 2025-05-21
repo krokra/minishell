@@ -47,17 +47,14 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
             if (current_token->next && current_token->next->type == T_WORD)
             {
                 delimiter_str = current_token->next->content;
-                
                 if (last_heredoc_fd != -1) {
                     close(last_heredoc_fd);
                     last_heredoc_fd = -1;
                 }
-
                 if (pipe(pipe_fds) == -1) {
                     perror("minishell: pipe for heredoc");
                     return (-1);
                 }
-
                 while (1)
                 {
                     input_line = readline("> ");
@@ -70,16 +67,13 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                         free(input_line);
                         break; 
                     }
-
                     processed_line = process_heredoc_line(input_line, env, data);
                     free(input_line);
-                    
                     if (!processed_line) {
                         close(pipe_fds[0]);
                         close(pipe_fds[1]);
                         return (-1);
                     }
-
                     if (write(pipe_fds[1], processed_line, strlen(processed_line)) == -1) { 
                         perror("minishell: write to heredoc pipe");
                         free(processed_line);
@@ -94,16 +88,14 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                         close(pipe_fds[1]);
                         return(-1);
                     }
-                    
                     free(processed_line);
                 }
-
-                if (close(pipe_fds[1]) == -1) {
+                if (close(pipe_fds[1]) == -1)
+                {
                     perror("minishell: close heredoc pipe write-end");
                     close(pipe_fds[0]);
                     return (-1);
                 }
-
                 last_heredoc_fd = pipe_fds[0];
                 current_token->heredoc_pipe_read_fd = pipe_fds[0];
             }

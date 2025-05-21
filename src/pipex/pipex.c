@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/20 13:10:26 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/21 09:00:46 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,12 +248,12 @@ void exec_cmd_tokens(t_data *data, char **envp)
             t_token *cmd = find_command_start_from_segment(seg);
             if (cmd && handle_builtins(envp, cmd, data))
                 exit(data->exit_status);
-
             char **argv = tokens_to_argv(cmd);
             if (argv && argv[0])
                 exec_cmd_common(argv, envp, seg, data);
-
-            exit(data->exit_status);
+            status = data->exit_status;
+            cleanup(NULL, envp, data->tokens, data);
+            exit(status);
         }
         // parent
         pids[n++] = pid;
@@ -265,8 +265,8 @@ void exec_cmd_tokens(t_data *data, char **envp)
 
     // attendre tous les enfants
     for (int i = 0; i < n; i++)
-        waitpid(pids[i], &status, 0), 
-        (WIFEXITED(status) && (data->exit_status = WEXITSTATUS(status)));
+        waitpid(pids[i], &data->status_getter, 0), 
+        (WIFEXITED(data->status_getter) && (data->exit_status = WEXITSTATUS(data->status_getter)));
 
     if (prev_pipe_read != -1)
         close(prev_pipe_read);
