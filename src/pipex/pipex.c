@@ -180,96 +180,130 @@ static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens, t_data *
     }
 }
 
-// helper : détecte s’il y a déjà un > ou >> dans ce segment
-static bool segment_has_output_redir(t_token *seg)
-{
-    while (seg && seg->type != T_PIPE)
-    {
-        if (seg->type == T_REDIR_OUT || seg->type == T_APPEND)
-            return true;
-        seg = seg->next;
-    }
-    return false;
-}
-
 void exec_cmd_tokens(t_data *data, char **envp)
 {
+    printf("\n[EXEC_CMD] Début de l'exécution des commandes\n");
     t_token *seg = data->tokens;
     int prev_pipe_read = -1;
     pid_t pids[256];
-    int n = 0, status;
+    int n = 0;
 
     while (seg)
     {
-        bool has_next = (seg->type == T_PIPE && seg->next);
+        printf("\n[EXEC_CMD] Nouveau segment de commande\n");
+        bool has_next = (seg->next && seg->next->type == T_PIPE);
         int pipefd[2];
 
         if (has_next && pipe(pipefd) < 0)
         {
+            printf("[EXEC_CMD] ERREUR: Échec de la création du pipe\n");
             perror("minishell: pipe");
             return;
         }
 
+        printf("[EXEC_CMD] Fork du processus\n");
         pid_t pid = fork();
         if (pid < 0)
         {
+            printf("[EXEC_CMD] ERREUR: Échec du fork\n");
             perror("minishell: fork");
-            if (has_next) { close(pipefd[0]); close(pipefd[1]); }
+            if (has_next)
+            {
+                close(pipefd[0]);
+                close(pipefd[1]);
+            }
             return;
         }
+
         if (pid == 0)
         {
-            // 1) entrée : heredoc ou prev_pipe_read
+            printf("[EXEC_CMD] Processus enfant %d démarré\n", getpid());
+            
+            // entrée : heredoc ou pipe précédent
             if (seg->heredoc_pipe_read_fd != -1)
             {
+                printf("[EXEC_CMD] Redirection depuis heredoc: fd=%d\n", seg->heredoc_pipe_read_fd);
                 dup2(seg->heredoc_pipe_read_fd, STDIN_FILENO);
                 close(seg->heredoc_pipe_read_fd);
-                if (prev_pipe_read != -1)
-                    close(prev_pipe_read);
             }
             else if (prev_pipe_read != -1)
             {
+                printf("[EXEC_CMD] Redirection depuis pipe précédent: fd=%d\n", prev_pipe_read);
                 dup2(prev_pipe_read, STDIN_FILENO);
                 close(prev_pipe_read);
             }
 
-            // 2) redirections <, >, >>
+            // redirections fichiers
             handle_pipe_redirections(seg, &prev_pipe_read);
 
-            // 3) pipe de sortie si pas déjà redirigé sur fichier
-            if (has_next && !segment_has_output_redir(seg))
+            // sortie vers le pipe suivant si nécessaire
+            if (has_next)
+            {
+                printf("[EXEC_CMD] Redirection vers nouveau pipe: fd=%d\n", pipefd[1]);
                 dup2(pipefd[1], STDOUT_FILENO);
+            }
 
-            // 4) fermer tous les fd superflus
-            if (has_next) { close(pipefd[0]); close(pipefd[1]); }
-            if (prev_pipe_read != -1) close(prev_pipe_read);
+            // on ferme tous les fds qu'il ne faut plus garder
+            if (has_next)
+            {
+                close(pipefd[0]);
+                close(pipefd[1]);
+            }
+            if (prev_pipe_read != -1)
+                close(prev_pipe_read);
 
-            // 5) exécution
+            // exécution
             t_token *cmd = find_command_start_from_segment(seg);
+            printf("[EXEC_CMD] Commande trouvée: %s\n", cmd ? cmd->content : "NULL");
+            
             if (cmd && handle_builtins(envp, cmd, data))
+            {
+                printf("[EXEC_CMD] Commande builtin exécutée\n");
                 exit(data->exit_status);
+            }
+
             char **argv = tokens_to_argv(cmd);
             if (argv && argv[0])
+            {
+                printf("[EXEC_CMD] Exécution de la commande: %s\n", argv[0]);
                 exec_cmd_common(argv, envp, seg, data);
-            status = data->exit_status;
-            cleanup(NULL, envp, data->tokens, data);
-            exit(status);
+            }
+
+            printf("[EXEC_CMD] Erreur d'exécution, exit avec status 1\n");
+            exit(1);
         }
-        // parent
+
+        printf("[EXEC_CMD] Processus parent: enfant %d créé\n", pid);
         pids[n++] = pid;
-        if (has_next) close(pipefd[1]);
-        if (prev_pipe_read != -1) close(prev_pipe_read);
+        if (has_next)
+            close(pipefd[1]);
+        if (prev_pipe_read != -1)
+            close(prev_pipe_read);
         prev_pipe_read = has_next ? pipefd[0] : -1;
-        seg = has_next ? seg->next : NULL;
+
+        // AVANCE : si on a une pipe, on saute le token `|`
+        seg = has_next ? seg->next->next : NULL;
     }
 
-    // attendre tous les enfants
+    printf("\n[EXEC_CMD] Attente de la fin des processus enfants\n");
     for (int i = 0; i < n; i++)
-        waitpid(pids[i], &data->status_getter, 0), 
-        (WIFEXITED(data->status_getter) && (data->exit_status = WEXITSTATUS(data->status_getter)));
+    {
+        printf("[EXEC_CMD] Attente du processus %d\n", pids[i]);
+        waitpid(pids[i], &data->status_getter, 0);
+        if (WIFEXITED(data->status_getter))
+        {
+            data->exit_status = WEXITSTATUS(data->status_getter);
+            printf("[EXEC_CMD] Processus %d terminé avec status %d\n", pids[i], data->exit_status);
+        }
+    }
 
     if (prev_pipe_read != -1)
+    {
+        printf("[EXEC_CMD] Fermeture du dernier pipe de lecture: fd=%d\n", prev_pipe_read);
         close(prev_pipe_read);
+    }
+    
+    printf("[EXEC_CMD] Fin de l'exécution des commandes\n\n");
 }
 
 // void exec_cmd(char *cmd, char **env, t_token *tokens)

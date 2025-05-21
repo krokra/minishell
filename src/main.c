@@ -48,32 +48,40 @@ void	disable_ctrl_backslash(void)
 
 void	readline_loop(char *str, char **envp, t_data *data)
 {
+	printf("[READLINE] Début du traitement de la commande\n");
 	int saved_stdout;
 	int redir_applied;
 	int last_redir;
 	t_token *redir;
 	int	fd;
 
-	printf("[DEBUG] Avant handle_heredocs\n");
+	printf("[READLINE] Remplacement des variables d'environnement\n");
 	replace_env_vars(data->tokens, envp, data);
+	
+	printf("[READLINE] Gestion des heredocs\n");
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
+		printf("[READLINE] ERREUR: Échec de la gestion des heredocs\n");
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
 		free(str);
 		free_tokens(data->tokens->first);
+		data->tokens = NULL;
 		return;
 	}
-	printf("[DEBUG] Après handle_heredocs\n");
+
 	if (has_pipe(data->tokens->first))
 	{
-		printf("[DEBUG] has_pipe=1, appel exec_cmd_tokens\n");
+		printf("[READLINE] Pipe détecté, exécution avec pipes\n");
+		saved_stdout = dup(STDOUT_FILENO);
 		exec_cmd_tokens(data, envp);
+		dup2(saved_stdout, STDOUT_FILENO);
+		close(saved_stdout);
 		if (data->tokens->heredoc_pipe_read_fd != -1)
 			close(data->tokens->heredoc_pipe_read_fd);
 	}
 	else
 	{
-		printf("[DEBUG] has_pipe=0\n");
+		printf("[READLINE] Pas de pipe, exécution simple\n");
 		saved_stdout = -1;
 		redir_applied = 0;
 		redir = data->tokens->first;
@@ -82,24 +90,23 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			last_redir = 0;
 			if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
 			{
+				printf("[READLINE] Redirection détectée\n");
 				if (saved_stdout == -1)
-					saved_stdout = dup(STDOUT_FILENO); //sauvergade sortie standard
+					saved_stdout = dup(STDOUT_FILENO);
 				if (redir->type == T_APPEND)
 				{
+					printf("[READLINE] Redirection append\n");
 					if (handle_append_redirection(redir) < 0)
-					{
-						last_redir = 1; // si echou
-					}
+						last_redir = 1;
 					else
 						last_redir = 0;
 				}
-				else // T_REDIR_OUT
+				else
 				{
+					printf("[READLINE] Redirection simple\n");
 					fd = handle_redirections(redir);
 					if (fd < 0)
-					{
-						last_redir = 1; // si echou
-					}
+						last_redir = 1;
 					else
 						last_redir = 0;
 					close(fd);
@@ -108,86 +115,118 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			}
 			redir = redir->next;
 		}
-		if (last_redir < 0) //verifie si la redirection a echouer
+		if (last_redir < 0)
 		{
-    		if (redir_applied && saved_stdout != -1)
-                close(saved_stdout);
-    		free(str);
-    		free_tokens(data->tokens->first);
+			printf("[READLINE] ERREUR: Échec de la redirection\n");
+			if (redir_applied && saved_stdout != -1)
+				close(saved_stdout);
+			free(str);
+			free_tokens(data->tokens->first);
+			data->tokens = NULL;
 			return;
 		}
-		// Exécuter le builtin (ou la commande) pendant la redirection
 		if (!handle_builtins(envp, data->tokens->first, data))
 		{
-			printf("[DEBUG] exec_cmd_tokens appelé dans else (pas de pipe)\n");
+			printf("[READLINE] Exécution de la commande\n");
 			exec_cmd_tokens(data, envp);
 		}
-		// Restaurer la sortie standard après
 		if (redir_applied && saved_stdout != -1)
 		{
+			printf("[READLINE] Restauration de la sortie standard\n");
 			dup2(saved_stdout, STDOUT_FILENO);
 			close(saved_stdout);
 		}
 		if (data->tokens->heredoc_pipe_read_fd != -1)
 			close(data->tokens->heredoc_pipe_read_fd);
 	}
+	printf("[READLINE] Nettoyage\n");
+	write(STDOUT_FILENO, "\n", 1);
 	free(str);
 	free_tokens(data->tokens->first);
+	data->tokens = NULL;
 }
 
 void	mainloop(char *str, char **envp, t_data *data)
 {
+	printf("[MAINLOOP] Démarrage de la boucle principale\n");
 	while (1)
 	{
 		str = readline("minishell$> ");
+		printf("[MAINLOOP] Ligne lue: '%s'\n", str ? str : "NULL");
 		if (str == NULL)
 		{
+			printf("[MAINLOOP] EOF détecté\n");
 			free(str);
-			break ;
+			break;
 		}
 		add_history(str);
 		if (str[0] == '\n' || str[0] == '\0')
 		{
+			printf("[MAINLOOP] Ligne vide, skip\n");
 			free(str);
-			continue ;
+			continue;
 		}
+		printf("[MAINLOOP] Traitement de la ligne\n");
+		data->tokens = NULL;  // Réinitialisation avant le traitement
 		quote_and_token_handling(str, find_first_quote(str), &data);
 		if (syntax_checker(data->tokens))
 		{
+			printf("[MAINLOOP] Erreur de syntaxe détectée\n");
 			free(str);
 			if (data->tokens != NULL)
+			{
 				free_tokens(data->tokens->first);
+				data->tokens = NULL;  // Réinitialisation après l'erreur de syntaxe
+			}
 			continue;
 		}
+		printf("[MAINLOOP] Exécution de la commande\n");
 		readline_loop(str, envp, data);
 	}
+	printf("[MAINLOOP] Fin de la boucle principale\n");
 	free(str);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	char		*str;
-	char		**env_cpy;
-	t_token		*tokens;
-	t_data		*data;
+	printf("\n[MAIN] Démarrage du programme\n");
+	printf("[MAIN] argc: %d\n", argc);
+	printf("[MAIN] envp: %p\n", (void*)envp);
+	
+	char *str;
+	char **env_cpy;
+	t_token *tokens;
+	t_data *data;
 
 	data = malloc(sizeof(t_data));
 	if (!data)
 	{
+		printf("[MAIN] ERREUR: Échec d'allocation de data\n");
 		perror("malloc");
 		return (1);
 	}
+	printf("[MAIN] Data allouée: %p\n", (void*)data);
+	
 	(void)argc;
 	(void)argv;
 	tokens = NULL;
 	data->tokens = tokens;
 	data->exit_status = 0;
 	data->status_getter = 0;
+	
+	printf("[MAIN] Copie de l'environnement\n");
 	env_cpy = env_dup(envp);
+	printf("[MAIN] Environnement copié: %p\n", (void*)env_cpy);
+	
+	printf("[MAIN] Configuration des signaux\n");
 	disable_ctrl_backslash();
 	signal_handler();
+	
 	str = NULL;
+	printf("[MAIN] Démarrage de la boucle principale\n");
 	mainloop(str, env_cpy, data);
+	
+	printf("[MAIN] Nettoyage final\n");
 	ft_free(env_cpy);
 	free(str);
 	free(data);
@@ -196,5 +235,6 @@ int	main(int argc, char **argv, char **envp)
 #else
 	rl_clear_history();
 #endif
+	printf("[MAIN] Fin du programme\n");
 	return (0);
 }
