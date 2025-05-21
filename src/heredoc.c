@@ -103,8 +103,6 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
     }
     // Close any remaining heredoc fd before returning
     if (last_heredoc_fd != -1)
-	{
         close(last_heredoc_fd);
-    }
     return (0);
 }
