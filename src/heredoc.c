@@ -51,10 +51,15 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                     close(last_heredoc_fd);
                     last_heredoc_fd = -1;
                 }
+                
                 if (pipe(pipe_fds) == -1) {
                     perror("minishell: pipe for heredoc");
                     return (-1);
                 }
+
+                // Store the read end of pipe to be closed later
+                current_token->heredoc_pipe_read_fd = pipe_fds[0];
+
                 while (1)
                 {
                     input_line = readline("> ");
@@ -90,22 +95,16 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                     }
                     free(processed_line);
                 }
-                if (close(pipe_fds[1]) == -1)
-                {
-                    perror("minishell: close heredoc pipe write-end");
-                    close(pipe_fds[0]);
-                    return (-1);
-                }
-                last_heredoc_fd = pipe_fds[0];
-                current_token->heredoc_pipe_read_fd = pipe_fds[0];
-            }
-            else
-            {
-                ft_putstr_fd("minishell: syntax error: heredoc operator needs a delimiter\n", 2);
-                return (-1);
+                // Always close write end after heredoc content is written
+                close(pipe_fds[1]);
             }
         }
         current_token = current_token->next;
+    }
+    // Close any remaining heredoc fd before returning
+    if (last_heredoc_fd != -1)
+	{
+        close(last_heredoc_fd);
     }
     return (0);
 }

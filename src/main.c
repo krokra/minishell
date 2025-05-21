@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/21 08:40:07 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/21 10:31:18 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,6 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
 		free(str);
 		free_tokens(data->tokens->first);
-		if (data->tokens->heredoc_pipe_read_fd != -1)
-			close(data->tokens->heredoc_pipe_read_fd);
 		return;
 	}
 	printf("[DEBUG] Après handle_heredocs\n");
@@ -70,6 +68,8 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	{
 		printf("[DEBUG] has_pipe=1, appel exec_cmd_tokens\n");
 		exec_cmd_tokens(data, envp);
+		if (data->tokens->heredoc_pipe_read_fd != -1)
+			close(data->tokens->heredoc_pipe_read_fd);
 	}
 	else
 	{
@@ -111,9 +111,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		if (last_redir < 0) //verifie si la redirection a echouer
 		{
     		if (redir_applied && saved_stdout != -1)
-    		{
                 close(saved_stdout);
-    		}
     		free(str);
     		free_tokens(data->tokens->first);
 			return;
@@ -130,6 +128,8 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			dup2(saved_stdout, STDOUT_FILENO);
 			close(saved_stdout);
 		}
+		if (data->tokens->heredoc_pipe_read_fd != -1)
+			close(data->tokens->heredoc_pipe_read_fd);
 	}
 	free(str);
 	free_tokens(data->tokens->first);
