@@ -44,3 +44,27 @@ int handle_append_redirection(t_token *tokens)
     close(fd);
     return fd;
 }
+
+int handle_input_redirection(t_token *tokens)
+{
+    int fd;
+    if (tokens->next == NULL || tokens->next->type != T_WORD)
+    {
+        perror("syntax error: input redirection needs a file name");
+        return (-1);
+    }
+    fd = open(tokens->next->content, O_RDONLY);
+    if (fd < 0)
+    {
+        perror("minishell: open (input)");
+        return (-1);
+    }
+    if (dup2(fd, STDIN_FILENO) < 0)
+    {
+        perror("minishell: dup2 (input)");
+        close(fd);
+        return (-1);
+    }
+    close(fd);
+    return 0;
+}

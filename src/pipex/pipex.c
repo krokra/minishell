@@ -12,42 +12,30 @@
 
 #include "../../includes/pipex.h"
 #include "../../includes/lexer.h"
+#include "../../includes/minishell.h"
 
 static void handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
 {
     t_token *current = tokens;
-    int fd;
     while (current && current->type != T_PIPE)
     {
         if (current->type == T_REDIR_IN)
         {
-            if (current->next && current->next->type == T_WORD)
+            if (handle_input_redirection(current) < 0)
             {
-                fd = open(current->next->content, O_RDONLY);
-                if (fd == -1)
-                {
-                    perror("minishell: open");
-                    exit(1);
-                }
-                if (dup2(fd, STDIN_FILENO) == -1)
-                {
-                    perror("minishell: dup2");
-                    close(fd);
-                    exit(1);
-                }
-                close(fd);
-                if (*prev_pipe_read != -1)
-                {
-                    close(*prev_pipe_read);
-                    *prev_pipe_read = -1;
-                }
+                exit(1);
+            }
+            if (prev_pipe_read && *prev_pipe_read != -1)
+            {
+                close(*prev_pipe_read);
+                *prev_pipe_read = -1;
             }
         }
         else if (current->type == T_REDIR_OUT)
         {
             if (current->next && current->next->type == T_WORD)
             {
-                fd = open(current->next->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                int fd = open(current->next->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
                 if (fd == -1)
                 {
                     perror("minishell: open");

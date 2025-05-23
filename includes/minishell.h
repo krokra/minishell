@@ -61,5 +61,6 @@ void	replace_env_vars(t_token *tokens, char **envp, t_data *data);
 int		handle_append_redirection(t_token *tokens);
 int		handle_redirections(t_token *tokens);
 char *remove_quotes(char *str);
+int		handle_input_redirection(t_token *tokens);
 
 #endif
