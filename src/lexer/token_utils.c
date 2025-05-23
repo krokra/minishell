@@ -44,6 +44,7 @@ t_token	*create_token(char *content, char quote)
 	if (!new)
 		return (NULL);
 	new->content = content;
+	printf("quote: %c\n", quote);
 	new->quotes = quote;
 	new->heredoc_pipe_read_fd = -1;
 	new->has_space_after = 0;  // Initialisé à 0 par défaut
@@ -111,7 +112,6 @@ void merge_tokens_without_space(t_token **tokens)
             free(cur->content);
             cur->content = merged;
             cur->has_space_after = cur->next->has_space_after;  // Conserver l'info d'espace du second token
-
             t_token *to_free = cur->next;
             cur->next = to_free->next;
             free(to_free->content);

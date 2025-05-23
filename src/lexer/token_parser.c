@@ -92,9 +92,6 @@ t_token	*get_token(char *input, int *i, int *quote)
 		}
 		(*i)++;
 	}
-
-	if (!in_quote)
-		*quote = 0;  // Pas de quote si on n'est pas dans une quote
 	char *content = create_token_string(input, start, *i);
 	printf("Created token: %s (quote: %c)\n", content, *quote);
 	t_token *token = create_token(content, *quote);

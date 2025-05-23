@@ -121,20 +121,28 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
 {
     while (tokens)
     {
-        // N'expande JAMAIS dans les quotes simples
-        if (tokens->quotes == '\'') {
-            // On ne touche pas au contenu
+        // Ne jamais expand si quotes simples
+        printf("tokens: %s\n", tokens->content);
+        printf("tokens->quotes: %c\n", tokens->quotes);
+        if (tokens->quotes == '\'')
+        {
+            char *stripped = remove_quotes(tokens->content);
+            free(tokens->content);
+            tokens->content = stripped;
             tokens = tokens->next;
             continue;
         }
-        // Expansion
-        char *expanded = replace_vars_in_str(tokens->content, envp, data);
-        free(tokens->content);
-        tokens->content = expanded;
-        // Retirer les quotes (sauf quotes simples déjà gérées)
+        printf("tokens: %s\n", tokens->content);
+        // D'abord, on retire les quotes (pas simples)
         char *stripped = remove_quotes(tokens->content);
         free(tokens->content);
         tokens->content = stripped;
+
+        // Puis on fait l'expansion
+        char *expanded = replace_vars_in_str(tokens->content, envp, data);
+        free(tokens->content);
+        tokens->content = expanded;
+
         tokens = tokens->next;
     }
 }
