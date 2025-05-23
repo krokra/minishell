@@ -39,11 +39,15 @@ static char	*create_token_string(char *input, int start, int end)
 	return (token);
 }
 
-char	*get_token(char *input, int *i, int *quote __attribute__((unused)))
+t_token	*get_token(char *input, int *i, int *quote)
 {
 	int	start;
 	int	in_quote = 0;
 	char	quote_char = 0;
+
+	printf("\n=== get_token ===\n");
+	printf("Input: %s\n", input);
+	printf("Position: %d\n", *i);
 
 	if (!skip_spaces(input, i))
 		return (NULL);
@@ -52,10 +56,16 @@ char	*get_token(char *input, int *i, int *quote __attribute__((unused)))
 	// Si c'est un opérateur, on le prend tout de suite
 	if (input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
 	{
+		printf("Found operator: %c\n", input[*i]);
 		if (input[*i] == input[*i + 1]) // pour << ou >>
 			(*i)++;
 		(*i)++;
-		return (create_token_string(input, start, *i));
+		*quote = 0;  // Pas de quote pour les opérateurs
+		char *content = create_token_string(input, start, *i);
+		printf("Created operator token: %s\n", content);
+		t_token *token = create_token(content, 0);
+		token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
+		return token;
 	}
 
 	// Sinon, on lit un mot ou une séquence entre quotes
@@ -66,19 +76,28 @@ char	*get_token(char *input, int *i, int *quote __attribute__((unused)))
 			break;
 		if (!in_quote && (input[*i] == '"' || input[*i] == '\''))
 		{
+			printf("Found quote: %c\n", input[*i]);
 			in_quote = 1;
 			quote_char = input[*i];
+			*quote = quote_char;  // On stocke le type de quote
 			(*i)++;
 			continue;
 		}
 		if (in_quote && input[*i] == quote_char)
-	{
+		{
+			printf("Closing quote: %c\n", quote_char);
 			in_quote = 0;
-			quote_char = 0;
 			(*i)++;
-			continue;
+			break;  // On coupe le token ici après la fermeture de la quote
 		}
 		(*i)++;
 	}
-	return (create_token_string(input, start, *i));
+
+	if (!in_quote)
+		*quote = 0;  // Pas de quote si on n'est pas dans une quote
+	char *content = create_token_string(input, start, *i);
+	printf("Created token: %s (quote: %c)\n", content, *quote);
+	t_token *token = create_token(content, *quote);
+	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
+	return token;
 }

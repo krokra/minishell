@@ -1,0 +1,15 @@
+Makefile
+djjdjdjjd.txt
+djkeide
+duehiudeh
+includes
+libft
+main.o
+minishell
+src
+supp.supp
+test.txt
+tetettetettee.txt
+tetststst.txt
+text.tctcttc
+text.txt

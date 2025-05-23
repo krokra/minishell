@@ -27,17 +27,26 @@ char *strjoin_and_free_s1(char *s1, const char *s2)
     return (joined_str);
 }
 
-static int remove_quotes(char *arg)
+char *remove_quotes(char *str)
 {
-    int len = ft_strlen(arg);
-    if (len > 1 && ((arg[0] == '\'' && arg[len - 1] == '\'') || (arg[0] == '\"' && arg[len - 1] == '\"')))
+    int i = 0, j = 0;
+    int len = ft_strlen(str);
+    char *result = malloc(len + 1); // Worst case: no quotes removed
+
+    if (!result)
+        return (NULL);
+
+    while (str[i])
     {
-        char quote_char = arg[0]; 
-        ft_memmove(arg, arg + 1, len - 2);
-        arg[len - 2] = '\0';
-        return (quote_char == '\'');
+        if (str[i] != '"' && str[i] != '\'')
+        {
+            result[j] = str[i];
+            j++;
+        }
+        i++;
     }
-    return (0);
+    result[j] = '\0';
+    return (result);
 }
 
 static int is_valid_var_char(char c)
@@ -112,15 +121,20 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
 {
     while (tokens)
     {
-        if ((tokens->type == T_ENVVAR || tokens->type == T_WORD) && tokens->content && tokens->content[0])
-        {
-            if (!remove_quotes(tokens->content))
-            {
-                char *new_content = replace_vars_in_str(tokens->content, envp, data);
-                free(tokens->content);
-                tokens->content = new_content;
-            }
+        // N'expande JAMAIS dans les quotes simples
+        if (tokens->quotes == '\'') {
+            // On ne touche pas au contenu
+            tokens = tokens->next;
+            continue;
         }
+        // Expansion
+        char *expanded = replace_vars_in_str(tokens->content, envp, data);
+        free(tokens->content);
+        tokens->content = expanded;
+        // Retirer les quotes (sauf quotes simples déjà gérées)
+        char *stripped = remove_quotes(tokens->content);
+        free(tokens->content);
+        tokens->content = stripped;
         tokens = tokens->next;
     }
 }

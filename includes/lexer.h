@@ -42,6 +42,7 @@ typedef struct s_token
 	t_token_type	type;
 	int				index;
 	int				heredoc_pipe_read_fd;
+	int				has_space_after;  // Indique si le token est suivi d'un espace dans l'input
 	struct s_token	*next;
 	struct s_token	*first;
 	t_data			*data;
@@ -66,10 +67,22 @@ int					syntax_checker(t_token *tokens);
 // Fonctions utils token
 t_token				*create_token(char *content, char quote);
 void				add_token(t_token **tokens, t_token *new);
-char				*get_token(char *input, int *i, int *quote);
+t_token				*get_token(char *input, int *i, int *quote);
 void				set_token_type(t_token *token);
 void				quote_and_token_handling(char *line, int quote, t_data **data);
 int					find_first_quote(const char *str);
 void				set_index(t_token *tokens);
+void				merge_tokens_without_space(t_token **tokens);
+void				merge_adjacent_tokens(t_token **tokens);
+void				replace_env_vars(t_token *tokens, char **envp, t_data *data);
+
+int has_output_redirection(t_token *tokens);
+int is_append(t_token *tokens);
+char *get_output_filename(t_token *tokens);
+
+t_token **split_tokens_by_pipe(t_token *tokens, int *count);
+char **build_argv_from_tokens(t_token *cmd);
+
+int get_heredoc_fd_from_segment(t_token *seg);
 
 #endif

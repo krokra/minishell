@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../../includes/pipex.h"
+#include "../../includes/lexer.h"
 
 static void handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
 {
@@ -87,29 +88,6 @@ static t_token *find_command_start_from_segment(t_token *current_segment_token)
     return NULL;
 }
 
-static int is_token_argument(t_token *token)
-{
-    return (token->type == T_WORD || token->type == T_ENVVAR) && token->content && token->content[0];
-}
-
-static int is_token_separator(t_token *token)
-{
-    return token->type == T_PIPE || token->type == T_REDIR_IN ||
-           token->type == T_REDIR_OUT || token->type == T_APPEND || token->type == T_HEREDOC;
-}
-
-static int count_arg_tokens(t_token *tokens)
-{
-    int count;
-    count = 0;
-    while (tokens && !is_token_separator(tokens))
-    {
-        if (is_token_argument(tokens)) count++;
-        tokens = tokens->next;
-    }
-    return count;
-}
-
 static void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 {
     if (data)
@@ -122,34 +100,7 @@ static void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
         free_tokens(tokens);
 }
 
-static char **tokens_to_argv(t_token *tokens)
-{
-    int arg_count;
-    char **argv;
-    int i;
-    arg_count = count_arg_tokens(tokens);
-    if (arg_count == 0)
-        return NULL;
-    argv = malloc(sizeof(char *) * (arg_count + 1));
-    if (!argv)
-        return NULL;
-    i = 0;
-    while (tokens && i < arg_count)
-    {
-        if (is_token_separator(tokens))
-            break;
-        if (is_token_argument(tokens))
-        {
-            argv[i] = ft_strdup(tokens->content);
-            if (!argv[i])
-                return NULL;
-            i++;
-        }
-        tokens = tokens->next;
-    }
-    argv[i] = NULL;
-    return (argv);
-}
+
 
 static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens, t_data *data)
 {
@@ -158,7 +109,7 @@ static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens, t_data *
     {
         ft_putstr_fd("minishell: command not found: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
-        cleanup(cmdtab, env, tokens->first, data);
+        cleanup(cmdtab, env, tokens, data);
         exit(127);
     }
     if (execve(path, cmdtab, env) == -1)
@@ -166,7 +117,7 @@ static void exec_cmd_common(char **cmdtab, char **env, t_token *tokens, t_data *
         ft_putstr_fd("minishell: error executing command: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
         free(path);
-        cleanup(cmdtab, env, tokens->first, data);
+        cleanup(cmdtab, env, tokens, data);
         exit(126);
     }
 }
@@ -191,83 +142,66 @@ static void perror_exit(const char *msg)
 
 void exec_cmd_tokens(t_data *data, char **envp)
 {
-    t_token *seg = data->tokens;
-    int      prev_pipe_read = -1;
-    pid_t    pids[256];
-    int      n = 0;
-
-    while (seg)
+    int n_cmds = 0;
+    t_token **cmds = split_tokens_by_pipe(data->tokens, &n_cmds);
+    int prev_pipe_read = -1;
+    pid_t pids[256];
+    int pipefd[2];
+    for (int i = 0; i < n_cmds; i++)
     {
-        // 1) trouver le prochain '|' dans toute la liste
-        t_token *next_pipe = seg;
-        while (next_pipe && next_pipe->type != T_PIPE)
-            next_pipe = next_pipe->next;
-        bool has_next = (next_pipe != NULL);
-
-        // 2) créer le pipe si besoin
-        int pipefd[2];
+        int has_next = (i < n_cmds - 1);
         if (has_next && pipe(pipefd) < 0)
             perror_exit("minishell: pipe");
-
-        // 3) fork
         pid_t pid = fork();
         if (pid < 0)
             perror_exit("minishell: fork");
-
         if (pid == 0)
         {
-            // enfant : STDIN ← heredoc ou prev_pipe_read
-            if (seg->heredoc_pipe_read_fd != -1)
-                dup2_and_close(seg->heredoc_pipe_read_fd, STDIN_FILENO);
+            int heredoc_fd = get_heredoc_fd_from_segment(cmds[i]);
+            if (heredoc_fd != -1)
+                dup2_and_close(heredoc_fd, STDIN_FILENO);
             else if (prev_pipe_read != -1)
                 dup2_and_close(prev_pipe_read, STDIN_FILENO);
-
-            // redirections fichiers (<, >, >>)
-            handle_pipe_redirections(seg, &prev_pipe_read);
-
-            // STDOUT → pipefd[1] si on a un segment suivant
+            handle_pipe_redirections(cmds[i], &prev_pipe_read);
+            if (!has_next && has_output_redirection(cmds[i])) {
+                char *filename = get_output_filename(cmds[i]);
+                int flags = is_append(cmds[i]) ? O_CREAT | O_WRONLY | O_APPEND
+                                               : O_CREAT | O_WRONLY | O_TRUNC;
+                int fd = open(filename, flags, 0644);
+                if (fd < 0) { perror("open"); exit(1); }
+                dup2(fd, STDOUT_FILENO);
+                close(fd);
+            }
             if (has_next)
                 dup2_and_close(pipefd[1], STDOUT_FILENO);
-
-            // fermer les descripteurs non utilisés
             if (has_next)
                 close(pipefd[0]);
             if (prev_pipe_read != -1)
                 close(prev_pipe_read);
-
-            // 4) exécuter la commande
-            t_token *cmd = find_command_start_from_segment(seg);
+            t_token *cmd = find_command_start_from_segment(cmds[i]);
             if (cmd && handle_builtins(envp, cmd, data))
                 exit(data->exit_status);
-            char **argv = tokens_to_argv(cmd);
-            exec_cmd_common(argv, envp, seg, data);
-
-            // si exec échoue
+            t_token *cmd_start = find_command_start_from_segment(cmds[i]);
+            char **argv = build_argv_from_tokens(cmd_start);
+            exec_cmd_common(argv, envp, cmds[i], data);
             exit(1);
         }
-
-        // parent : on garde le pid, on ferme la sortie du pipe et l'ancien prev_pipe_read
-        pids[n++] = pid;
+        pids[i] = pid;
         if (has_next)
             close(pipefd[1]);
         if (prev_pipe_read != -1)
             close(prev_pipe_read);
         prev_pipe_read = has_next ? pipefd[0] : -1;
-
-        // 5) avancer au segment suivant (on saute le token '|')
-        seg = has_next ? next_pipe->next : NULL;
     }
-
-    // 6) attendre tous les enfants
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n_cmds; i++)
     {
         waitpid(pids[i], &data->status_getter, 0);
         if (WIFEXITED(data->status_getter))
             data->exit_status = WEXITSTATUS(data->status_getter);
     }
-
     if (prev_pipe_read != -1)
         close(prev_pipe_read);
+    free(cmds);
 }
 
 // void exec_cmd(char *cmd, char **env, t_token *tokens)

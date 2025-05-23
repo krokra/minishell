@@ -15,20 +15,6 @@
 #include "../includes/minishell.h"
 #include <signal.h>
 
-// Nouvelle fonction helper
-static int has_pipe(t_token *tokens)
-{
-	t_token *current;
-	current = tokens;
-	while (current != NULL)
-	{
-		if (current->type == T_PIPE)
-			return (1);
-		current = current->next;
-	}
-	return (0);
-}
-
 void	disable_ctrl_backslash(void)
 {
 	struct termios	term;
@@ -54,7 +40,10 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	t_token *redir;
 	int	fd;
 
+	// Expansion d'abord
 	replace_env_vars(data->tokens, envp, data);
+	// Merge APRÈS expansion et retrait des quotes
+	merge_tokens_without_space(&data->tokens);
 	
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
@@ -65,7 +54,28 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		return;
 	}
 
-	if (has_pipe(data->tokens->first))
+	// Vérification de la syntaxe des pipes
+	t_token *current = data->tokens->first;
+	int pipe_count = 0;
+	while (current)
+	{
+		if (current->type == T_PIPE)
+		{
+			pipe_count++;
+			// Vérifier qu'il y a une commande avant et après le pipe
+			if (!current->next || current->next->type == T_PIPE)
+			{
+				ft_putstr_fd("minishell: syntax error near unexpected token '|'\n", 2);
+				free(str);
+				free_tokens(data->tokens->first);
+				data->tokens = NULL;
+				return;
+			}
+		}
+		current = current->next;
+	}
+
+	if (pipe_count > 0)
 	{
 		saved_stdout = dup(STDOUT_FILENO);
 		exec_cmd_tokens(data, envp);

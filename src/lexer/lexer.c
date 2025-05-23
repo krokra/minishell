@@ -14,27 +14,18 @@
 
 t_token	*lexer(char *input, int quote)
 {
-
 	t_token	*tokens_head;
-	t_token	*new_token;
-	char	*content_str;
+	t_token	*token;
 	int		i;
 
 	tokens_head = NULL;
 	i = 0;
 	while (input[i])
 	{
-		content_str = get_token(input, &i, &quote);
-		if (!content_str)
+		token = get_token(input, &i, &quote);
+		if (!token)
 			break;
-		new_token = create_token(content_str, quote);
-		if (!new_token)
-		{
-			free(content_str);
-			free_tokens(tokens_head);
-			return (NULL);
-		}
-		add_token(&tokens_head, new_token);
+		add_token(&tokens_head, token);
 	}
 
 	if (tokens_head)
