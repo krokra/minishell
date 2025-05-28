@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 11:54:58 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 13:58:55 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,14 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	t_token *redir;
 	int	fd;
 
-	// Expansion d'abord
+	// 1. Expansion des variables (en préservant les quotes simples)
 	replace_env_vars(data->tokens, envp, data);
-	// Merge APRÈS expansion et retrait des quotes
+	
+	// 2. Fusion des tokens adjacents sans espace
 	merge_tokens_without_space(&data->tokens);
+	
+	// 3. Suppression des quotes après expansion et fusion
+	remove_quotes_after_expansion(data->tokens);
 	
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{

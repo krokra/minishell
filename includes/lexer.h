@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 11:41:38 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 13:16:44 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ void				set_index(t_token *tokens);
 void				merge_tokens_without_space(t_token **tokens);
 void				merge_adjacent_tokens(t_token **tokens);
 void				replace_env_vars(t_token *tokens, char **envp, t_data *data);
+void				remove_quotes_after_expansion(t_token *tokens);
 
 int has_output_redirection(t_token *tokens);
 int is_append(t_token *tokens);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_env.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:49 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 12:53:23 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 14:37:50 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ char	**env_dup(char **envp)
 		i++;
 	}
 	new_env[i] = NULL;
+	handle_shlvl(new_env);
 	return (new_env);
 }
 

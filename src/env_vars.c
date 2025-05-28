@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 11:14:03 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 14:44:49 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,30 @@ char *remove_quotes(char *str)
 {
     int i = 0, j = 0;
     int len = ft_strlen(str);
-    char *result = malloc(len + 1); // Worst case: no quotes removed
+    char *result = malloc(len + 1);
+    int in_quote = 0;
+    char quote_char = 0;
 
     if (!result)
         return (NULL);
 
     while (str[i])
     {
-        if (str[i] != '"' && str[i] != '\'')
+        if ((str[i] == '"' || str[i] == '\'') && !in_quote)
         {
-            result[j] = str[i];
-            j++;
+            in_quote = 1;
+            quote_char = str[i];
+            i++;
+            continue;
         }
+        if (str[i] == quote_char && in_quote)
+        {
+            in_quote = 0;
+            i++;
+            continue;
+        }
+        result[j] = str[i];
+        j++;
         i++;
     }
     result[j] = '\0';
@@ -119,31 +131,43 @@ static char *replace_vars_in_str(char *str, char **envp, t_data *data)
 
 void replace_env_vars(t_token *tokens, char **envp, t_data *data)
 {
-    while (tokens)
+    t_token *current = tokens;
+    while (current)
     {
-        // Ne jamais expand si quotes simples
-        printf("tokens: %s\n", tokens->content);
-        printf("tokens->quotes: %c\n", tokens->quotes);
-        if (tokens->quotes == '\'')
+        printf("Processing token: %s (quote: %c)\n", current->content, current->quotes);
+        
+        // Si c'est une quote simple, on ne fait pas d'expansion
+        if (current->quotes == '\'')
         {
-            char *stripped = remove_quotes(tokens->content);
-            free(tokens->content);
-            tokens->content = stripped;
-            tokens = tokens->next;
+            printf("Single quote detected, skipping expansion\n");
+            current = current->next;
             continue;
         }
-        printf("tokens: %s\n", tokens->content);
-        // D'abord, on retire les quotes (pas simples)
-        char *stripped = remove_quotes(tokens->content);
-        free(tokens->content);
-        tokens->content = stripped;
-
-        // Puis on fait l'expansion
-        char *expanded = replace_vars_in_str(tokens->content, envp, data);
-        free(tokens->content);
-        tokens->content = expanded;
-
-        tokens = tokens->next;
+        
+        // Pour les doubles quotes ou sans quote, on fait l'expansion
+        char *expanded = replace_vars_in_str(current->content, envp, data);
+        if (expanded)
+        {
+            // Si le contenu expansé contient des espaces, on le re-tokenise
+            if (ft_strchr(expanded, ' '))
+            {
+                t_token *new_tokens = lexer(expanded, 0);
+                if (new_tokens)
+                {
+                    // On remplace le token actuel par les nouveaux tokens
+                    current->content = new_tokens->content;
+                    current->next = new_tokens->next;
+                    free(expanded);
+                    free(new_tokens);
+                }
+            }
+            else
+            {
+                free(current->content);
+                current->content = expanded;
+            }
+        }
+        current = current->next;
     }
 }
 
@@ -164,3 +188,92 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
 //         current = current->next;
 //     }
 // }
+
+static int is_valid_shlvl(const char *value)
+{
+    int i = 0;
+    
+    if (!value)
+        return (0);
+    while (value[i])
+    {
+        if (!ft_isdigit(value[i]))
+            return (0);
+        i++;
+    }
+    return (1);
+}
+
+void handle_shlvl(char **envp)
+{
+    char *shlvl_value;
+    int shlvl;
+    char *new_value;
+    
+    shlvl_value = ft_getenv(envp, "SHLVL");
+    if (!shlvl_value || !is_valid_shlvl(shlvl_value))
+        shlvl = 1;
+    else
+    {
+        shlvl = ft_atoi(shlvl_value) + 1;
+        if (shlvl > 999)
+            shlvl = 1;
+    }
+    new_value = ft_itoa(shlvl);
+    if (new_value)
+    {
+        if (shlvl_value)
+            ft_setenv(envp, "SHLVL", new_value, 1);
+        else
+            ft_setenv(envp, "SHLVL", new_value, 0);
+        free(new_value);
+    }
+}
+
+int ft_setenv(char **env, const char *name, const char *value, int overwrite)
+{
+    int i;
+    char *new_entry;
+    char **new_env;
+
+    if (!name || !value)
+        return (-1);
+    
+    // Vérifier si la variable existe déjà
+    i = 0;
+    while (env[i])
+    {
+        if (ft_strncmp(env[i], name, ft_strlen(name)) == 0 && env[i][ft_strlen(name)] == '=')
+        {
+            if (!overwrite)
+                return (0);
+            new_entry = ft_strjoin(name, "=");
+            new_entry = strjoin_and_free_s1(new_entry, value);
+            free(env[i]);
+            env[i] = new_entry;
+            return (0);
+        }
+        i++;
+    }
+
+    // Si la variable n'existe pas, l'ajouter
+    new_entry = ft_strjoin(name, "=");
+    new_entry = strjoin_and_free_s1(new_entry, value);
+    
+    // Trouver la première position NULL dans env
+    i = 0;
+    while (env[i])
+        i++;
+    
+    // Réallouer env pour ajouter la nouvelle variable
+    new_env = ft_realloc(env, (i + 1) * sizeof(char *), (i + 2) * sizeof(char *));
+    if (!new_env)
+    {
+        free(new_entry);
+        return (-1);
+    }
+    
+    new_env[i] = new_entry;
+    new_env[i + 1] = NULL;
+    return (0);
+}

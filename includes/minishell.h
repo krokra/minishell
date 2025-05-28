@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 12:26:46 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 14:57:48 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,7 @@
 # include <sys/param.h>
 # include <limits.h>
 #include <fcntl.h>
-#include <bits/sigaction.h>
-#include <asm-generic/signal-defs.h>
+#include <signal.h>
 
 typedef struct s_token t_token;
 typedef struct s_data t_data;
@@ -46,16 +45,17 @@ void	ft_exit(char **envp, t_token *tokens, t_data *data);
 void	ft_echo(t_token *token, t_data *data);
 int		handle_builtins(char **envp, t_token *token, t_data *data);
 char	**env_dup(char **envp);
+void	handle_shlvl(char **envp);
 void	oldpwd_update(char **env, char *new_oldpwd);
 void	pwd_update(char **env, char *new_pwd);
 void	ft_export(char **env, char *arg, t_data *data);
 void	ft_unset(char *name, char **env, t_data *data);
 char	*ft_getenv(char **env, char *name);
+int		ft_setenv(char **env, const char *name, const char *value, int overwrite);
 int		export_len(char *arg);
 void	*ft_realloc(void *dst, size_t old_size, size_t new_size);
 void	sigint_prompt(int sig);
 void	signal_handler(void);
-int		export_len(char *arg);
 char	*parse_export1(char *arg);
 char	*parse_export2(char *arg);
 void	replace_by_value(char **arg, char **envp);
