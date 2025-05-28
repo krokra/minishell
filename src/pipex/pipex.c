@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 12:26:15 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 15:32:55 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,16 +161,20 @@ void    exec_cmd_tokens(t_data *data, char **envp)
     int prev_pipe_read = -1;
     pid_t pids[256];
     int pipefd[2];
+	int	sig;
+	
     for (int i = 0; i < n_cmds; i++)
     {
         int has_next = (i < n_cmds - 1);
         if (has_next && pipe(pipefd) < 0)
             perror_exit("minishell: pipe");
+		signal(SIGINT, SIG_IGN);
         pid_t pid = fork();
         if (pid < 0)
             perror_exit("minishell: fork");
         if (pid == 0)
         {
+
             int heredoc_fd = get_heredoc_fd_from_segment(cmds[i]);
             if (heredoc_fd != -1)
                 dup2_and_close(heredoc_fd, STDIN_FILENO);
@@ -198,6 +202,8 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             t_token *cmd_start = find_command_start_from_segment(cmds[i]);
             char **argv = build_argv_from_tokens(cmd_start);
             free_tokens_tab(cmds);
+			signal(SIGINT, SIG_DFL);
+			signal(SIGQUIT, SIG_DFL);
             exec_cmd_common(argv, envp, data);
             exit(1);
         }
@@ -213,7 +219,15 @@ void    exec_cmd_tokens(t_data *data, char **envp)
         waitpid(pids[i], &data->status_getter, 0);
         if (WIFEXITED(data->status_getter))
             data->exit_status = WEXITSTATUS(data->status_getter);
+		else if (WIFSIGNALED(data->status_getter))
+		{
+    		sig = WTERMSIG(data->status_getter);
+   			data->exit_status = 128 + sig;
+    		if (sig == SIGINT)
+        	write(1, "\n", 1);
+		}
     }
+	signal(SIGINT, sigint_prompt);
     if (prev_pipe_read != -1)
         close(prev_pipe_read);
     free(cmds);
