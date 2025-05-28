@@ -6,26 +6,19 @@ static char *process_heredoc_line(char *line, char **env, t_data *data)
     char *processed_line;
     t_token *temp_token;
     
-    temp_token = malloc(sizeof(t_token));
+    temp_token = create_token(line, 0);
     if (!temp_token)
         return (NULL);
-    
-    temp_token->content = ft_strdup(line);
     if (!temp_token->content)
     {
-        free(temp_token);
+        free_tokens(temp_token);
         return (NULL);
     }
     temp_token->type = T_WORD;
     temp_token->next = NULL;
-    
     replace_env_vars(temp_token, env, data);
-    
     processed_line = ft_strdup(temp_token->content);
-    
-    free(temp_token->content);
-    free(temp_token);
-    
+    free_tokens(temp_token);
     return (processed_line);
 }
 
@@ -73,7 +66,6 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                         break; 
                     }
                     processed_line = process_heredoc_line(input_line, env, data);
-                    free(input_line);
                     if (!processed_line) {
                         close(pipe_fds[0]);
                         close(pipe_fds[1]);

@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/20 10:49:22 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 12:26:46 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@
 # include <sys/param.h>
 # include <limits.h>
 #include <fcntl.h>
+#include <bits/sigaction.h>
+#include <asm-generic/signal-defs.h>
 
 typedef struct s_token t_token;
 typedef struct s_data t_data;

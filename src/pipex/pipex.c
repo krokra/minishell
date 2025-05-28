@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/27 09:52:33 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 12:26:15 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,36 +88,25 @@ static void free_tokens_tab(t_token **tokens)
 
 static void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 {
-    // Debug prints
     fprintf(stderr, "Starting cleanup with: data=%p cmdtab=%p env=%p tokens=%p\n", 
             (void*)data, (void*)cmdtab, (void*)env, (void*)tokens);
-    
-    // Free data first
     if (data)
     {
         free(data);
         data = NULL;
     }
-
-    // Free command table
     if (cmdtab)
     {
         ft_free(cmdtab);
         cmdtab = NULL;
     }
-
-    // Free environment variables
     if (env)
     {
         ft_free(env);
         env = NULL;
     }
-
-    // Only free tokens if they haven't been freed already
     if (tokens)
     {
-        // Add this check to ensure tokens haven't been freed
-        // This assumes tokens->content is always valid when tokens is valid
         if (tokens->content)  
         {
             free_tokens(tokens);
@@ -129,11 +118,11 @@ static void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 static void exec_cmd_common(char **cmdtab, char **env, t_data *data)
 {
     char *path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
+
     if (!path)
     {
         ft_putstr_fd("minishell: command not found: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
-        // Don't pass tokens to cleanup here, as they might be freed elsewhere
         cleanup(cmdtab, env, NULL, data);
         exit(127);
     }
@@ -142,13 +131,12 @@ static void exec_cmd_common(char **cmdtab, char **env, t_data *data)
         ft_putstr_fd("minishell: error executing command: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
         free(path);
-        // Don't pass tokens to cleanup here, as they might be freed elsewhere
         cleanup(cmdtab, env, NULL, data);
         exit(126);
     }
+	
 }
 
-// helper pour dup2 + fermer l'ancienne fd
 static void dup2_and_close(int oldfd, int newfd)
 {
     if (dup2(oldfd, newfd) < 0)
@@ -166,7 +154,7 @@ static void perror_exit(const char *msg)
     exit(1);
 }
 
-void exec_cmd_tokens(t_data *data, char **envp)
+void    exec_cmd_tokens(t_data *data, char **envp)
 {
     int n_cmds = 0;
     t_token **cmds = split_tokens_by_pipe(data->tokens, &n_cmds);

@@ -12,6 +12,7 @@
 
 #include "../includes/minishell.h"
 
+
 void	sigint_prompt(int sig)
 {
 	if (sig == SIGINT)

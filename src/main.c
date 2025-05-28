@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/21 11:30:37 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 11:54:58 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	disable_ctrl_backslash(void)
 
 void	readline_loop(char *str, char **envp, t_data *data)
 {
-	int saved_stdout;
 	int redir_applied;
 	int last_redir;
 	t_token *redir;
@@ -77,16 +76,16 @@ void	readline_loop(char *str, char **envp, t_data *data)
 
 	if (pipe_count > 0)
 	{
-		saved_stdout = dup(STDOUT_FILENO);
+		data->saved_stdout = dup(STDOUT_FILENO);
 		exec_cmd_tokens(data, envp);
-		dup2(saved_stdout, STDOUT_FILENO);
-		close(saved_stdout);
+		dup2(data->saved_stdout, STDOUT_FILENO);
+		close(data->saved_stdout);
 		if (data->tokens->heredoc_pipe_read_fd != -1)
 			close(data->tokens->heredoc_pipe_read_fd);
 	}
 	else
 	{
-		saved_stdout = -1;
+		data->saved_stdout = -1;
 		redir_applied = 0;
 		redir = data->tokens->first;
 		while (redir)
@@ -94,14 +93,16 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			last_redir = 0;
 			if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
 			{
-				if (saved_stdout == -1)
-					saved_stdout = dup(STDOUT_FILENO);
+				if (data->saved_stdout == -1)
+					data->saved_stdout = dup(STDOUT_FILENO);
 				if (redir->type == T_APPEND)
 				{
-					if (handle_append_redirection(redir) < 0)
+					fd = handle_append_redirection(redir);
+					if (fd < 0)
 						last_redir = 1;
 					else
 						last_redir = 0;
+					close(fd);
 				}
 				else
 				{
@@ -118,21 +119,19 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		}
 		if (last_redir < 0)
 		{
-			if (redir_applied && saved_stdout != -1)
-				close(saved_stdout);
+			if (redir_applied && data->saved_stdout != -1)
+				close(data->saved_stdout);
 			free(str);
 			free_tokens(data->tokens->first);
 			data->tokens = NULL;
 			return;
 		}
 		if (!handle_builtins(envp, data->tokens->first, data))
-		{
 			exec_cmd_tokens(data, envp);
-		}
-		if (redir_applied && saved_stdout != -1)
+		if (redir_applied && data->saved_stdout != -1)
 		{
-			dup2(saved_stdout, STDOUT_FILENO);
-			close(saved_stdout);
+			dup2(data->saved_stdout, STDOUT_FILENO);
+			close(data->saved_stdout);
 		}
 		if (data->tokens->heredoc_pipe_read_fd != -1)
 			close(data->tokens->heredoc_pipe_read_fd);

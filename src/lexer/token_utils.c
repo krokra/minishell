@@ -6,34 +6,35 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/01 15:21:28 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 12:38:37 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/lexer.h"
 
-void    set_token_type(t_token *token)
+void	set_token_type(t_token *token)
 {
-    if ((token->quotes == '"' || token->quotes == '\'') && token->content[1] != '$')
-        token->type = T_WORD;
-    else if (ft_strncmp(token->content, "|", 2) == 0)
+	if ((token->quotes == '"' || token->quotes == '\'')
+		&& token->content[1] != '$')
+	token->type = T_WORD;
+	else if (ft_strncmp(token->content, "|", 2) == 0)
 	{
-        token->type = T_PIPE;
+		token->type = T_PIPE;
 	}
-    else if (ft_strncmp(token->content, "<", 2) == 0)
-        token->type = T_REDIR_IN;
-    else if (ft_strncmp(token->content, ">", 2) == 0)
-        token->type = T_REDIR_OUT;
-    else if (ft_strncmp(token->content, ">>", 3) == 0)
-        token->type = T_APPEND;
-    else if (ft_strncmp(token->content, "<<", 3) == 0)
-        token->type = T_HEREDOC;
-    else if (ft_strncmp(token->content, "$", 1) == 0
-            || ft_strncmp(token->content, "\"$", 2) == 0
-            || ft_strncmp(token->content, "'$", 2) == 0)
-        token->type = T_ENVVAR;
-    else
-        token->type = T_WORD;
+	else if (ft_strncmp(token->content, "<", 2) == 0)
+		token->type = T_REDIR_IN;
+	else if (ft_strncmp(token->content, ">", 2) == 0)
+		token->type = T_REDIR_OUT;
+	else if (ft_strncmp(token->content, ">>", 3) == 0)
+		token->type = T_APPEND;
+	else if (ft_strncmp(token->content, "<<", 3) == 0)
+		token->type = T_HEREDOC;
+	else if (ft_strncmp(token->content, "$", 1) == 0
+		|| ft_strncmp(token->content, "\"$", 2) == 0
+		|| ft_strncmp(token->content, "'$", 2) == 0)
+		token->type = T_ENVVAR;
+	else
+		token->type = T_WORD;
 }
 
 t_token	*create_token(char *content, char quote)
@@ -44,10 +45,9 @@ t_token	*create_token(char *content, char quote)
 	if (!new)
 		return (NULL);
 	new->content = content;
-	printf("quote: %c\n", quote);
 	new->quotes = quote;
 	new->heredoc_pipe_read_fd = -1;
-	new->has_space_after = 0;  // Initialisé à 0 par défaut
+	new->has_space_after = 0;
 	new->next = NULL;
 	set_token_type(new);
 	return (new);
@@ -69,7 +69,7 @@ void	set_index(t_token *tokens)
 
 void	add_token(t_token **tokens, t_token *new)
 {
-	t_token *current;
+	t_token	*current;
 
 	if (!*tokens)
 	{
@@ -83,45 +83,43 @@ void	add_token(t_token **tokens, t_token *new)
 	current->next = new;
 }
 
-void merge_tokens_without_space(t_token **tokens)
+void	merge_tokens_without_space(t_token **tokens)
 {
-    printf("\n=== merge_tokens_without_space ===\n");
-    t_token *cur = *tokens;
-    while (cur && cur->next)
-    {
-        printf("Current token: %s (type: %d, quote: %c, has_space_after: %d)\n", 
-            cur->content, cur->type, cur->quotes, cur->has_space_after);
-        printf("Next token: %s (type: %d, quote: %c)\n", 
-            cur->next->content, cur->next->type, cur->next->quotes);
+	t_token	*cur;
+	char	*merged;
+	t_token	*to_free;
 
-        // On ne merge pas si :
-        // 1. Il y a un espace entre les tokens
-        // 2. Le token actuel est un opérateur (PIPE, REDIR_IN, etc.)
-        // 3. Le token suivant est un opérateur
-        if (!cur->has_space_after && 
-            cur->type != T_PIPE && cur->type != T_REDIR_IN && 
-            cur->type != T_REDIR_OUT && cur->type != T_APPEND && 
-            cur->type != T_HEREDOC &&
-            cur->next->type != T_PIPE && cur->next->type != T_REDIR_IN && 
-            cur->next->type != T_REDIR_OUT && cur->next->type != T_APPEND && 
-            cur->next->type != T_HEREDOC)
-        {
-            printf("Merging tokens...\n");
-            char *merged = ft_strjoin(cur->content, cur->next->content);
-            printf("Merged result: %s\n", merged);
-            free(cur->content);
-            cur->content = merged;
-            cur->has_space_after = cur->next->has_space_after;  // Conserver l'info d'espace du second token
-            t_token *to_free = cur->next;
-            cur->next = to_free->next;
-            free(to_free->content);
-            free(to_free);
-            continue;
-        }
-        else
-            printf("Skipping merge - incompatible types or space detected\n");
-        cur = cur->next;
-    }
+	cur = *tokens;
+	printf("\n=== merge_tokens_without_space ===\n");
+	while (cur && cur->next)
+	{
+		printf("Current token: %s (type: %d, quote: %c, has_space_after: %d)\n",
+			cur->content, cur->type, cur->quotes, cur->has_space_after);
+		printf("Next token: %s (type: %d, quote: %c)\n",
+			cur->next->content, cur->next->type, cur->next->quotes);
+		if (!cur->has_space_after
+			&& cur->type != T_PIPE && cur->type != T_REDIR_IN
+			&& cur->type != T_REDIR_OUT && cur->type != T_APPEND
+			&& cur->type != T_HEREDOC && cur->next->type != T_PIPE
+			&& cur->next->type != T_REDIR_IN && cur->next->type != T_REDIR_OUT
+			&& cur->next->type != T_APPEND && cur->next->type != T_HEREDOC)
+		{
+			printf("Merging tokens...\n");
+			merged = ft_strjoin(cur->content, cur->next->content);
+			printf("Merged result: %s\n", merged);
+			free(cur->content);
+			cur->content = merged;
+			cur->has_space_after = cur->next->has_space_after;
+			to_free = cur->next;
+			cur->next = to_free->next;
+			free(to_free->content);
+			free(to_free);
+			continue ;
+		}
+		else
+			printf("Skipping merge - incompatible types or space detected\n");
+		cur = cur->next;
+	}
 }
 
 // Cette fonction est maintenant obsolète, on utilise merge_tokens_without_space à la place

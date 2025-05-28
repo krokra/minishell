@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 12:38:11 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 11:41:38 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ typedef struct s_data
 	int				exit_status;
 	int				status_getter;
 	t_token			*tokens;
+	int				saved_stdout;
 }					t_data;
 
 // Fonctions utils
