@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_parser.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 12:05:19 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 18:30:05 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,14 @@ t_token	*get_token(char *input, int *i, int *quote)
 		if (!in_quote && (input[*i] == '"' || input[*i] == '\''))
 		{
 			printf("Found quote: %c\n", input[*i]);
+			// Vérifier si c'est une séquence de guillemets vides
+			if (input[*i] == '\'' && input[*i + 1] == '\'')
+			{
+				// On ignore les guillemets simples vides et on continue avec le token suivant
+				(*i) += 2;
+				start = *i;  // On met à jour le début du token
+				continue;
+			}
 			in_quote = 1;
 			quote_char = input[*i];
 			*quote = quote_char;  // On stocke le type de quote

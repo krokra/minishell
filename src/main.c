@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 15:55:45 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/29 18:28:06 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,6 +186,7 @@ void	mainloop(char *str, char **envp, t_data *data)
 			}
 			continue;
 		}
+		print_tokens(data->tokens);
 		readline_loop(str, envp, data);
 	}
 	free(str);
