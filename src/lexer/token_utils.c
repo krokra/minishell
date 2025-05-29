@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 13:54:18 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/28 23:03:24 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,17 +212,27 @@ char **build_argv_from_tokens(t_token *cmd)
     return argv;
 }
 
-int get_heredoc_fd_from_segment(t_token *seg)
+int get_heredoc_fd_from_segment(t_token *segment)
 {
-    while (seg)
+    t_token     *current = segment;
+    int         last_fd = -1;
+
+    fprintf(stderr, "get_heredoc_fd_from_segment: starting search\n");
+    while (current && current->type != T_PIPE)
     {
-        if (seg->type == T_HEREDOC && seg->heredoc_pipe_read_fd != -1)
-            return seg->heredoc_pipe_read_fd;
-        if (seg->type == T_PIPE)
-            break; // ne dépasse pas ce segment
-        seg = seg->next;
+        if (current->type == T_HEREDOC)
+        {
+            fprintf(stderr, "Found heredoc token, fd = %d\n", current->heredoc_pipe_read_fd);
+            if (current->heredoc_pipe_read_fd != -1)
+            {
+                last_fd = current->heredoc_pipe_read_fd;
+                fprintf(stderr, "Setting last_fd to %d\n", last_fd);
+            }
+        }
+        current = current->next;
     }
-    return -1;
+    fprintf(stderr, "get_heredoc_fd_from_segment: returning fd %d\n", last_fd);
+    return last_fd;
 }
 
 void remove_quotes_after_expansion(t_token *tokens)

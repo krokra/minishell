@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 15:32:55 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:57:53 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,38 +17,39 @@
 static void handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
 {
     t_token *current = tokens;
+
     while (current && current->type != T_PIPE)
     {
-        if (current->type == T_REDIR_IN)
+        if (current->type == T_REDIR_IN && current->next)
         {
             if (handle_input_redirection(current) < 0)
-            {
                 exit(1);
-            }
             if (prev_pipe_read && *prev_pipe_read != -1)
             {
                 close(*prev_pipe_read);
                 *prev_pipe_read = -1;
             }
         }
-        else if (current->type == T_REDIR_OUT)
+        else if ((current->type == T_REDIR_OUT || current->type == T_APPEND)
+            && current->next && current->next->type == T_WORD)
         {
-            if (current->next && current->next->type == T_WORD)
+            char *filename = current->next->content;
+            int flags = (current->type == T_APPEND)
+                ? O_WRONLY | O_CREAT | O_APPEND
+                : O_WRONLY | O_CREAT | O_TRUNC;
+            int fd = open(filename, flags, 0644);
+            if (fd == -1)
             {
-                int fd = open(current->next->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                if (fd == -1)
-                {
-                    perror("minishell: open");
-                    exit(1);
-                }
-                if (dup2(fd, STDOUT_FILENO) == -1)
-                {
-                    perror("minishell: dup2");
-                    close(fd);
-                    exit(1);
-                }
-                close(fd);
+                perror("minishell: open");
+                exit(1);
             }
+            if (dup2(fd, STDOUT_FILENO) == -1)
+            {
+                perror("minishell: dup2");
+                close(fd);
+                exit(1);
+            }
+            close(fd);
         }
         current = current->next;
     }
@@ -161,49 +162,45 @@ void    exec_cmd_tokens(t_data *data, char **envp)
     int prev_pipe_read = -1;
     pid_t pids[256];
     int pipefd[2];
-	int	sig;
-	
+    int sig;
+    
     for (int i = 0; i < n_cmds; i++)
     {
         int has_next = (i < n_cmds - 1);
         if (has_next && pipe(pipefd) < 0)
             perror_exit("minishell: pipe");
-		signal(SIGINT, SIG_IGN);
+        signal(SIGINT, SIG_IGN);
         pid_t pid = fork();
         if (pid < 0)
             perror_exit("minishell: fork");
         if (pid == 0)
         {
-
             int heredoc_fd = get_heredoc_fd_from_segment(cmds[i]);
+            fprintf(stderr, "heredoc fd = %d\n", heredoc_fd);
             if (heredoc_fd != -1)
                 dup2_and_close(heredoc_fd, STDIN_FILENO);
             else if (prev_pipe_read != -1)
                 dup2_and_close(prev_pipe_read, STDIN_FILENO);
+            
+            // Gérer toutes les redirections dans l'ordre
             handle_pipe_redirections(cmds[i], &prev_pipe_read);
-            if (!has_next && has_output_redirection(cmds[i])) {
-                char *filename = get_output_filename(cmds[i]);
-                int flags = is_append(cmds[i]) ? O_CREAT | O_WRONLY | O_APPEND
-                                               : O_CREAT | O_WRONLY | O_TRUNC;
-                int fd = open(filename, flags, 0644);
-                if (fd < 0) { perror("open"); exit(1); }
-                dup2(fd, STDOUT_FILENO);
-                close(fd);
-            }
+            
             if (has_next)
                 dup2_and_close(pipefd[1], STDOUT_FILENO);
             if (has_next)
                 close(pipefd[0]);
             if (prev_pipe_read != -1)
                 close(prev_pipe_read);
+            
             t_token *cmd = find_command_start_from_segment(cmds[i]);
             if (cmd && handle_builtins(envp, cmd, data))
                 exit(data->exit_status);
+            
             t_token *cmd_start = find_command_start_from_segment(cmds[i]);
             char **argv = build_argv_from_tokens(cmd_start);
             free_tokens_tab(cmds);
-			signal(SIGINT, SIG_DFL);
-			signal(SIGQUIT, SIG_DFL);
+            signal(SIGINT, SIG_DFL);
+            signal(SIGQUIT, SIG_DFL);
             exec_cmd_common(argv, envp, data);
             exit(1);
         }
@@ -219,15 +216,15 @@ void    exec_cmd_tokens(t_data *data, char **envp)
         waitpid(pids[i], &data->status_getter, 0);
         if (WIFEXITED(data->status_getter))
             data->exit_status = WEXITSTATUS(data->status_getter);
-		else if (WIFSIGNALED(data->status_getter))
-		{
-    		sig = WTERMSIG(data->status_getter);
-   			data->exit_status = 128 + sig;
-    		if (sig == SIGINT)
-        	write(1, "\n", 1);
-		}
+        else if (WIFSIGNALED(data->status_getter))
+        {
+            sig = WTERMSIG(data->status_getter);
+            data->exit_status = 128 + sig;
+            if (sig == SIGINT)
+                write(1, "\n", 1);
+        }
     }
-	signal(SIGINT, sigint_prompt);
+    signal(SIGINT, sigint_prompt);
     if (prev_pipe_read != -1)
         close(prev_pipe_read);
     free(cmds);

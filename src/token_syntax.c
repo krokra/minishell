@@ -15,6 +15,7 @@
 int	verify_syntax(t_token *tokens)
 {
 	t_token	*current;
+	int		after_pipe = 0;
 
 	current = tokens;
 	if (tokens->type == T_PIPE)
@@ -22,7 +23,13 @@ int	verify_syntax(t_token *tokens)
 	current = current->next;
 	while (current)
 	{
-		if (current->type == T_PIPE && (!current->next || current->next->type != T_WORD || current->next->type == T_ENVVAR))
+		if (current->type == T_PIPE)
+		{
+			after_pipe = 1;
+			if (!current->next || current->next->type != T_WORD || current->next->type == T_ENVVAR)
+				return (1);
+		}
+		if (after_pipe && current->type == T_HEREDOC)
 			return (1);
 		if ((current->type == T_REDIR_IN || current->type == T_REDIR_OUT || current->type == T_APPEND)
 				&& (!current->next || (current->next->type != T_WORD && current->next->type != T_ENVVAR)))
