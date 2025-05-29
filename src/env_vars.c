@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 18:35:36 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 19:53:00 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,21 +97,41 @@ char *replace_vars_in_str(char *str, char **envp, t_data *data)
     char *value;
     char *tmp;
 
+    printf("str: %s\n", str);
     result = ft_strdup("");
     while (*str)
     {
         start = str;
         while (*str && *str != '$')
             str++;
+
         if (str > start)
         {
             tmp = ft_substr(start, 0, str - start);
             result = strjoin_and_free_s1(result, tmp);
             free(tmp);
         }
+
         if (*str == '$')
         {
             str++;
+            // 🔴 Cas spécial $"..." ou $'...' → pas d'expansion
+            if (*str == '"' || *str == '\'')
+            {
+                char quote = *str;
+                str++; // skip le guillemet
+                start = str;
+                while (*str && *str != quote)
+                    str++;
+                tmp = ft_substr(start, 0, str - start);  // contenu brut
+                result = strjoin_and_free_s1(result, tmp);
+                free(tmp);
+                if (*str == quote)
+                    str++; // skip quote de fin
+                continue;
+            }
+
+            // Cas classique d'expansion
             size_t var_len = get_var_name_len(str);
             if (var_len > 0)
             {
