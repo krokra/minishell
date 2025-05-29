@@ -6,13 +6,29 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 15:55:43 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:32:18 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/pipex.h"
 #include "../../includes/lexer.h"
 #include "../../includes/minishell.h"
+
+static int is_stdout_redirected(t_token *tokens)
+{
+    t_token *current = tokens;
+    
+    while (current && current->type != T_PIPE)
+    {
+        if ((current->type == T_REDIR_OUT || current->type == T_APPEND)
+            && current->next && current->next->type == T_WORD)
+        {
+            return 1;  // stdout est déjà redirigé
+        }
+        current = current->next;
+    }
+    return 0;  // stdout n'est pas redirigé
+}
 
 static void handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
 {
@@ -198,8 +214,10 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             handle_pipe_redirections(cmds[i], &prev_pipe_read);
             
             if (has_next) {
-                printf("[PIPEX] Child %d: Redirecting stdout to pipe\n", getpid());
-                dup2_and_close(pipefd[1], STDOUT_FILENO);
+                if (!is_stdout_redirected(cmds[i])) {
+                    printf("[PIPEX] Child %d: Redirecting stdout to pipe\n", getpid());
+                    dup2_and_close(pipefd[1], STDOUT_FILENO);
+                }
             }
             if (has_next)
                 close(pipefd[0]);

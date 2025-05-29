@@ -1,0 +1,6 @@
+[PIPEX] Child 80006: Executing command: grep
+test
+euibehje test
+test kjeheh
+testhhfhfhf
+test
