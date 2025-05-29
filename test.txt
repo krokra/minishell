@@ -1,1 +1,0 @@
-[PIPEX] Child 79233: Redirecting stdout to pipe

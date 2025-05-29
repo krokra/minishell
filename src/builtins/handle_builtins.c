@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 11:18:48 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 12:47:46 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 19:31:59 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,14 @@ int	handle_builtins(char **envp, t_token *token, t_data *data)
 {
 	if (!token)
 		return (0);
-	if (ft_strncmp(token->content, "cd", 3) == 0)
+	if (ft_strncmp(token->content, "cd", 3) == 0 && token->next != NULL)
 		ft_cd(token->next->content, envp, data);
-	else if (ft_strncmp(token->content, "export", 7) == 0)
+	else if (ft_strncmp(token->content, "cd", 3) == 0 && token->next == NULL)
+		ft_cd(NULL, envp, data);
+	else if (ft_strncmp(token->content, "export", 7) == 0 && token->next != NULL)
 		ft_export(envp, token->next->content, data);
+	else if (ft_strncmp(token->content, "export", 7) == 0 && token->next == NULL)
+		ft_export(envp, NULL, data);
 	else if (ft_strncmp(token->content, "env", 4) == 0)
 		ft_env(envp, data);
 	else if (ft_strncmp(token->content, "pwd", 4) == 0)

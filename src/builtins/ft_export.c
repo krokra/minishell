@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:27 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 12:57:18 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 19:33:11 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,11 @@ void	ft_export(char **env, char *arg, t_data *data)
 	char	*value;
 	char	*var;
 
+	if (arg == NULL)
+	{
+		ft_env(env, data);
+		return ;
+	}
 	name = parse_export1(arg);
 	value = parse_export2(arg);
 	if (!name || !value)

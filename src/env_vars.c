@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 18:24:40 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/29 18:35:36 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,31 +132,30 @@ char *replace_vars_in_str(char *str, char **envp, t_data *data)
 void replace_env_vars(t_token *tokens, char **envp, t_data *data)
 {
     t_token *current = tokens;
-	char *expanded;
-	
+    char *expanded;
+    
     while (current)
     {
         printf("Processing token: %s (quote: %c)\n", current->content, current->quotes);
-        
-        // Si c'est une quote simple, on ne fait pas d'expansion
         if (current->quotes == '\'')
         {
             printf("Single quote detected, skipping expansion\n");
             current = current->next;
             continue;
         }
-        
-        // Pour les doubles quotes ou sans quote, on fait l'expansion
         expanded = replace_vars_in_str(current->content, envp, data);
         if (expanded)
         {
-            // Si le contenu expansé contient des espaces, on le re-tokenise
-            if (ft_strchr(expanded, ' '))
+            if (current->quotes == '"')
+            {
+                free(current->content);
+                current->content = expanded;
+            }
+            else if (ft_strchr(expanded, ' '))
             {
                 t_token *new_tokens = lexer(expanded, 0);
                 if (new_tokens)
                 {
-                    // On remplace le token actuel par les nouveaux tokens
                     current->content = new_tokens->content;
                     current->next = new_tokens->next;
                     free(expanded);

@@ -1,1 +1,0 @@
-[MAIN] Handling output redirection
