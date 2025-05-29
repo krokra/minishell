@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 14:30:29 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:09:32 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static char *get_env_value(char *var_name, char **envp, t_data *data)
         return (ft_strdup(""));
 }
 
-static char *replace_vars_in_str(char *str, char **envp, t_data *data)
+char *replace_vars_in_str(char *str, char **envp, t_data *data)
 {
     char *result;
     char *start;
@@ -160,7 +160,7 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
                     current->content = new_tokens->content;
                     current->next = new_tokens->next;
                     free(expanded);
-                    free_tokens(new_tokens);
+                    free(new_tokens);
                 }
             }
             else

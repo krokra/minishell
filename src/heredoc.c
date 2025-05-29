@@ -1,25 +1,13 @@
 #include "../includes/minishell.h"
 
-// Fonction pour traiter les variables dans une ligne de heredoc
-static char *process_heredoc_line(char *line, char **env, t_data *data)
+// Fonction pour traiter les variables dans une ligne de heredoc sans tokenisation
+static char *expand_line_heredoc(char *line, char **env, t_data *data)
 {
-    char *processed_line;
-    t_token *temp_token;
-    
-    temp_token = create_token(line, 0);
-    if (!temp_token)
+    if (!line)
         return (NULL);
-    if (!temp_token->content)
-    {
-        free_tokens(temp_token);
-        return (NULL);
-    }
-    temp_token->type = T_WORD;
-    temp_token->next = NULL;
-    replace_env_vars(temp_token, env, data);
-    processed_line = ft_strdup(temp_token->content);
-    free_tokens(temp_token);
-    return (processed_line);
+    if (ft_strchr(line, '$') == NULL)
+        return (ft_strdup(line));
+    return (replace_vars_in_str(line, env, data));
 }
 
 int handle_heredocs(t_token *tokens, char **env, t_data *data)
@@ -31,16 +19,20 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
     int         pipe_fds[2];
     int         last_heredoc_fd;
 
+    printf("[HEREDOC] Starting heredoc handling\n");
     last_heredoc_fd = -1;
     current_token = tokens;
     while (current_token)
     {
         if (current_token->type == T_HEREDOC)
         {
+            printf("[HEREDOC] Found heredoc token\n");
             if (current_token->next && current_token->next->type == T_WORD)
             {
                 delimiter_str = current_token->next->content;
+                printf("[HEREDOC] Delimiter: %s\n", delimiter_str);
                 if (last_heredoc_fd != -1) {
+                    printf("[HEREDOC] Closing previous heredoc fd: %d\n", last_heredoc_fd);
                     close(last_heredoc_fd);
                     last_heredoc_fd = -1;
                 }
@@ -49,6 +41,7 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                     perror("minishell: pipe for heredoc");
                     return (-1);
                 }
+                printf("[HEREDOC] Created pipe: read=%d, write=%d\n", pipe_fds[0], pipe_fds[1]);
 
                 // Store the read end of pipe to be closed later
                 current_token->heredoc_pipe_read_fd = pipe_fds[0];
@@ -57,16 +50,20 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                 {
                     input_line = readline("> ");
                     if (input_line == NULL) { 
+                        printf("[HEREDOC] EOF received, closing pipe\n");
                         close(pipe_fds[0]);
                         close(pipe_fds[1]);
                         return (-1);
                     }
                     if (strcmp(input_line, delimiter_str) == 0) { 
+                        printf("[HEREDOC] Delimiter matched, ending heredoc\n");
                         free(input_line);
                         break; 
                     }
-                    processed_line = process_heredoc_line(input_line, env, data);
+                    printf("[HEREDOC] Processing line: %s\n", input_line);
+                    processed_line = expand_line_heredoc(input_line, env, data);
                     if (!processed_line) {
+                        printf("[HEREDOC] Error processing line\n");
                         close(pipe_fds[0]);
                         close(pipe_fds[1]);
                         return (-1);
@@ -85,16 +82,21 @@ int handle_heredocs(t_token *tokens, char **env, t_data *data)
                         close(pipe_fds[1]);
                         return(-1);
                     }
+                    printf("[HEREDOC] Wrote line to pipe\n");
                     free(processed_line);
                 }
                 // Always close write end after heredoc content is written
+                printf("[HEREDOC] Closing write end of pipe\n");
                 close(pipe_fds[1]);
             }
         }
         current_token = current_token->next;
     }
     // Close any remaining heredoc fd before returning
-    if (last_heredoc_fd != -1)
+    if (last_heredoc_fd != -1) {
+        printf("[HEREDOC] Closing last heredoc fd: %d\n", last_heredoc_fd);
         close(last_heredoc_fd);
+    }
+    printf("[HEREDOC] Finished handling heredocs\n");
     return (0);
 }

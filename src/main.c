@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 14:24:01 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 15:55:45 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,15 +39,21 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	t_token *redir;
 	int	fd;
 
+	printf("[MAIN] Starting command processing\n");
+	
 	// 1. Expansion des variables (en préservant les quotes simples)
+	printf("[MAIN] Expanding environment variables\n");
 	replace_env_vars(data->tokens, envp, data);
 	
 	// 2. Fusion des tokens adjacents sans espace
+	printf("[MAIN] Merging adjacent tokens\n");
 	merge_tokens_without_space(&data->tokens);
 	
 	// 3. Suppression des quotes après expansion et fusion
+	printf("[MAIN] Removing quotes after expansion\n");
 	remove_quotes_after_expansion(data->tokens);
 	
+	printf("[MAIN] Handling heredocs\n");
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
@@ -58,6 +64,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	}
 
 	// Vérification de la syntaxe des pipes
+	printf("[MAIN] Checking pipe syntax\n");
 	t_token *current = data->tokens->first;
 	int pipe_count = 0;
 	while (current)
@@ -77,8 +84,11 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		}
 		current = current->next;
 	}
+	printf("[MAIN] Found %d pipes\n", pipe_count);
+	
 	if (pipe_count > 0)
 	{
+		printf("[MAIN] Executing piped commands\n");
 		data->saved_stdout = dup(STDOUT_FILENO);
 		exec_cmd_tokens(data, envp);
 		dup2(data->saved_stdout, STDOUT_FILENO);
@@ -88,6 +98,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	}
 	else
 	{
+		printf("[MAIN] Executing single command\n");
 		data->saved_stdout = -1;
 		redir_applied = 0;
 		redir = data->tokens->first;
@@ -96,6 +107,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			last_redir = 0;
 			if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
 			{
+				printf("[MAIN] Handling output redirection\n");
 				if (data->saved_stdout == -1)
 					data->saved_stdout = dup(STDOUT_FILENO);
 				if (redir->type == T_APPEND)
@@ -140,6 +152,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			close(data->tokens->heredoc_pipe_read_fd);
 	}
 
+	printf("[MAIN] Command execution completed\n");
 	free(str);
 	free_tokens(data->tokens->first);
 	data->tokens = NULL;

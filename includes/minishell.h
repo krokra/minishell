@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 14:57:48 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:08:47 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,5 +64,6 @@ int		handle_append_redirection(t_token *tokens);
 int		handle_redirections(t_token *tokens);
 char *remove_quotes(char *str);
 int		handle_input_redirection(t_token *tokens);
+char    *replace_vars_in_str(char *str, char **envp, t_data *data);
 
 #endif
