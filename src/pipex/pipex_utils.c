@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/21 11:02:34 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 13:39:55 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,11 @@ char *path_of_cmd(char *cmd, char **paths)
     int i;
 
     i = 0;
+	if (!cmd)
+	{
+		ft_free(paths);
+		return (NULL);
+	}
     if (!paths)
         return (ft_strdup(cmd));
     if (strchr(cmd, '/') != NULL)

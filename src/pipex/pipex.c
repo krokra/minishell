@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 22:57:53 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/29 14:19:09 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ static void exec_cmd_common(char **cmdtab, char **env, t_data *data)
 {
     char *path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
 
-    if (!path)
+    if (!path || path == NULL)
     {
         ft_putstr_fd("minishell: command not found: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
@@ -135,7 +135,7 @@ static void exec_cmd_common(char **cmdtab, char **env, t_data *data)
         cleanup(cmdtab, env, NULL, data);
         exit(126);
     }
-	
+	cleanup(cmdtab, env, NULL, data);
 }
 
 static void dup2_and_close(int oldfd, int newfd)
@@ -182,7 +182,6 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             else if (prev_pipe_read != -1)
                 dup2_and_close(prev_pipe_read, STDIN_FILENO);
             
-            // Gérer toutes les redirections dans l'ordre
             handle_pipe_redirections(cmds[i], &prev_pipe_read);
             
             if (has_next)
@@ -201,7 +200,9 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             free_tokens_tab(cmds);
             signal(SIGINT, SIG_DFL);
             signal(SIGQUIT, SIG_DFL);
-            exec_cmd_common(argv, envp, data);
+			if (argv[0] != NULL)
+            		exec_cmd_common(argv, envp, data);
+			cleanup(argv, envp, NULL, data);
             exit(1);
         }
         pids[i] = pid;

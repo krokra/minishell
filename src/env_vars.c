@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 14:44:49 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/29 14:30:29 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,8 @@ static char *replace_vars_in_str(char *str, char **envp, t_data *data)
 void replace_env_vars(t_token *tokens, char **envp, t_data *data)
 {
     t_token *current = tokens;
+	char *expanded;
+	
     while (current)
     {
         printf("Processing token: %s (quote: %c)\n", current->content, current->quotes);
@@ -145,7 +147,7 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
         }
         
         // Pour les doubles quotes ou sans quote, on fait l'expansion
-        char *expanded = replace_vars_in_str(current->content, envp, data);
+        expanded = replace_vars_in_str(current->content, envp, data);
         if (expanded)
         {
             // Si le contenu expansé contient des espaces, on le re-tokenise
@@ -158,7 +160,7 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
                     current->content = new_tokens->content;
                     current->next = new_tokens->next;
                     free(expanded);
-                    free(new_tokens);
+                    free_tokens(new_tokens);
                 }
             }
             else
@@ -275,5 +277,6 @@ int ft_setenv(char **env, const char *name, const char *value, int overwrite)
     
     new_env[i] = new_entry;
     new_env[i + 1] = NULL;
+	free(new_entry);
     return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 15:28:43 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/29 14:24:01 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		}
 		current = current->next;
 	}
-
 	if (pipe_count > 0)
 	{
 		data->saved_stdout = dup(STDOUT_FILENO);
