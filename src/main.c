@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 17:28:12 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/30 18:34:44 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,13 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	printf("[MAIN] Expanding environment variables\n");
 	replace_env_vars(data->tokens, envp, data);
 	
-	// 2. Fusion des tokens adjacents sans espace
-	printf("[MAIN] Merging adjacent tokens\n");
-	merge_tokens_without_space(&data->tokens);
-	
-	// 3. Suppression des quotes après expansion et fusion
+	// 2. Suppression des quotes après expansion
 	printf("[MAIN] Removing quotes after expansion\n");
 	remove_quotes_after_expansion(data->tokens);
+	
+	// 3. Fusion des tokens adjacents sans espace
+	printf("[MAIN] Merging adjacent tokens\n");
+	merge_tokens_without_space(&data->tokens);
 	
 	printf("[MAIN] Handling heredocs\n");
 	if (handle_heredocs(data->tokens, envp, data) == -1)
