@@ -48,7 +48,6 @@ libft:
 clean:
 	@make clean -C libft
 	$(RM) $(OBJ)
-	rm src/main.o
 
 fclean: clean
 	@make fclean -C libft

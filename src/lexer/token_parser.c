@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 17:02:41 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/30 17:57:24 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,12 +78,12 @@ t_token	*get_token(char *input, int *i, int *quote)
 		if (!in_quote && (input[*i] == '"' || input[*i] == '\''))
 		{
 			printf("Found quote: %c\n", input[*i]);
-			// Vérifier si c'est une séquence de guillemets vides
 			if (*i > start)
 			{
 				char *content = create_token_string(input, start, *i);
 				printf("Created token: %s (quote: %c)\n", content, *quote);
 				token = create_token(content, *quote);
+				token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
 				return (token);
 			}
 			if (input[*i] == '\'' && input[*i + 1] == '\'')
@@ -109,8 +109,9 @@ t_token	*get_token(char *input, int *i, int *quote)
 		(*i)++;
 	}
 	char *content = create_token_string(input, start, *i);
-	printf("Created token: %s (quote: %c)\n", content, *quote);
+	printf("Created tokOEEEEEEEEEEEEEEEEEEEEEn: %s (quote: %c)\n", content, *quote);
 	token = create_token(content, *quote);
 	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
+	*quote = 0;
 	return token;
 }

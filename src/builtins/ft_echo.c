@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 13:14:53 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/30 18:04:45 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,11 @@ void	ft_echo(t_token *token, t_data *data)
     }
     while (token != NULL && (token->type == T_WORD || token->type == T_ENVVAR))
     {
-        if (!first_arg)
+        if (first_arg == 0)
             ft_putchar_fd(' ', 1);
         ft_putstr_fd(token->content, 1);
-        first_arg = 0;
+		if (ft_strncmp(token->content, "$", 2) == 0)
+        	first_arg = 0;
         token = token->next;
     }
     if (!skip_newline)
