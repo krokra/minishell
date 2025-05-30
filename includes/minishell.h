@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 19:15:03 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/30 15:17:10 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ char	**env_dup(char **envp);
 void	handle_shlvl(char **envp);
 void	oldpwd_update(char **env, char *new_oldpwd);
 void	pwd_update(char **env, char *new_pwd);
-void	ft_export(char **env, char *arg, t_data *data);
-void	ft_unset(char *name, char **env, t_data *data);
+void	ft_export(char **env, t_token *token, t_data *data);
+void	ft_unset(t_token *token, char **env, t_data *data);
 char	*ft_getenv(char **env, char *name);
 int		ft_setenv(char **env, const char *name, const char *value, int overwrite);
 int		export_len(char *arg);
@@ -65,5 +65,6 @@ int		handle_redirections(t_token *tokens);
 char *remove_quotes(char *str);
 int		handle_input_redirection(t_token *tokens);
 char    *replace_vars_in_str(char *str, char **envp, t_data *data);
+void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data);
 
 #endif

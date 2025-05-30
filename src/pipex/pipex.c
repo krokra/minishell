@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 19:01:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/30 14:48:21 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,17 +93,18 @@ static t_token *find_command_start_from_segment(t_token *current_segment_token)
     return NULL;
 }
 
-static void free_tokens_tab(t_token **tokens)
-{
-    if (!tokens) return;
-    for (int i = 0; tokens[i]; i++)
-    {
-        free(tokens[i]);
-    }
-    free(tokens);
-}
+// static void free_tokens_tab(t_token **tokens)
+// {
+//     if (!tokens) return;
+//     for (int i = 0; tokens[i]; i++)
+//     {
+//         free(tokens[i]);
+//     }
+//     free(tokens);
+// 	tokens = NULL;
+// }
 
-static void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
+void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 {
     fprintf(stderr, "Starting cleanup with: data=%p cmdtab=%p env=%p tokens=%p\n", 
             (void*)data, (void*)cmdtab, (void*)env, (void*)tokens);
@@ -143,7 +144,7 @@ static void exec_cmd_common(char **cmdtab, char **env, t_data *data)
         cleanup(cmdtab, env, NULL, data);
         exit(127);
     }
-    if (execve(path, cmdtab, env) == -1)
+    else if (execve(path, cmdtab, env) == -1)
     {
         ft_putstr_fd("minishell: error executing command: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
@@ -227,18 +228,26 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             t_token *cmd = find_command_start_from_segment(cmds[i]);
             if (cmd && handle_builtins(envp, cmd, data)) {
                 printf("[PIPEX] Child %d: Executing builtin command\n", getpid());
-                exit(data->exit_status);
+				int	status = data->exit_status;
+				cleanup(NULL, envp, data->tokens, data);
+				free(cmds);
+                exit(status);
             }
             
             t_token *cmd_start = find_command_start_from_segment(cmds[i]);
             char **argv = build_argv_from_tokens(cmd_start);
             printf("[PIPEX] Child %d: Executing command: %s\n", getpid(), argv[0]);
-            free_tokens_tab(cmds);
             signal(SIGINT, SIG_DFL);
             signal(SIGQUIT, SIG_DFL);
+			printf("%s", argv[0]);
             if (argv[0] != NULL)
-                exec_cmd_common(argv, envp, data);
-            cleanup(argv, envp, NULL, data);
+			{
+				free(cmds);
+				free(data->tokens);
+	            exec_cmd_common(argv, envp, data);
+			}
+            cleanup(argv, envp, data->tokens, data);
+			free(cmds);
             exit(1);
         }
         printf("[PIPEX] Parent: Created child process %d\n", pid);
@@ -263,9 +272,9 @@ void    exec_cmd_tokens(t_data *data, char **envp)
         }
     }
     signal(SIGINT, sigint_prompt);
+	free(cmds);
     if (prev_pipe_read != -1)
         close(prev_pipe_read);
-    free(cmds);
 }
 
 // void exec_cmd(char *cmd, char **env, t_token *tokens)

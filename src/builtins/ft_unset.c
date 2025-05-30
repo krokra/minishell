@@ -6,36 +6,76 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:01 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 12:50:21 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/30 15:14:58 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minishell.h"
 
-void	ft_unset(char *name, char **env, t_data *data)
+static int	is_valid_identifier_char(char c)
+{
+	return (ft_isalnum(c) || c == '_');
+}
+
+static int	is_valid_identifier(const char *name)
+{
+	int	i;
+
+	if (!name || !*name || (ft_isdigit(*name)))
+		return (0);
+	if (!ft_isalpha(*name))
+		return (0);
+	i = 1;
+	while (name[i])
+	{
+		if (!is_valid_identifier_char(name[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+void	ft_unset(t_token *token, char **env, t_data *data)
 {
 	int	i;
 	int	len;
 
-	len = ft_strlen(name);
-	if (name == NULL || ft_strchr(name, '=') != NULL)
-		return ;
-	i = 0;
-	while (env[i] != NULL)
+	if (!token)
 	{
-		if (ft_strncmp(env[i], name, ft_strlen(name)) == 0
-			&& env[i][len] == '=')
+		data->exit_status = 1;
+		ft_putstr_fd("unset : not enough arguments\n", 1);
+		return ;
+	}
+	while (token)
+	{
+		len = ft_strlen(token->content);
+		if (!is_valid_identifier(token->content))
 		{
-			free(env[i]);
-			while (env[i] != NULL)
-			{
-				env[i] = env[i + 1];
-				i++;
-			}
-			data->exit_status = 0;
-			break ;
+			ft_putstr_fd("minishell: unset: `", 2);
+			ft_putstr_fd(token->content, 2);
+			ft_putstr_fd("': not a valid identifier\n", 2);
+			return ;
 		}
-		i++;
+		if (token->content == NULL || ft_strchr(token->content, '=') != NULL)
+			return ;
+		i = 0;
+		while (env[i] != NULL)
+		{
+			if (ft_strncmp(env[i], token->content, ft_strlen(token->content)) == 0
+				&& env[i][len] == '=')
+			{
+				free(env[i]);
+				while (env[i] != NULL)
+				{
+					env[i] = env[i + 1];
+					i++;
+				}
+				data->exit_status = 0;
+				break ;
+			}
+			i++;
+		}
+		token = token->next;
 	}
 	data->exit_status = 1;
 }
