@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 19:53:00 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/30 12:37:36 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,11 +96,28 @@ char *replace_vars_in_str(char *str, char **envp, t_data *data)
     char *var_name;
     char *value;
     char *tmp;
+    int in_quote = 0;
+    char quote_char = 0;
 
     printf("str: %s\n", str);
     result = ft_strdup("");
     while (*str)
     {
+        // Gestion des guillemets
+        if ((*str == '"' || *str == '\'') && !in_quote)
+        {
+            in_quote = 1;
+            quote_char = *str;
+            str++;
+            continue;
+        }
+        if (*str == quote_char && in_quote)
+        {
+            in_quote = 0;
+            str++;
+            continue;
+        }
+
         start = str;
         while (*str && *str != '$')
             str++;
@@ -115,6 +132,12 @@ char *replace_vars_in_str(char *str, char **envp, t_data *data)
         if (*str == '$')
         {
             str++;
+            // Si on est dans des guillemets, on préserve le $
+            if (in_quote)
+            {
+                result = strjoin_and_free_s1(result, "$");
+                continue;
+            }
             // 🔴 Cas spécial $"..." ou $'...' → pas d'expansion
             if (*str == '"' || *str == '\'')
             {
