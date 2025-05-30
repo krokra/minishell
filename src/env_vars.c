@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 12:37:36 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/30 17:24:52 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,82 +92,70 @@ static char *get_env_value(char *var_name, char **envp, t_data *data)
 char *replace_vars_in_str(char *str, char **envp, t_data *data)
 {
     char *result;
-    char *start;
     char *var_name;
     char *value;
     char *tmp;
     int in_quote = 0;
     char quote_char = 0;
 
-    printf("str: %s\n", str);
+    printf("str: %s|\n", str);
     result = ft_strdup("");
     while (*str)
     {
-        // Gestion des guillemets
+        // Handle quotes
         if ((*str == '"' || *str == '\'') && !in_quote)
         {
-            in_quote = 1;
             quote_char = *str;
+            in_quote = 1;
             str++;
             continue;
         }
         if (*str == quote_char && in_quote)
         {
             in_quote = 0;
+            quote_char = 0;
             str++;
             continue;
         }
 
-        start = str;
-        while (*str && *str != '$')
-            str++;
-
-        if (str > start)
+        // Skip expansion in single quotes
+        if (in_quote && quote_char == '\'')
         {
-            tmp = ft_substr(start, 0, str - start);
-            result = strjoin_and_free_s1(result, tmp);
+            tmp = result;
+            result = ft_strjoin(result, (char[]){*str, '\0'});
             free(tmp);
-        }
-
-        if (*str == '$')
-        {
             str++;
-            // Si on est dans des guillemets, on préserve le $
-            if (in_quote)
-            {
-                result = strjoin_and_free_s1(result, "$");
-                continue;
-            }
-            // 🔴 Cas spécial $"..." ou $'...' → pas d'expansion
-            if (*str == '"' || *str == '\'')
-            {
-                char quote = *str;
-                str++; // skip le guillemet
-                start = str;
-                while (*str && *str != quote)
-                    str++;
-                tmp = ft_substr(start, 0, str - start);  // contenu brut
-                result = strjoin_and_free_s1(result, tmp);
-                free(tmp);
-                if (*str == quote)
-                    str++; // skip quote de fin
-                continue;
-            }
-
-            // Cas classique d'expansion
-            size_t var_len = get_var_name_len(str);
-            if (var_len > 0)
-            {
-                var_name = ft_substr(str, 0, var_len);
-                value = get_env_value(var_name, envp, data);
-                result = strjoin_and_free_s1(result, value);
-                free(var_name);
-                free(value);
-                str += var_len;
-            }
-            else
-                result = strjoin_and_free_s1(result, "$");
+            continue;
         }
+
+		if (ft_strncmp(str, "$", 2) == 0)
+			return (ft_strdup(""));
+    	if (*str == '$' && (*(str + 1) == '?' || ft_isalnum(*(str + 1)) || *(str + 1) == '_'))
+        {
+            str++;  // Skip the $
+            var_name = malloc(get_var_name_len(str) + 1);
+            if (!var_name)
+                return (NULL);
+            ft_strlcpy(var_name, str, get_var_name_len(str) + 1);
+            value = get_env_value(var_name, envp, data);
+            free(var_name);
+
+            // Append the value to result
+            tmp = result;
+            result = ft_strjoin(result, value);
+            free(tmp);
+            free(value);
+
+            // Move str past the variable name
+            str += get_var_name_len(str);
+            continue;
+        }
+
+        // Handle normal characters
+        tmp = result;
+        result = ft_strjoin(result, (char[]){*str, '\0'});
+        free(tmp);
+        str++;
     }
     return (result);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 23:03:24 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/30 17:15:05 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,9 @@ void	merge_tokens_without_space(t_token **tokens)
 	printf("\n=== merge_tokens_without_space ===\n");
 	while (cur && cur->next)
 	{
-		printf("Current token: %s (type: %d, quote: %c, has_space_after: %d)\n",
+		printf("Current token:%s(type: %d, quote: %c, has_space_after: %d)\n",
 			cur->content, cur->type, cur->quotes, cur->has_space_after);
-		printf("Next token: %s (type: %d, quote: %c)\n",
+		printf("Next token:%s(type: %d, quote: %c)\n",
 			cur->next->content, cur->next->type, cur->next->quotes);
 		if (!cur->has_space_after && (cur->type == T_WORD || cur->quotes != 0) 
 			&& (cur->next->type == T_WORD || cur->next->quotes != 0))

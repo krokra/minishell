@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_parser.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 18:30:05 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/30 17:02:41 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ t_token	*get_token(char *input, int *i, int *quote)
 	int	start;
 	int	in_quote = 0;
 	char	quote_char = 0;
+	t_token *token;
 
 	printf("\n=== get_token ===\n");
 	printf("Input: %s\n", input);
@@ -78,6 +79,13 @@ t_token	*get_token(char *input, int *i, int *quote)
 		{
 			printf("Found quote: %c\n", input[*i]);
 			// Vérifier si c'est une séquence de guillemets vides
+			if (*i > start)
+			{
+				char *content = create_token_string(input, start, *i);
+				printf("Created token: %s (quote: %c)\n", content, *quote);
+				token = create_token(content, *quote);
+				return (token);
+			}
 			if (input[*i] == '\'' && input[*i + 1] == '\'')
 			{
 				// On ignore les guillemets simples vides et on continue avec le token suivant
@@ -102,7 +110,7 @@ t_token	*get_token(char *input, int *i, int *quote)
 	}
 	char *content = create_token_string(input, start, *i);
 	printf("Created token: %s (quote: %c)\n", content, *quote);
-	t_token *token = create_token(content, *quote);
+	token = create_token(content, *quote);
 	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
 	return token;
 }
