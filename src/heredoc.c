@@ -7,7 +7,7 @@ static char *expand_line_heredoc(char *line, char **env, t_data *data)
         return (NULL);
     if (ft_strchr(line, '$') == NULL)
         return (ft_strdup(line));
-    return (replace_vars_in_str(line, env, data));
+    return (replace_vars_in_str(NULL, line, env, data));
 }
 
 int handle_heredocs(t_token *tokens, char **env, t_data *data)

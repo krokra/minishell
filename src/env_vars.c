@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 17:30:54 by psirault         ###   ########.fr       */
+/*   Updated: 2025/05/30 18:18:48 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static char *get_env_value(char *var_name, char **envp, t_data *data)
         return (ft_strdup(""));
 }
 
-char *replace_vars_in_str(char *str, char **envp, t_data *data)
+char *replace_vars_in_str(t_token *token, char *str, char **envp, t_data *data)
 {
     char *result;
     char *var_name;
@@ -98,7 +98,7 @@ char *replace_vars_in_str(char *str, char **envp, t_data *data)
     int in_quote = 0;
     char quote_char = 0;
 
-    printf("str: %s|\n", str);
+    printf("str: %s|\n", token->content);
     result = ft_strdup("");
     while (*str)
     {
@@ -128,7 +128,7 @@ char *replace_vars_in_str(char *str, char **envp, t_data *data)
             continue;
         }
 
-		if (ft_strncmp(str, "$", 2) == 0)
+		if (ft_strncmp(str, "$", 2) == 0 && token->has_space_after == 0)
 			return (ft_strdup(""));
     	if (*str == '$' && (*(str + 1) == '?' || ft_isalnum(*(str + 1)) || *(str + 1) == '_'))
         {
@@ -174,7 +174,7 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
             current = current->next;
             continue;
         }
-        expanded = replace_vars_in_str(current->content, envp, data);
+        expanded = replace_vars_in_str(current, current->content, envp, data);
         if (expanded)
         {
             if (current->quotes == '"')
