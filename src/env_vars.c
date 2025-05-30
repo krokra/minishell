@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 18:33:28 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/05/30 18:49:50 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ char *replace_vars_in_str(t_token *token, char *str, char **envp, t_data *data)
     int in_quote = 0;
     char quote_char = 0;
 
-    printf("str: %s|\n", token->content);
     result = ft_strdup("");
     while (*str)
     {
