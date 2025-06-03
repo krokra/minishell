@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 18:18:15 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/02 11:46:50 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ typedef struct s_data t_data;
 
 int		handle_heredocs(t_token *tokens, char **env, t_data *data);
 void	ft_pwd(t_data *data);
+int		is_builtin(char *cmd);
 void	ft_cd(char *str, char **env, t_data *data);
 void	ft_env(char **strs, t_data *data);
 void	ft_exit(char **envp, t_token *tokens, t_data *data);

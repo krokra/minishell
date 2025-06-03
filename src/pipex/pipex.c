@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 14:48:21 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/02 10:21:34 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,6 @@ static t_token *find_command_start_from_segment(t_token *current_segment_token)
 
 void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 {
-    fprintf(stderr, "Starting cleanup with: data=%p cmdtab=%p env=%p tokens=%p\n", 
-            (void*)data, (void*)cmdtab, (void*)env, (void*)tokens);
     if (data)
     {
         free(data);
@@ -165,7 +163,6 @@ static void dup2_and_close(int oldfd, int newfd)
     close(oldfd);
 }
 
-// helper pour perror + exit
 static void perror_exit(const char *msg)
 {
     perror(msg);
@@ -180,35 +177,23 @@ void    exec_cmd_tokens(t_data *data, char **envp)
     pid_t pids[256];
     int pipefd[2];
     int sig;
-    
-    printf("[PIPEX] Starting execution of %d commands\n", n_cmds);
-    
+        
     for (int i = 0; i < n_cmds; i++)
     {
-        int has_next = (i < n_cmds - 1);
-        printf("[PIPEX] Processing command %d/%d\n", i + 1, n_cmds);
-        
+        int has_next = (i < n_cmds - 1);        
         if (has_next && pipe(pipefd) < 0)
-            perror_exit("minishell: pipe");
-        if (has_next)
-            printf("[PIPEX] Created pipe: read=%d, write=%d\n", pipefd[0], pipefd[1]);
-            
+            perror_exit("minishell: pipe");            
         signal(SIGINT, SIG_IGN);
         pid_t pid = fork();
         if (pid < 0)
             perror_exit("minishell: fork");
         if (pid == 0)
         {
-            printf("[PIPEX] Child process %d started\n", getpid());
-            int heredoc_fd = get_heredoc_fd_from_segment(cmds[i]);
-            printf("[PIPEX] Child %d: heredoc fd = %d\n", getpid(), heredoc_fd);
-            
+            int heredoc_fd = get_heredoc_fd_from_segment(cmds[i]);            
             if (heredoc_fd != -1) {
-                printf("[PIPEX] Child %d: Redirecting heredoc to stdin\n", getpid());
                 dup2_and_close(heredoc_fd, STDIN_FILENO);
             }
             else if (prev_pipe_read != -1) {
-                printf("[PIPEX] Child %d: Redirecting previous pipe to stdin\n", getpid());
                 dup2_and_close(prev_pipe_read, STDIN_FILENO);
             }
             
@@ -216,7 +201,6 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             
             if (has_next) {
                 if (!is_stdout_redirected(cmds[i])) {
-                    printf("[PIPEX] Child %d: Redirecting stdout to pipe\n", getpid());
                     dup2_and_close(pipefd[1], STDOUT_FILENO);
                 }
             }
@@ -227,7 +211,6 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             
             t_token *cmd = find_command_start_from_segment(cmds[i]);
             if (cmd && handle_builtins(envp, cmd, data)) {
-                printf("[PIPEX] Child %d: Executing builtin command\n", getpid());
 				int	status = data->exit_status;
 				cleanup(NULL, envp, data->tokens, data);
 				free(cmds);
@@ -236,10 +219,8 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             
             t_token *cmd_start = find_command_start_from_segment(cmds[i]);
             char **argv = build_argv_from_tokens(cmd_start);
-            printf("[PIPEX] Child %d: Executing command: %s\n", getpid(), argv[0]);
             signal(SIGINT, SIG_DFL);
             signal(SIGQUIT, SIG_DFL);
-			printf("%s", argv[0]);
             if (argv[0] != NULL)
 			{
 				free(cmds);
@@ -250,7 +231,6 @@ void    exec_cmd_tokens(t_data *data, char **envp)
 			free(cmds);
             exit(1);
         }
-        printf("[PIPEX] Parent: Created child process %d\n", pid);
         pids[i] = pid;
         if (has_next)
             close(pipefd[1]);

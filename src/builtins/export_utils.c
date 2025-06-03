@@ -51,14 +51,10 @@ char	*parse_export1(char *arg)
 {
 	char	*res;
 	int		i;
-	int		len;
 
-	if (arg == NULL)
+	if (export_len(arg) <= 0 || arg == NULL)
 		return (NULL);
-	len = export_len(arg);
-	if (len <= 0)
-		return (NULL);
-	res = (char *)malloc(sizeof(char) * (len + 1));
+	res = (char *)malloc(sizeof(char) * (export_len(arg) + 1));
 	if (!res)
 		return (NULL);
 	i = 0;
@@ -68,11 +64,10 @@ char	*parse_export1(char *arg)
 		i++;
 	}
 	res[i] = '\0';
-	
 	if (!is_valid_identifier(res))
 	{
 		free(res);
-		ft_putstr_fd("minishell: export: `", 2);
+		ft_putstr_fd("minishell: export: '", 2);
 		ft_putstr_fd(arg, 2);
 		ft_putstr_fd("': not a valid identifier\n", 2);
 		return (NULL);

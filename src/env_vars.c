@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 18:49:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/03 13:31:50 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,11 +97,10 @@ char *replace_vars_in_str(t_token *token, char *str, char **envp, t_data *data)
     char *tmp;
     int in_quote = 0;
     char quote_char = 0;
-
+ 
     result = ft_strdup("");
     while (*str)
     {
-        // Handle quotes
         if ((*str == '"' || *str == '\'') && !in_quote)
         {
             quote_char = *str;
@@ -116,8 +115,6 @@ char *replace_vars_in_str(t_token *token, char *str, char **envp, t_data *data)
             str++;
             continue;
         }
-
-        // Skip expansion in single quotes
         if (in_quote && quote_char == '\'')
         {
             tmp = result;
@@ -126,26 +123,21 @@ char *replace_vars_in_str(t_token *token, char *str, char **envp, t_data *data)
             str++;
             continue;
         }
-
 		if (ft_strncmp(str, "$", 2) == 0 && token->has_space_after == 0)
 			return (ft_strdup(""));
     	if (*str == '$' && (*(str + 1) == '?' || ft_isalnum(*(str + 1)) || *(str + 1) == '_'))
         {
-            str++;  // Skip the $
+            str++;
             var_name = malloc(get_var_name_len(str) + 1);
             if (!var_name)
                 return (NULL);
             ft_strlcpy(var_name, str, get_var_name_len(str) + 1);
             value = get_env_value(var_name, envp, data);
             free(var_name);
-
-            // Append the value to result
             tmp = result;
             result = ft_strjoin(result, value);
             free(tmp);
             free(value);
-
-            // Move str past the variable name
             str += get_var_name_len(str);
             continue;
         }
@@ -166,10 +158,8 @@ void replace_env_vars(t_token *tokens, char **envp, t_data *data)
     
     while (current)
     {
-        printf("Processing token: %s (quote: %c)\n", current->content, current->quotes);
         if (current->quotes == '\'')
         {
-            printf("Single quote detected, skipping expansion\n");
             current = current->next;
             continue;
         }
@@ -269,8 +259,6 @@ int ft_setenv(char **env, const char *name, const char *value, int overwrite)
 
     if (!name || !value)
         return (-1);
-    
-    // Vérifier si la variable existe déjà
     i = 0;
     while (env[i])
     {
@@ -286,17 +274,11 @@ int ft_setenv(char **env, const char *name, const char *value, int overwrite)
         }
         i++;
     }
-
-    // Si la variable n'existe pas, l'ajouter
     new_entry = ft_strjoin(name, "=");
     new_entry = strjoin_and_free_s1(new_entry, value);
-    
-    // Trouver la première position NULL dans env
     i = 0;
     while (env[i])
         i++;
-    
-    // Réallouer env pour ajouter la nouvelle variable
     new_env = ft_realloc(env, (i + 1) * sizeof(char *), (i + 2) * sizeof(char *));
     if (!new_env)
     {

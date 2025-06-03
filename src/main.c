@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 18:34:44 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/02 12:09:58 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,23 +37,11 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	int redir_applied;
 	int last_redir;
 	t_token *redir;
-	int	fd;
+	int	fd;	
 
-	printf("[MAIN] Starting command processing\n");
-	
-	// 1. Expansion des variables (en préservant les quotes simples)
-	printf("[MAIN] Expanding environment variables\n");
 	replace_env_vars(data->tokens, envp, data);
-	
-	// 2. Suppression des quotes après expansion
-	printf("[MAIN] Removing quotes after expansion\n");
 	remove_quotes_after_expansion(data->tokens);
-	
-	// 3. Fusion des tokens adjacents sans espace
-	printf("[MAIN] Merging adjacent tokens\n");
 	merge_tokens_without_space(&data->tokens);
-	
-	printf("[MAIN] Handling heredocs\n");
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
@@ -62,9 +50,6 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		data->tokens = NULL;
 		return;
 	}
-
-	// Vérification de la syntaxe des pipes
-	printf("[MAIN] Checking pipe syntax\n");
 	t_token *current = data->tokens->first;
 	int pipe_count = 0;
 	while (current)
@@ -72,7 +57,6 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		if (current->type == T_PIPE)
 		{
 			pipe_count++;
-			// Vérifier qu'il y a une commande avant et après le pipe
 			if (!current->next || current->next->type == T_PIPE)
 			{
 				ft_putstr_fd("minishell: syntax error near unexpected token '|'\n", 2);
@@ -83,12 +67,9 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			}
 		}
 		current = current->next;
-	}
-	printf("[MAIN] Found %d pipes\n", pipe_count);
-	
+	}	
 	if (pipe_count > 0)
 	{
-		printf("[MAIN] Executing piped commands\n");
 		data->saved_stdout = dup(STDOUT_FILENO);
 		exec_cmd_tokens(data, envp);
 		dup2(data->saved_stdout, STDOUT_FILENO);
@@ -98,7 +79,6 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	}
 	else
 	{
-		printf("[MAIN] Executing single command\n");
 		data->saved_stdout = -1;
 		redir_applied = 0;
 		redir = data->tokens->first;
@@ -107,7 +87,6 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			last_redir = 0;
 			if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
 			{
-				printf("[MAIN] Handling output redirection\n");
 				if (data->saved_stdout == -1)
 					data->saved_stdout = dup(STDOUT_FILENO);
 				if (redir->type == T_APPEND)
@@ -151,12 +130,39 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		if (data->tokens->heredoc_pipe_read_fd != -1)
 			close(data->tokens->heredoc_pipe_read_fd);
 	}
-
-	printf("[MAIN] Command execution completed\n");
 	free(str);
 	free_tokens(data->tokens->first);
 	data->tokens = NULL;
 }
+
+// int	is_valid_command(t_token *tokens, char **envp)
+// {
+// 	t_token *current;
+
+// 	current = tokens;
+// 	while (current->next)
+// 	{
+// 		if (current->type == T_WORD && current->next->type != T_REDIR_IN)
+// 		{
+// 			char *path = path_of_cmd(current->content, ft_get_paths("PATH", envp));
+// 			if (path == NULL && !is_builtin(current->content))
+// 			{
+// 				ft_putstr_fd("command not found : ", 1);
+// 				ft_putstr_fd(current->content, 1);
+// 				write(1, "\n", 1);
+// 				free(path);
+// 				return (0);
+// 			}
+// 		}
+// 		if (((current->type == T_WORD && current->next->type == T_WORD) ||
+// 				((current->type == T_HEREDOC || current->type == T_REDIR_IN || current->type == T_REDIR_OUT || current->type == T_APPEND) &&
+// 					current->next->type == T_WORD)) && current->next != NULL)
+// 			current = current->next;
+// 		if (current->next != NULL)
+// 			current = current->next;
+// 	}
+// 	return (1);
+// }
 
 void	mainloop(char *str, char **envp, t_data *data)
 {
@@ -174,22 +180,27 @@ void	mainloop(char *str, char **envp, t_data *data)
 			free(str);
 			continue;
 		}
-		data->tokens = NULL;  // Réinitialisation avant le traitement
+		data->tokens = NULL;
 		quote_and_token_handling(str, find_first_quote(str), &data);
+		// print_tokens(data->tokens);
+		// if (!is_valid_command(data->tokens, envp))
+		// {
+		// 	free(str);
+		// 	free_tokens(data->tokens->first);
+		// 	continue;
+		// }
 		if (syntax_checker(data->tokens))
 		{
 			free(str);
 			if (data->tokens != NULL)
 			{
 				free_tokens(data->tokens->first);
-				data->tokens = NULL;  // Réinitialisation après l'erreur de syntaxe
+				data->tokens = NULL;
 			}
 			continue;
 		}
-		print_tokens(data->tokens);
 		readline_loop(str, envp, data);
 	}
-	free(str);
 }
 
 int	main(int argc, char **argv, char **envp)

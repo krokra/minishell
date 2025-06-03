@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 18:33:54 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/02 10:17:38 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,19 +90,12 @@ void	merge_tokens_without_space(t_token **tokens)
 	t_token	*to_free;
 
 	cur = *tokens;
-	printf("\n=== merge_tokens_without_space ===\n");
 	while (cur && cur->next)
 	{
-		printf("Current token:%s(type: %d, quote: %c, has_space_after: %d)\n",
-			cur->content, cur->type, cur->quotes, cur->has_space_after);
-		printf("Next token:%s(type: %d, quote: %c)\n",
-			cur->next->content, cur->next->type, cur->next->quotes);
 		if (!cur->has_space_after && (cur->type == T_WORD || cur->quotes != 0) 
 			&& (cur->next->type == T_WORD || cur->next->quotes != 0))
 		{
-			printf("Merging tokens...\n");
 			merged = ft_strjoin(cur->content, cur->next->content);
-			printf("Merged result: %s\n", merged);
 			free(cur->content);
 			cur->content = merged;
 			cur->has_space_after = cur->next->has_space_after;
@@ -112,19 +105,17 @@ void	merge_tokens_without_space(t_token **tokens)
 			free(to_free);
 			continue;
 		}
-		else
-			printf("Skipping merge - incompatible types or space detected\n");
 		cur = cur->next;
 	}
 }
 
 // Cette fonction est maintenant obsolète, on utilise merge_tokens_without_space à la place
-void merge_adjacent_tokens(t_token **tokens)
-{
-    printf("\n=== merge_adjacent_tokens (DEPRECATED) ===\n");
-    printf("This function is deprecated, use merge_tokens_without_space instead\n");
-    merge_tokens_without_space(tokens);
-}
+// void merge_adjacent_tokens(t_token **tokens)
+// {
+//     printf("\n=== merge_adjacent_tokens (DEPRECATED) ===\n");
+//     printf("This function is deprecated, use merge_tokens_without_space instead\n");
+//     merge_tokens_without_space(tokens);
+// }
 
 int has_output_redirection(t_token *tokens)
 {
@@ -217,34 +208,27 @@ int get_heredoc_fd_from_segment(t_token *segment)
     t_token     *current = segment;
     int         last_fd = -1;
 
-    fprintf(stderr, "get_heredoc_fd_from_segment: starting search\n");
     while (current && current->type != T_PIPE)
     {
         if (current->type == T_HEREDOC)
         {
-            fprintf(stderr, "Found heredoc token, fd = %d\n", current->heredoc_pipe_read_fd);
             if (current->heredoc_pipe_read_fd != -1)
             {
                 last_fd = current->heredoc_pipe_read_fd;
-                fprintf(stderr, "Setting last_fd to %d\n", last_fd);
             }
         }
         current = current->next;
     }
-    fprintf(stderr, "get_heredoc_fd_from_segment: returning fd %d\n", last_fd);
     return last_fd;
 }
 
 void remove_quotes_after_expansion(t_token *tokens)
 {
     while (tokens)
-    {
-        printf("Removing quotes from token: %s (quote: %c)\n", tokens->content, tokens->quotes);
-        
+    {        
         // Si c'est une quote simple, on retire les quotes externes
         if (tokens->quotes == '\'')
         {
-            printf("Single quote detected, removing outer quotes\n");
             char *stripped = remove_quotes(tokens->content);
             if (stripped)
             {
@@ -255,7 +239,6 @@ void remove_quotes_after_expansion(t_token *tokens)
         // Pour les doubles quotes, on retire les quotes externes
         else if (tokens->quotes == '"')
         {
-            printf("Double quote detected, removing outer quotes\n");
             char *stripped = remove_quotes(tokens->content);
             if (stripped)
             {

@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 14:39:41 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/02 10:11:58 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,40 +45,40 @@ char	**ft_get_paths(char *var, char **env)
 	return (NULL);
 }
 
-char *path_of_cmd(char *cmd, char **paths)
+char	*path_of_cmd(char *cmd, char **paths)
 {
-    char *path;
-    char *tmp;
-    int i;
+	char	*path;
+	char	*tmp;
+	int		i;
 
-    i = 0;
+	i = 0;
 	if (!cmd)
 	{
 		ft_free(paths);
 		return (NULL);
 	}
-    if (!paths)
-        return (ft_strdup(cmd));
-    if (strchr(cmd, '/') != NULL)
-    {
-        if (access(cmd, F_OK | X_OK) == 0)
-            return (ft_strdup(cmd));
-        else
-            return (NULL);
-    }
-    while (paths[i])
-    {
-        tmp = ft_strjoin(paths[i], "/");
-        path = ft_strjoin(tmp, cmd);
-        free(tmp);
-        if (access(path, F_OK | X_OK) == 0)
-        {
-            ft_free(paths);
-            return (path);
-        }
-        free(path);
-        i++;
-    }
-    ft_free(paths);
-    return (NULL);
+	if (!paths)
+		return (ft_strdup(cmd));
+	if (strchr(cmd, '/') != NULL)
+	{
+		if (access(cmd, F_OK | X_OK) == 0)
+			return (ft_strdup(cmd));
+		else
+			return (NULL);
+	}
+	while (paths[i])
+	{
+		tmp = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(tmp, cmd);
+		free(tmp);
+		if (access(path, F_OK | X_OK) == 0)
+		{
+			ft_free(paths);
+			return (path);
+		}
+		free(path);
+		i++;
+	}
+	ft_free(paths);
+	return (NULL);
 }

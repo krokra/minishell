@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 17:57:24 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/02 10:15:41 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,6 @@ t_token	*get_token(char *input, int *i, int *quote)
 	char	quote_char = 0;
 	t_token *token;
 
-	printf("\n=== get_token ===\n");
-	printf("Input: %s\n", input);
-	printf("Position: %d\n", *i);
-
 	if (!skip_spaces(input, i))
 		return (NULL);
 	start = *i;
@@ -57,13 +53,11 @@ t_token	*get_token(char *input, int *i, int *quote)
 	// Si c'est un opérateur, on le prend tout de suite
 	if (input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
 	{
-		printf("Found operator: %c\n", input[*i]);
 		if (input[*i] == input[*i + 1]) // pour << ou >>
 			(*i)++;
 		(*i)++;
 		*quote = 0;  // Pas de quote pour les opérateurs
 		char *content = create_token_string(input, start, *i);
-		printf("Created operator token: %s\n", content);
 		t_token *token = create_token(content, 0);
 		token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
 		return token;
@@ -77,11 +71,9 @@ t_token	*get_token(char *input, int *i, int *quote)
 			break;
 		if (!in_quote && (input[*i] == '"' || input[*i] == '\''))
 		{
-			printf("Found quote: %c\n", input[*i]);
 			if (*i > start)
 			{
 				char *content = create_token_string(input, start, *i);
-				printf("Created token: %s (quote: %c)\n", content, *quote);
 				token = create_token(content, *quote);
 				token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
 				return (token);
@@ -101,7 +93,6 @@ t_token	*get_token(char *input, int *i, int *quote)
 		}
 		if (in_quote && input[*i] == quote_char)
 		{
-			printf("Closing quote: %c\n", quote_char);
 			in_quote = 0;
 			(*i)++;
 			break;  // On coupe le token ici après la fermeture de la quote
@@ -109,7 +100,6 @@ t_token	*get_token(char *input, int *i, int *quote)
 		(*i)++;
 	}
 	char *content = create_token_string(input, start, *i);
-	printf("Created tokOEEEEEEEEEEEEEEEEEEEEEn: %s (quote: %c)\n", content, *quote);
 	token = create_token(content, *quote);
 	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
 	*quote = 0;

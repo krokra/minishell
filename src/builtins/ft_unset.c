@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:01 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/30 15:14:58 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:05:03 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,11 +35,31 @@ static int	is_valid_identifier(const char *name)
 	return (1);
 }
 
-void	ft_unset(t_token *token, char **env, t_data *data)
+static void	unset_loop(t_token *token, char **env, t_data *data, int i)
 {
-	int	i;
 	int	len;
 
+	while (env[i] != NULL)
+	{
+		len = ft_strlen(token->content);
+		if (ft_strncmp(env[i], token->content, len) == 0
+			&& env[i][len] == '=')
+		{
+			free(env[i]);
+			while (env[i] != NULL)
+			{
+				env[i] = env[i + 1];
+				i++;
+			}
+			data->exit_status = 0;
+			break ;
+		}
+		i++;
+	}
+}
+
+void	ft_unset(t_token *token, char **env, t_data *data)
+{
 	if (!token)
 	{
 		data->exit_status = 1;
@@ -48,7 +68,6 @@ void	ft_unset(t_token *token, char **env, t_data *data)
 	}
 	while (token)
 	{
-		len = ft_strlen(token->content);
 		if (!is_valid_identifier(token->content))
 		{
 			ft_putstr_fd("minishell: unset: `", 2);
@@ -58,23 +77,7 @@ void	ft_unset(t_token *token, char **env, t_data *data)
 		}
 		if (token->content == NULL || ft_strchr(token->content, '=') != NULL)
 			return ;
-		i = 0;
-		while (env[i] != NULL)
-		{
-			if (ft_strncmp(env[i], token->content, ft_strlen(token->content)) == 0
-				&& env[i][len] == '=')
-			{
-				free(env[i]);
-				while (env[i] != NULL)
-				{
-					env[i] = env[i + 1];
-					i++;
-				}
-				data->exit_status = 0;
-				break ;
-			}
-			i++;
-		}
+		unset_loop(token, env, data, 0);
 		token = token->next;
 	}
 	data->exit_status = 1;

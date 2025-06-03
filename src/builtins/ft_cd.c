@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:58 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 19:31:07 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:11:09 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ void	ft_cd(char *str, char **env, t_data *data)
 	pwd = getcwd(NULL, 0);
 	if (pwd == NULL)
 	{
-		perror("getcwd() error");
 		data->exit_status = 1;
 		return ;
 	}
@@ -67,9 +66,5 @@ void	ft_cd(char *str, char **env, t_data *data)
 		data->exit_status = 0;
 		return ;
 	}
-	else
-	{
-		perror("chdir() error");
-		data->exit_status = 1;
-	}
+	data->exit_status = 1;
 }
