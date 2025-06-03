@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/28 13:16:44 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/03 15:13:50 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,13 @@ typedef struct s_data
 	int				saved_stdout;
 }					t_data;
 
+typedef struct s_token_state
+{
+    int		in_quote;
+    int		start;
+    char	quote_char;
+}					t_token_state;
+
 // Fonctions utils
 char				*ft_strcat(char *dst, const char *src);
 
@@ -77,6 +84,9 @@ void				merge_tokens_without_space(t_token **tokens);
 void				merge_adjacent_tokens(t_token **tokens);
 void				replace_env_vars(t_token *tokens, char **envp, t_data *data);
 void				remove_quotes_after_expansion(t_token *tokens);
+t_token				*get_token_end(char *input, int *i, int *quote, int start);
+t_token				*get_token_operator(char *input, int *i, int *quote, int start);
+t_token				*get_token_general(char *input, int *i, int *quote, int start);
 
 int has_output_redirection(t_token *tokens);
 int is_append(t_token *tokens);

@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/02 12:09:58 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/03 15:14:02 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ void	readline_loop(char *str, char **envp, t_data *data)
 	replace_env_vars(data->tokens, envp, data);
 	remove_quotes_after_expansion(data->tokens);
 	merge_tokens_without_space(&data->tokens);
+	print_tokens(data->tokens);
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);

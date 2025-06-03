@@ -6,18 +6,11 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/02 10:15:41 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/03 15:10:02 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/lexer.h"
-
-static int	skip_spaces(char *input, int *i)
-{
-	while (input[*i] && (input[*i] == ' ' || input[*i] == '\t'))
-		(*i)++;
-	return (input[*i] != '\0');
-}
 
 static char	*create_token_string(char *input, int start, int end)
 {
@@ -39,69 +32,40 @@ static char	*create_token_string(char *input, int start, int end)
 	return (token);
 }
 
-t_token	*get_token(char *input, int *i, int *quote)
+t_token	*get_token_operator(char *input, int *i, int *quote, int start)
 {
-	int	start;
-	int	in_quote = 0;
-	char	quote_char = 0;
-	t_token *token;
+	t_token		*token;
+	char		*content;
 
-	if (!skip_spaces(input, i))
-		return (NULL);
-	start = *i;
-
-	// Si c'est un opérateur, on le prend tout de suite
-	if (input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
-	{
-		if (input[*i] == input[*i + 1]) // pour << ou >>
-			(*i)++;
+	if (input[*i] == input[*i + 1])
 		(*i)++;
-		*quote = 0;  // Pas de quote pour les opérateurs
-		char *content = create_token_string(input, start, *i);
-		t_token *token = create_token(content, 0);
-		token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
-		return token;
-	}
+	(*i)++;
+	*quote = 0;
+	content = create_token_string(input, start, *i);
+	token = create_token(content, *quote);
+	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
+	return (token);
+}
 
-	// Sinon, on lit un mot ou une séquence entre quotes
-	while (input[*i])
-	{
-		if (!in_quote && (input[*i] == ' ' || input[*i] == '\t' ||
-			input[*i] == '|' || input[*i] == '<' || input[*i] == '>'))
-			break;
-		if (!in_quote && (input[*i] == '"' || input[*i] == '\''))
-		{
-			if (*i > start)
-			{
-				char *content = create_token_string(input, start, *i);
-				token = create_token(content, *quote);
-				token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
-				return (token);
-			}
-			if (input[*i] == '\'' && input[*i + 1] == '\'')
-			{
-				// On ignore les guillemets simples vides et on continue avec le token suivant
-				(*i) += 2;
-				start = *i;  // On met à jour le début du token
-				continue;
-			}
-			in_quote = 1;
-			quote_char = input[*i];
-			*quote = quote_char;  // On stocke le type de quote
-			(*i)++;
-			continue;
-		}
-		if (in_quote && input[*i] == quote_char)
-		{
-			in_quote = 0;
-			(*i)++;
-			break;  // On coupe le token ici après la fermeture de la quote
-		}
-		(*i)++;
-	}
-	char *content = create_token_string(input, start, *i);
+t_token	*get_token_general(char *input, int *i, int *quote, int start)
+{
+	t_token		*token;
+	char		*content;
+
+	content = create_token_string(input, start, *i);
+	token = create_token(content, *quote);
+	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
+	return (token);
+}
+
+t_token	*get_token_end(char *input, int *i, int *quote, int start)
+{
+	t_token		*token;
+	char		*content;
+
+	content = create_token_string(input, start, *i);
 	token = create_token(content, *quote);
 	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
 	*quote = 0;
-	return token;
+	return (token);
 }
