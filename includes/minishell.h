@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/02 11:46:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:02:43 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,11 @@
 # include <sys/wait.h>
 # include <sys/param.h>
 # include <limits.h>
-#include <fcntl.h>
-#include <signal.h>
+# include <fcntl.h>
+# include <signal.h>
 
-typedef struct s_token t_token;
-typedef struct s_data t_data;
+typedef struct s_token	t_token;
+typedef struct s_data	t_data;
 
 int		handle_heredocs(t_token *tokens, char **env, t_data *data);
 void	ft_pwd(t_data *data);
@@ -52,7 +52,8 @@ void	pwd_update(char **env, char *new_pwd);
 void	ft_export(char **env, t_token *token, t_data *data);
 void	ft_unset(t_token *token, char **env, t_data *data);
 char	*ft_getenv(char **env, char *name);
-int		ft_setenv(char **env, const char *name, const char *value, int overwrite);
+int		ft_setenv(char **env, const char *name, const char *value,
+			int overwrite);
 int		export_len(char *arg);
 void	*ft_realloc(void *dst, size_t old_size, size_t new_size);
 void	sigint_prompt(int sig);
@@ -63,9 +64,10 @@ void	replace_by_value(char **arg, char **envp);
 void	replace_env_vars(t_token *tokens, char **envp, t_data *data);
 int		handle_append_redirection(t_token *tokens);
 int		handle_redirections(t_token *tokens);
-char *remove_quotes(char *str);
+char	*remove_quotes(char *str);
 int		handle_input_redirection(t_token *tokens);
-char *replace_vars_in_str(t_token *token, char *str, char **envp, t_data *data);
-void cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data);
+char	*replace_vars_in_str(t_token *token, char *str, char **envp,
+			t_data *data);
+void	cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data);
 
 #endif

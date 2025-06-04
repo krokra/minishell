@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:11 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/19 12:39:41 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:02:56 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@
 # include "lexer.h"
 # include "../libft/libft.h"
 
-typedef struct s_token t_token;
-typedef struct s_data t_data;
+typedef struct s_token	t_token;
+typedef struct s_data	t_data;
 
 void	wrong_args(void);
 char	**ft_get_paths(char *var, char **env);
