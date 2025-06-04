@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 11:14:11 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/04 14:27:01 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,21 @@ char	**ft_get_paths(char *var, char **env)
 
 static char	*join_path(char *dir, char *cmd)
 {
-	char *tmp = ft_strjoin(dir, "/");
-	char *full = ft_strjoin(tmp, cmd);
+	char	*tmp;
+	char	*full;
+
+	tmp = ft_strjoin(dir, "/");
+	full = ft_strjoin(tmp, cmd);
 	free(tmp);
 	return (full);
+}
+
+static char	*is_access_possible(char *cmd)
+{
+	if (access(cmd, F_OK | X_OK) == 0)
+		return (ft_strdup(cmd));
+	else
+		return (NULL);
 }
 
 char	*path_of_cmd(char *cmd, char **paths)
@@ -64,7 +75,7 @@ char	*path_of_cmd(char *cmd, char **paths)
 	if (!paths)
 		return (ft_strdup(cmd));
 	if (strchr(cmd, '/'))
-		return (access(cmd, F_OK | X_OK) == 0 ? ft_strdup(cmd) : NULL);
+		return (is_access_possible(cmd));
 	while (paths[i])
 	{
 		path = join_path(paths[i++], cmd);
