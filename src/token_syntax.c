@@ -16,6 +16,8 @@ int	verify_syntax_refactor(t_token *tokens, int after_pipe)
 {
 	while (tokens)
 	{
+		if (ft_strncmp(tokens->content, "||", 2) == 0)
+			return (1);
 		if (tokens->type == T_PIPE)
 		{
 			after_pipe = 1;

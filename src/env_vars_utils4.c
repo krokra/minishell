@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 13:25:53 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 13:27:52 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 18:31:56 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,30 +66,39 @@ static int	quote_helper3(char **str, t_vars *vars, char **envp, t_data *data)
 	return (0);
 }
 
-char	*replace_vars_in_str(t_token *tok, char *str, char **envp, t_data *data)
+static char    *free_replace_vars(t_vars *vars)
 {
-	t_vars	*vars;
+    char    *res;
 
-	vars = (t_vars *)malloc(sizeof(t_vars));
-	vars->result = ft_strdup("");
-	vars->in_quote = 0;
-	vars->quote_char = 0;
-	while (*str)
-	{
-		if (quote_helper(&str, vars) == 1)
-			continue ;
-		if (quote_helper2(&str, vars) == 1)
-			continue ;
-		if (ft_strncmp(str, "$", 2) == 0 && tok->has_space_after == 0)
-			return (ft_strdup(""));
-		if (quote_helper3(&str, vars, envp, data) == 2)
+    res = vars->result;
+    free(vars);
+    return (res);
+}
+
+char    *replace_vars_in_str(t_token *tok, char *str, char **envp, t_data *data)
+{
+    t_vars	*vars;
+	int		i;
+
+    vars = (t_vars *)malloc(sizeof(t_vars));
+    vars->result = ft_strdup("");
+    vars->in_quote = 0;
+    vars->quote_char = 0;
+    while (*str)
+    {
+        if (quote_helper(&str, vars) || quote_helper2(&str, vars))
+            continue ;
+        if (ft_strncmp(str, "$", 2) == 0 && tok->has_space_after == 0)
+            return (free_replace_vars(vars));
+		i = quote_helper3(&str, vars, envp, data);
+        if (i == 2)
 			return (NULL);
-		else if (quote_helper3(&str, vars, envp, data) == 1)
+		if (i == 1)
 			continue ;
-		vars->tmp = vars->result;
-		vars->result = ft_strjoin(vars->result, (char []){*str, '\0'});
-		free(vars->tmp);
-		str++;
-	}
-	return (vars->result);
+        vars->tmp = vars->result;
+        vars->result = ft_strjoin(vars->result, (char []){*str, '\0'});
+        free(vars->tmp);
+        str++;
+    }
+    return (free_replace_vars(vars));
 }

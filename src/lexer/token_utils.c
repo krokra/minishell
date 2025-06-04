@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 11:13:55 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 17:54:56 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static char	**build_argv_loop(t_token *tmp, char **argv, int i)
 	while (tmp && tmp->type != T_PIPE)
 	{
 		if (tmp->type == T_WORD || tmp->type == T_ENVVAR)
-			argv[i++] = tmp->content;
+			argv[i++] = ft_strdup(tmp->content);
 		if ((tmp->type == T_REDIR_OUT || tmp->type == T_APPEND
 				|| tmp->type == T_REDIR_IN
 				|| tmp->type == T_HEREDOC) && tmp->next)

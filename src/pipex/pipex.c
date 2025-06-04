@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 11:57:43 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/04 18:23:13 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,8 @@ static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 	if (!path || path == NULL)
 	{
 		ft_putstr_fd("minishell: command not found: ", 2);
-		ft_putstr_fd_nl(cmdtab[0], 2);
-		cleanup(cmdtab, env, NULL, data);
+		ft_putstr_fd_nl(cmdtab[0], 2);;
+		cleanup(cmdtab, env, data->tokens, data);
 		exit(127);
 	}
 	else if (execve(path, cmdtab, env) == -1)
@@ -151,10 +151,9 @@ static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 		ft_putstr_fd("minishell: error executing command: ", 2);
 		ft_putstr_fd_nl(cmdtab[0], 2);
 		free(path);
-		cleanup(cmdtab, env, NULL, data);
+		cleanup(cmdtab, env, data->tokens, data);
 		exit(126);
 	}
-	cleanup(cmdtab, env, NULL, data);
 }
 
 static void	dup2_and_close(int oldfd, int newfd)
@@ -222,7 +221,7 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 	cmd = find_command_start_from_segment(meta->cmds[meta->i]);
 	if (cmd && handle_builtins(envp, cmd, data))
 	{
-		cleanup(NULL, envp, data->tokens, data);
+		cleanup(NULL, envp, NULL, data);
 		free(meta->cmds);
 		exit(data->exit_status);
 	}
@@ -230,14 +229,10 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 	argv = build_argv_from_tokens(start, 0, 0);
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
-	if (argv[0])
-	{
-		free(meta->cmds);
-		free(data->tokens);
-		exec_cmd_common(argv, envp, data);
-	}
-	cleanup(argv, envp, data->tokens, data);
 	free(meta->cmds);
+	if (argv[0])
+		exec_cmd_common(argv, envp, data);
+	cleanup(argv, envp, data->tokens, data);
 	exit(1);
 }
 
