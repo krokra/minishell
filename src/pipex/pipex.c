@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/02 10:21:34 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 10:48:02 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ static void perror_exit(const char *msg)
 void    exec_cmd_tokens(t_data *data, char **envp)
 {
     int n_cmds = 0;
-    t_token **cmds = split_tokens_by_pipe(data->tokens, &n_cmds);
+    t_token **cmds = split_tokens_by_pipe(data->tokens, &n_cmds, 0, 1);
     int prev_pipe_read = -1;
     pid_t pids[256];
     int pipefd[2];
@@ -218,7 +218,7 @@ void    exec_cmd_tokens(t_data *data, char **envp)
             }
             
             t_token *cmd_start = find_command_start_from_segment(cmds[i]);
-            char **argv = build_argv_from_tokens(cmd_start);
+            char **argv = build_argv_from_tokens(cmd_start, 0, 0);
             signal(SIGINT, SIG_DFL);
             signal(SIGQUIT, SIG_DFL);
             if (argv[0] != NULL)

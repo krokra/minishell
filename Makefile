@@ -21,6 +21,8 @@ SRCS := main.c \
 		src/lexer/lexer.c \
 		src/lexer/lexmain.c \
 		src/lexer/token_utils.c \
+		src/lexer/token_utils2.c \
+		src/lexer/token_utils3.c \
 		src/lexer/token_print.c \
 		src/lexer/token_parser.c \
 		src/token_syntax.c \

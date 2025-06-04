@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:01 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/02 10:17:10 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 10:35:56 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,15 @@
 
 void	print_tokens(t_token *tokens)
 {
-	t_token *current = tokens;
-	int i;
-    i = 0;
+	t_token	*current;
+	int		i;
 
+	current = tokens;
+	i = 0;
 	while (current)
 	{
-		printf("Token %d: [%s] quote: [%c] type: [%d] index: [%d]\n", i++, current->content,
-			current->quotes, current->type, current->index);
+		printf("Token %d: [%s] quote: [%c] type: [%d] index: [%d]\n", i++,
+			current->content, current->quotes, current->type, current->index);
 		current = current->next;
 	}
 }

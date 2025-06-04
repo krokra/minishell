@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/02 10:56:10 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 10:34:55 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,10 @@ static int	is_quote_closed(const char *str, char quote)
 	return (!found);
 }
 
-static char	*read_until_quote_closed(char *line, int *quote)
+static char	*read_until_quote_closed(char *line, char *old_line, int *quote)
 {
 	char	*input;
 	char	*tmp;
-	char	*old_line;
 
 	old_line = line;
 	while (*quote)
@@ -86,11 +85,12 @@ static char	*read_until_quote_closed(char *line, int *quote)
 
 void	quote_and_token_handling(char *line, int quote, t_data **data)
 {
-	char	*result = NULL;
+	char	*result;
 
+	result = NULL;
 	if (quote)
 	{
-		result = read_until_quote_closed(line, &quote);
+		result = read_until_quote_closed(line, line, &quote);
 		if (!result)
 		{
 			free(line);

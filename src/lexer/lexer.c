@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:59 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/03 15:04:08 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 10:33:25 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,21 @@ t_token	*lexer(char *input, int quote)
 {
 	t_token	*tokens_head;
 	t_token	*token;
+	t_token	*current;
 	int		i;
 
 	tokens_head = NULL;
 	i = 0;
 	while (input[i])
 	{
-		token = get_token(input, &i, &quote, 0);
+		token = get_token(input, &i, &quote);
 		if (!token)
-			break;
+			break ;
 		add_token(&tokens_head, token);
 	}
 	if (tokens_head)
 	{
-		t_token *current = tokens_head;
+		current = tokens_head;
 		while (current)
 		{
 			current->first = tokens_head;
