@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 14:27:01 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 21:13:14 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,13 @@ static char	*join_path(char *dir, char *cmd)
 	return (full);
 }
 
-static char	*is_access_possible(char *cmd)
-{
-	if (access(cmd, F_OK | X_OK) == 0)
-		return (ft_strdup(cmd));
-	else
-		return (NULL);
-}
+// static char	*is_access_possible(char *cmd)
+// {
+// 	if (access(cmd, F_OK | X_OK) == 0)
+// 		return (ft_strdup(cmd));
+// 	else
+// 		return (NULL);
+// }
 
 char	*path_of_cmd(char *cmd, char **paths)
 {
@@ -74,8 +74,13 @@ char	*path_of_cmd(char *cmd, char **paths)
 		return (ft_free(paths), NULL);
 	if (!paths)
 		return (ft_strdup(cmd));
-	if (strchr(cmd, '/'))
-		return (is_access_possible(cmd));
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, F_OK | X_OK) == 0)
+			return (ft_free(paths), ft_strdup(cmd));
+		else
+			return (ft_free(paths), NULL);
+	}
 	while (paths[i])
 	{
 		path = join_path(paths[i++], cmd);

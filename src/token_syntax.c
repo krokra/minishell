@@ -54,13 +54,14 @@ int	verify_syntax(t_token *tokens)
 	return (verify_syntax_refactor(current, after_pipe));
 }
 
-int	syntax_checker(t_token *tokens)
+int	syntax_checker(t_token *tokens, t_data *data)
 {
 	if (tokens == NULL)
 		return (1);
 	if (verify_syntax(tokens))
 	{
 		printf("Syntax error\n");
+		data->exit_status = 2;
 		return (1);
 	}
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 11:01:37 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 21:19:39 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ char				*ft_strcat(char *dst, const char *src);
 t_token				*lexer(char *input, int quote);
 void				free_tokens(t_token *tokens);
 void				print_tokens(t_token *tokens);
-int					syntax_checker(t_token *tokens);
+int					syntax_checker(t_token *tokens, t_data *data);
 t_token				*create_token(char *content, char quote);
 void				add_token(t_token **tokens, t_token *new);
 t_token				*get_token(char *input, int *i, int *quote);

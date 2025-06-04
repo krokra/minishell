@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 16:38:13 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/04 21:19:53 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ void	mainloop(char *str, char **envp, t_data *data)
 		}
 		data->tokens = NULL;
 		quote_and_token_handling(str, find_first_quote(str), &data);
-		if (syntax_checker(data->tokens))
+		if (syntax_checker(data->tokens, data))
 		{
 			free(str);
 			free_tokens(data->tokens->first);
