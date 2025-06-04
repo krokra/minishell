@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 13:40:06 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 16:30:15 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,14 +127,25 @@ void	execute_simple_redirection(char *str, char **envp, t_data *data,
 		data->tokens = NULL;
 		return ;
 	}
-	if (!handle_builtins(envp, data->tokens->first, data))
-		exec_cmd_tokens(data, envp);
-	if (append->redir_applied && data->saved_stdout != -1)
+	if (handle_builtins(envp, data->tokens->first, data))
 	{
-		dup2(data->saved_stdout, STDOUT_FILENO);
-		close(data->saved_stdout);
+		if (append->redir_applied && data->saved_stdout != -1)
+		{
+			dup2(data->saved_stdout, STDOUT_FILENO);
+			close(data->saved_stdout);
+			data->saved_stdout = -1;
+		}
 	}
-	if (data->tokens->heredoc_pipe_read_fd != -1)
+	else
+	{
+		if (append->redir_applied && data->saved_stdout != -1)
+		{
+			dup2(data->saved_stdout, STDOUT_FILENO);
+			close(data->saved_stdout);
+		}
+		exec_cmd_tokens(data, envp);
+	}
+	if (data->tokens->heredoc_pipe_read_fd != -1)clea
 		close(data->tokens->heredoc_pipe_read_fd);
 }
 
