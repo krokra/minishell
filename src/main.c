@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 16:30:15 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/04 16:38:13 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ void	execute_simple_redirection(char *str, char **envp, t_data *data,
 		}
 		exec_cmd_tokens(data, envp);
 	}
-	if (data->tokens->heredoc_pipe_read_fd != -1)clea
+	if (data->tokens->heredoc_pipe_read_fd != -1)
 		close(data->tokens->heredoc_pipe_read_fd);
 }
 
