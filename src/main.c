@@ -6,11 +6,11 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 10:58:16 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 13:40:06 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//double leaks
+// double leaks
 
 #include "../includes/minishell.h"
 #include <signal.h>
@@ -32,13 +32,8 @@ void	disable_ctrl_backslash(void)
 	}
 }
 
-void	readline_loop(char *str, char **envp, t_data *data)
+void	gestion_heredocs(t_data *data, char **envp, char *str)
 {
-	int redir_applied;
-	int last_redir;
-	t_token *redir;
-	int	fd;	
-
 	replace_env_vars(data->tokens, envp, data);
 	remove_quotes_after_expansion(data->tokens);
 	merge_tokens_without_space(&data->tokens);
@@ -49,10 +44,15 @@ void	readline_loop(char *str, char **envp, t_data *data)
 		free(str);
 		free_tokens(data->tokens->first);
 		data->tokens = NULL;
-		return;
+		return ;
 	}
-	t_token *current = data->tokens->first;
-	int pipe_count = 0;
+}
+
+int	check_pipe_syntax_error(t_token *current, t_data *data, char *str)
+{
+	int	pipe_count;
+
+	pipe_count = 0;
 	while (current)
 	{
 		if (current->type == T_PIPE)
@@ -60,15 +60,94 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			pipe_count++;
 			if (!current->next || current->next->type == T_PIPE)
 			{
-				ft_putstr_fd("minishell: syntax error near unexpected token '|'\n", 2);
+				ft_putstr_fd("minishell: syntax error near unexpected token '|'\n",
+					2);
 				free(str);
 				free_tokens(data->tokens->first);
 				data->tokens = NULL;
-				return;
+				break ;
 			}
 		}
 		current = current->next;
-	}	
+	}
+	return (pipe_count);
+}
+
+void	redirection_exec(t_data *data, t_append *append, t_token *redir)
+{
+	if (data->saved_stdout == -1)
+		data->saved_stdout = dup(STDOUT_FILENO);
+	if (redir->type == T_APPEND)
+	{
+		append->fd = handle_append_redirection(redir);
+		if (append->fd < 0)
+			append->last_redir = 1;
+		else
+			append->last_redir = 0;
+		close(append->fd);
+	}
+	else
+	{
+		append->fd = handle_redirections(redir);
+		if (append->fd < 0)
+			append->last_redir = 1;
+		else
+			append->last_redir = 0;
+		close(append->fd);
+	}
+	append->redir_applied = 1;
+}
+
+void	handle_out_redirections(t_data *data, t_append *append, t_token *redir)
+{
+	while (redir)
+	{
+		append->last_redir = 0;
+		if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
+			redirection_exec(data, append, redir);
+		redir = redir->next;
+	}
+}
+
+void	execute_simple_redirection(char *str, char **envp, t_data *data,
+		t_append *append)
+{
+	t_token	*redir;
+
+	data->saved_stdout = -1;
+	append->redir_applied = 0;
+	redir = data->tokens->first;
+	handle_out_redirections(data, append, redir);
+	if (append->last_redir < 0)
+	{
+		if (append->redir_applied && data->saved_stdout != -1)
+			close(data->saved_stdout);
+		free(str);
+		free_tokens(data->tokens->first);
+		data->tokens = NULL;
+		return ;
+	}
+	if (!handle_builtins(envp, data->tokens->first, data))
+		exec_cmd_tokens(data, envp);
+	if (append->redir_applied && data->saved_stdout != -1)
+	{
+		dup2(data->saved_stdout, STDOUT_FILENO);
+		close(data->saved_stdout);
+	}
+	if (data->tokens->heredoc_pipe_read_fd != -1)
+		close(data->tokens->heredoc_pipe_read_fd);
+}
+
+void	readline_loop(char *str, char **envp, t_data *data)
+{
+	t_append	append;
+	t_token		*current;
+	int			pipe_count;
+
+	gestion_heredocs(data, envp, str);
+	current = data->tokens->first;
+	pipe_count = 0;
+	pipe_count = check_pipe_syntax_error(current, data, str);
 	if (pipe_count > 0)
 	{
 		data->saved_stdout = dup(STDOUT_FILENO);
@@ -79,91 +158,11 @@ void	readline_loop(char *str, char **envp, t_data *data)
 			close(data->tokens->heredoc_pipe_read_fd);
 	}
 	else
-	{
-		data->saved_stdout = -1;
-		redir_applied = 0;
-		redir = data->tokens->first;
-		while (redir)
-		{
-			last_redir = 0;
-			if (redir->type == T_APPEND || redir->type == T_REDIR_OUT)
-			{
-				if (data->saved_stdout == -1)
-					data->saved_stdout = dup(STDOUT_FILENO);
-				if (redir->type == T_APPEND)
-				{
-					fd = handle_append_redirection(redir);
-					if (fd < 0)
-						last_redir = 1;
-					else
-						last_redir = 0;
-					close(fd);
-				}
-				else
-				{
-					fd = handle_redirections(redir);
-					if (fd < 0)
-						last_redir = 1;
-					else
-						last_redir = 0;
-					close(fd);
-				}
-				redir_applied = 1;
-			}
-			redir = redir->next;
-		}
-		if (last_redir < 0)
-		{
-			if (redir_applied && data->saved_stdout != -1)
-				close(data->saved_stdout);
-			free(str);
-			free_tokens(data->tokens->first);
-			data->tokens = NULL;
-			return;
-		}
-		if (!handle_builtins(envp, data->tokens->first, data))
-			exec_cmd_tokens(data, envp);
-		if (redir_applied && data->saved_stdout != -1)
-		{
-			dup2(data->saved_stdout, STDOUT_FILENO);
-			close(data->saved_stdout);
-		}
-		if (data->tokens->heredoc_pipe_read_fd != -1)
-			close(data->tokens->heredoc_pipe_read_fd);
-	}
+		execute_simple_redirection(str, envp, data, &append);
 	free(str);
 	free_tokens(data->tokens->first);
 	data->tokens = NULL;
 }
-
-// int	is_valid_command(t_token *tokens, char **envp)
-// {
-// 	t_token *current;
-
-// 	current = tokens;
-// 	while (current->next)
-// 	{
-// 		if (current->type == T_WORD && current->next->type != T_REDIR_IN)
-// 		{
-// 			char *path = path_of_cmd(current->content, ft_get_paths("PATH", envp));
-// 			if (path == NULL && !is_builtin(current->content))
-// 			{
-// 				ft_putstr_fd("command not found : ", 1);
-// 				ft_putstr_fd(current->content, 1);
-// 				write(1, "\n", 1);
-// 				free(path);
-// 				return (0);
-// 			}
-// 		}
-// 		if (((current->type == T_WORD && current->next->type == T_WORD) ||
-// 				((current->type == T_HEREDOC || current->type == T_REDIR_IN || current->type == T_REDIR_OUT || current->type == T_APPEND) &&
-// 					current->next->type == T_WORD)) && current->next != NULL)
-// 			current = current->next;
-// 		if (current->next != NULL)
-// 			current = current->next;
-// 	}
-// 	return (1);
-// }
 
 void	mainloop(char *str, char **envp, t_data *data)
 {
@@ -173,32 +172,22 @@ void	mainloop(char *str, char **envp, t_data *data)
 		if (str == NULL)
 		{
 			free(str);
-			break;
+			break ;
 		}
 		add_history(str);
 		if (str[0] == '\n' || str[0] == '\0')
 		{
 			free(str);
-			continue;
+			continue ;
 		}
 		data->tokens = NULL;
 		quote_and_token_handling(str, find_first_quote(str), &data);
-		// print_tokens(data->tokens);
-		// if (!is_valid_command(data->tokens, envp))
-		// {
-		// 	free(str);
-		// 	free_tokens(data->tokens->first);
-		// 	continue;
-		// }
 		if (syntax_checker(data->tokens))
 		{
 			free(str);
-			if (data->tokens != NULL)
-			{
-				free_tokens(data->tokens->first);
-				data->tokens = NULL;
-			}
-			continue;
+			free_tokens(data->tokens->first);
+			data->tokens = NULL;
+			continue ;
 		}
 		readline_loop(str, envp, data);
 	}
@@ -206,10 +195,9 @@ void	mainloop(char *str, char **envp, t_data *data)
 
 int	main(int argc, char **argv, char **envp)
 {
-	char *str;
-	char **env_cpy;
-	t_token *tokens;
-	t_data *data;
+	char	*str;
+	char	**env_cpy;
+	t_data	*data;
 
 	data = malloc(sizeof(t_data));
 	if (!data)
@@ -217,29 +205,19 @@ int	main(int argc, char **argv, char **envp)
 		perror("malloc");
 		return (1);
 	}
-	
 	(void)argc;
 	(void)argv;
-	tokens = NULL;
-	data->tokens = tokens;
+	data->tokens = NULL;
 	data->exit_status = 0;
 	data->status_getter = 0;
-	
 	env_cpy = env_dup(envp);
-	
 	disable_ctrl_backslash();
 	signal_handler();
-	
 	str = NULL;
 	mainloop(str, env_cpy, data);
-	
 	ft_free(env_cpy);
 	free(str);
 	free(data);
-#ifdef __APPLE__
-	clear_history();
-#else
 	rl_clear_history();
-#endif
 	return (0);
 }

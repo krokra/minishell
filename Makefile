@@ -27,6 +27,10 @@ SRCS := main.c \
 		src/lexer/token_parser.c \
 		src/token_syntax.c \
 		src/env_vars.c \
+		src/env_vars_utils.c \
+		src/env_vars_utils2.c \
+		src/env_vars_utils3.c \
+		src/env_vars_utils4.c \
 		src/heredoc.c \
 		src/redirections.c \
 		src/lexer/get_token.c

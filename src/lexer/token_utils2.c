@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:43:47 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 10:44:03 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 13:28:43 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,9 @@ void	set_token_type(t_token *token)
 	if ((token->quotes == '"' || token->quotes == '\'')
 		&& token->content[1] != '$')
 	token->type = T_WORD;
-	else if (ft_strncmp(token->content, "|", 2) == 0)
-	{
+	else if (ft_strncmp(token->content, "|", 1) == 0
+		|| ft_strncmp(token->content, "||", 2) == 0)
 		token->type = T_PIPE;
-	}
 	else if (ft_strncmp(token->content, "<", 2) == 0)
 		token->type = T_REDIR_IN;
 	else if (ft_strncmp(token->content, ">", 2) == 0)

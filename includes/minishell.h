@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 11:02:43 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 13:33:49 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,19 @@
 
 typedef struct s_token	t_token;
 typedef struct s_data	t_data;
-
+typedef struct s_vars {
+	char	*result;
+	char	*var_name;
+	char	*value;
+	char	*tmp;
+	int		in_quote;
+	char	quote_char;
+}					t_vars;
+typedef struct s_append {
+	int	fd;
+	int	last_redir;
+	int	redir_applied;
+}					t_append;
 int		handle_heredocs(t_token *tokens, char **env, t_data *data);
 void	ft_pwd(t_data *data);
 int		is_builtin(char *cmd);
@@ -69,5 +81,9 @@ int		handle_input_redirection(t_token *tokens);
 char	*replace_vars_in_str(t_token *token, char *str, char **envp,
 			t_data *data);
 void	cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data);
+size_t	get_var_name_len(char *str);
+char	*strjoin_and_free_s1(char *s1, const char *s2);
+int		is_valid_var_char(char c);
+char	*get_env_value(char *var_name, char **envp, t_data *data);
 
 #endif

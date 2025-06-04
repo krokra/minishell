@@ -6,288 +6,60 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/03 13:31:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/04 13:22:08 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-char *strjoin_and_free_s1(char *s1, const char *s2)
+char	*strjoin_and_free_s1(char *s1, const char *s2)
 {
-    char *joined_str;
+	char	*joined_str;
 
-    if (!s1 && !s2)
-        return (ft_strdup(""));
-    if (!s1)
-        return (ft_strdup(s2));
-    if (!s2)
-        return (s1);
-    joined_str = ft_strjoin(s1, s2);
-    free(s1);
-    return (joined_str);
+	if (!s1 && !s2)
+		return (ft_strdup(""));
+	if (!s1)
+		return (ft_strdup(s2));
+	if (!s2)
+		return (s1);
+	joined_str = ft_strjoin(s1, s2);
+	free(s1);
+	return (joined_str);
 }
 
-char *remove_quotes(char *str)
+static char	*remove_quotes_loop(char *str, char *res, int qchar, int in_quote)
 {
-    int i = 0, j = 0;
-    int len = ft_strlen(str);
-    char *result = malloc(len + 1);
-    int in_quote = 0;
-    char quote_char = 0;
+	int	i;
+	int	j;
 
-    if (!result)
-        return (NULL);
-
-    while (str[i])
-    {
-        if ((str[i] == '"' || str[i] == '\'') && !in_quote)
-        {
-            in_quote = 1;
-            quote_char = str[i];
-            i++;
-            continue;
-        }
-        if (str[i] == quote_char && in_quote)
-        {
-            in_quote = 0;
-            i++;
-            continue;
-        }
-        result[j] = str[i];
-        j++;
-        i++;
-    }
-    result[j] = '\0';
-    return (result);
+	i = -1;
+	j = 0;
+	while (str[++i])
+	{
+		if ((str[i] == '"' || str[i] == '\'') && !in_quote)
+		{
+			in_quote = 1;
+			qchar = str[i];
+			continue ;
+		}
+		if (str[i] == qchar && in_quote)
+		{
+			in_quote = 0;
+			continue ;
+		}
+		res[j] = str[i];
+		j++;
+	}
+	res[j] = '\0';
+	return (res);
 }
 
-static int is_valid_var_char(char c)
+char	*remove_quotes(char *str)
 {
-    return (ft_isalnum(c) || c == '_');
-}
+	char	*result;
 
-static size_t get_var_name_len(char *str)
-{
-    if (str[0] == '?')
-        return 1;
-    size_t len = 0;
-    while (str[len] && is_valid_var_char(str[len]))
-        len++;
-    return len;
-}
-
-static char *get_env_value(char *var_name, char **envp, t_data *data)
-{
-    char *value;
-
-    if (var_name[0] == '?' && var_name[1] == '\0')
-        return (ft_itoa(data->exit_status));
-    value = ft_getenv(envp, var_name);
-    if (value)
-        return (ft_strdup(value));
-    else
-        return (ft_strdup(""));
-}
-
-char *replace_vars_in_str(t_token *token, char *str, char **envp, t_data *data)
-{
-    char *result;
-    char *var_name;
-    char *value;
-    char *tmp;
-    int in_quote = 0;
-    char quote_char = 0;
- 
-    result = ft_strdup("");
-    while (*str)
-    {
-        if ((*str == '"' || *str == '\'') && !in_quote)
-        {
-            quote_char = *str;
-            in_quote = 1;
-            str++;
-            continue;
-        }
-        if (*str == quote_char && in_quote)
-        {
-            in_quote = 0;
-            quote_char = 0;
-            str++;
-            continue;
-        }
-        if (in_quote && quote_char == '\'')
-        {
-            tmp = result;
-            result = ft_strjoin(result, (char[]){*str, '\0'});
-            free(tmp);
-            str++;
-            continue;
-        }
-		if (ft_strncmp(str, "$", 2) == 0 && token->has_space_after == 0)
-			return (ft_strdup(""));
-    	if (*str == '$' && (*(str + 1) == '?' || ft_isalnum(*(str + 1)) || *(str + 1) == '_'))
-        {
-            str++;
-            var_name = malloc(get_var_name_len(str) + 1);
-            if (!var_name)
-                return (NULL);
-            ft_strlcpy(var_name, str, get_var_name_len(str) + 1);
-            value = get_env_value(var_name, envp, data);
-            free(var_name);
-            tmp = result;
-            result = ft_strjoin(result, value);
-            free(tmp);
-            free(value);
-            str += get_var_name_len(str);
-            continue;
-        }
-
-        // Handle normal characters
-        tmp = result;
-        result = ft_strjoin(result, (char[]){*str, '\0'});
-        free(tmp);
-        str++;
-    }
-    return (result);
-}
-
-void replace_env_vars(t_token *tokens, char **envp, t_data *data)
-{
-    t_token *current = tokens;
-    char *expanded;
-    
-    while (current)
-    {
-        if (current->quotes == '\'')
-        {
-            current = current->next;
-            continue;
-        }
-        expanded = replace_vars_in_str(current, current->content, envp, data);
-        if (expanded)
-        {
-            if (current->quotes == '"')
-            {
-                free(current->content);
-                current->content = expanded;
-            }
-            else if (ft_strchr(expanded, ' '))
-            {
-                t_token *new_tokens = lexer(expanded, 0);
-                if (new_tokens)
-                {
-                    current->content = new_tokens->content;
-                    current->next = new_tokens->next;
-                    free(expanded);
-                    free(new_tokens);
-                }
-            }
-            else
-            {
-                free(current->content);
-                current->content = expanded;
-            }
-        }
-        current = current->next;
-    }
-}
-
-// void    replace_env_vars(t_token *tokens, char **args, char **envp)
-// {
-//     t_token    *current;
-
-//     current = tokens;
-//     while (current != NULL)
-//     {
-//         if (current->type == T_ENVVAR || current->type == T_WORD)
-//         {
-//             if (remove_quotes(args[current->index]) == 0)
-//                 replace_by_value(&args[current->index], envp);
-//             else
-//                 return ;
-//         }
-//         current = current->next;
-//     }
-// }
-
-static int is_valid_shlvl(const char *value)
-{
-    int i = 0;
-    
-    if (!value)
-        return (0);
-    while (value[i])
-    {
-        if (!ft_isdigit(value[i]))
-            return (0);
-        i++;
-    }
-    return (1);
-}
-
-void handle_shlvl(char **envp)
-{
-    char *shlvl_value;
-    int shlvl;
-    char *new_value;
-    
-    shlvl_value = ft_getenv(envp, "SHLVL");
-    if (!shlvl_value || !is_valid_shlvl(shlvl_value))
-        shlvl = 1;
-    else
-    {
-        shlvl = ft_atoi(shlvl_value) + 1;
-        if (shlvl > 999)
-            shlvl = 1;
-    }
-    new_value = ft_itoa(shlvl);
-    if (new_value)
-    {
-        if (shlvl_value)
-            ft_setenv(envp, "SHLVL", new_value, 1);
-        else
-            ft_setenv(envp, "SHLVL", new_value, 0);
-        free(new_value);
-    }
-}
-
-int ft_setenv(char **env, const char *name, const char *value, int overwrite)
-{
-    int i;
-    char *new_entry;
-    char **new_env;
-
-    if (!name || !value)
-        return (-1);
-    i = 0;
-    while (env[i])
-    {
-        if (ft_strncmp(env[i], name, ft_strlen(name)) == 0 && env[i][ft_strlen(name)] == '=')
-        {
-            if (!overwrite)
-                return (0);
-            new_entry = ft_strjoin(name, "=");
-            new_entry = strjoin_and_free_s1(new_entry, value);
-            free(env[i]);
-            env[i] = new_entry;
-            return (0);
-        }
-        i++;
-    }
-    new_entry = ft_strjoin(name, "=");
-    new_entry = strjoin_and_free_s1(new_entry, value);
-    i = 0;
-    while (env[i])
-        i++;
-    new_env = ft_realloc(env, (i + 1) * sizeof(char *), (i + 2) * sizeof(char *));
-    if (!new_env)
-    {
-        free(new_entry);
-        return (-1);
-    }
-    
-    new_env[i] = new_entry;
-    new_env[i + 1] = NULL;
-	free(new_entry);
-    return (0);
+	result = (char *)malloc(ft_strlen(str) + 1);
+	if (!result)
+		return (NULL);
+	return (remove_quotes_loop(str, result, 0, 0));
 }
