@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 21:09:02 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/05 09:31:09 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,13 +217,15 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 	t_token	*cmd;
 	t_token	*start;
 	char	**argv;
+	int		status;
 
 	cmd = find_command_start_from_segment(meta->cmds[meta->i]);
 	if (cmd && handle_builtins(envp, cmd, data))
 	{
-		cleanup(NULL, envp, NULL, data);
+		status = data->exit_status;
+		cleanup(NULL, envp, data->tokens, data);
 		free(meta->cmds);
-		exit(data->exit_status);
+		exit(status);
 	}
 	start = find_command_start_from_segment(meta->cmds[meta->i]);
 	argv = build_argv_from_tokens(start, 0, 0);

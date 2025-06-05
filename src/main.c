@@ -6,11 +6,9 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 21:19:53 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/05 09:42:31 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// double leaks
 
 #include "../includes/minishell.h"
 #include <signal.h>
@@ -25,6 +23,7 @@ void	disable_ctrl_backslash(void)
 		exit(EXIT_FAILURE);
 	}
 	term.c_cc[VQUIT] = 0;
+    term.c_cc[VSUSP] = 0;
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
 	{
 		perror("tcsetattr");
@@ -153,15 +152,17 @@ void	readline_loop(char *str, char **envp, t_data *data)
 {
 	t_append	append;
 	t_token		*current;
-	int			pipe_count;
 
 	gestion_heredocs(data, envp, str);
 	current = data->tokens->first;
-	pipe_count = 0;
-	pipe_count = check_pipe_syntax_error(current, data, str);
-	if (pipe_count > 0)
+	if (check_pipe_syntax_error(current, data, str) > 0)
 	{
 		data->saved_stdout = dup(STDOUT_FILENO);
+		if (data->saved_stdout != -1)
+		{
+			dup2(data->saved_stdout, STDOUT_FILENO);
+			close(data->saved_stdout);
+		}
 		exec_cmd_tokens(data, envp);
 		dup2(data->saved_stdout, STDOUT_FILENO);
 		close(data->saved_stdout);

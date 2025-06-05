@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:27 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/02 14:00:30 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/05 09:54:24 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ static void	export_loop(char **env, t_token *token, t_data *data)
 
 void	ft_export(char **env, t_token *token, t_data *data)
 {
-	if (!token)
+	if (!token || token->type == T_PIPE || token->type == T_REDIR_OUT || token->type == T_APPEND)
 	{
 		ft_env(env, data);
 		return ;
