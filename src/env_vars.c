@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 13:22:08 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 13:58:10 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,12 @@ static char	*remove_quotes_loop(char *str, char *res, int qchar, int in_quote)
 		{
 			in_quote = 1;
 			qchar = str[i];
-			continue ;
+			continue;
 		}
-		if (str[i] == qchar && in_quote)
+		if (in_quote && str[i] == qchar)
 		{
 			in_quote = 0;
-			continue ;
+			continue;
 		}
 		res[j] = str[i];
 		j++;

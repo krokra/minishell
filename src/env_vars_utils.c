@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:18:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 15:30:55 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/06 15:17:57 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 static void	expanded_handling(char *exp, t_token *new_tokens, t_token *current)
 {
+	(void)new_tokens;
 	if (exp)
 	{
 		if (current->quotes == '"')
@@ -50,11 +51,6 @@ void	replace_env_vars(t_token *tokens, char **envp, t_data *data)
 	current = tokens;
 	while (current)
 	{
-		if (current->quotes == '\'')
-		{
-			current = current->next;
-			continue ;
-		}
 		expanded = replace_vars_in_str(current, current->content, envp, data);
 		expanded_handling(expanded, new_tokens, current);
 		current = current->next;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/05 09:42:31 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 14:07:59 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,8 @@ void	disable_ctrl_backslash(void)
 void	gestion_heredocs(t_data *data, char **envp, char *str)
 {
 	replace_env_vars(data->tokens, envp, data);
-	remove_quotes_after_expansion(data->tokens);
+	// remove_quotes_after_expansion(data->tokens);
 	merge_tokens_without_space(&data->tokens);
-	print_tokens(data->tokens);
 	if (handle_heredocs(data->tokens, envp, data) == -1)
 	{
 		ft_putstr_fd("minishell: error handling heredocs\n", 2);
@@ -230,6 +229,6 @@ int	main(int argc, char **argv, char **envp)
 	ft_free(env_cpy);
 	free(str);
 	free(data);
-	rl_clear_history();
+	clear_history();
 	return (0);
 }

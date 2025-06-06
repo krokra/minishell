@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 17:54:56 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/05 15:50:56 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ void	remove_quotes_after_expansion(t_token *tokens)
 {
 	char	*stripped;
 
+	print_tokens(tokens);
 	while (tokens)
 	{
 		if (tokens->quotes == '\'')
