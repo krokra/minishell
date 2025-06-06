@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 21:19:39 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 18:26:31 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef struct s_token
 	int				index;
 	int				heredoc_pipe_read_fd;
 	int				has_space_after;
+	int				heredoc_delimiter_quoted;
 	struct s_token	*next;
 	struct s_token	*first;
 	t_data			*data;

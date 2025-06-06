@@ -3,16 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/05 09:31:09 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 18:52:57 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/lexer.h"
 #include "../../includes/minishell.h"
 #include "../../includes/pipex.h"
+
+void    close_all_except_std(void)
+{
+	int fd;
+
+	fd = 3;
+    while (fd < 1024)
+	{
+		close(fd);
+		fd++;
+	}
+}
 
 static int	is_stdout_redirected(t_token *tokens)
 {
@@ -30,6 +42,7 @@ static int	is_stdout_redirected(t_token *tokens)
 	}
 	return (0);
 }
+
 void	handle_stdout_redirection(t_token *current)
 {
 	char	*filename;
@@ -139,6 +152,7 @@ static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 	char	*path;
 
 	path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
+	close_all_except_std();
 	if (path == NULL)
 	{
 		ft_putstr_fd("minishell: command not found: ", 2);
@@ -220,6 +234,7 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 	int		status;
 
 	cmd = find_command_start_from_segment(meta->cmds[meta->i]);
+	close_all_except_std();
 	if (cmd && handle_builtins(envp, cmd, data))
 	{
 		status = data->exit_status;

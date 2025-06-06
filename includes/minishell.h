@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 18:18:47 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 18:58:14 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ typedef struct s_vars {
 	char	*tmp;
 	int		in_quote;
 	char	quote_char;
+	int		is_heredoc;
 }					t_vars;
 typedef struct s_append {
 	int	fd;
@@ -52,6 +53,7 @@ typedef struct s_append {
 int		handle_heredocs(t_token *tokens, char **env, t_data *data);
 void	ft_pwd(t_data *data);
 int		is_builtin(char *cmd);
+void    close_all_except_std(void);
 void	ft_cd(char *str, char **env, t_data *data);
 void	ft_env(char **strs, t_data *data);
 void	ft_exit(char **envp, t_token *tokens, t_data *data);

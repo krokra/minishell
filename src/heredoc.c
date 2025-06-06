@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 18:19:55 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/03 14:13:35 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 18:32:06 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@ static char	*expand_line_heredoc(char *line, char **env, t_data *data)
 {
 	if (!line)
 		return (NULL);
-	if (ft_strchr(line, '$') == NULL)
-		return (ft_strdup(line));
-	return (replace_vars_in_str(NULL, line, env, data));
+	t_token temp_token;
+	temp_token.type = T_HEREDOC;
+	temp_token.has_space_after = 0;
+	return (replace_vars_in_str(&temp_token, line, env, data));
 }
 
 static int	processed_line_check(char *processed_line, int pipe_fds[2])
@@ -60,7 +61,7 @@ int	hdoc_loop(t_token *current_token, int pipe_fds[2], char **env, t_data *data)
 	while (1)
 	{
 		input_line = readline("> ");
-		if (input_line == NULL)
+		if (!input_line)
 		{
 			close(pipe_fds[0]);
 			close(pipe_fds[1]);
@@ -69,9 +70,16 @@ int	hdoc_loop(t_token *current_token, int pipe_fds[2], char **env, t_data *data)
 		if (strcmp(input_line, delimiter_str) == 0)
 		{
 			free(input_line);
-			break ;
+			break;
 		}
-		processed_line = expand_line_heredoc(input_line, env, data);
+		if (!current_token->heredoc_delimiter_quoted)
+			processed_line = expand_line_heredoc(input_line, env, data);
+		else
+			processed_line = ft_strdup(input_line);
+		free(input_line);
+
+		if (!processed_line)
+			return (-1);
 		if (processed_line_check(processed_line, pipe_fds) == 0)
 			return (-1);
 	}

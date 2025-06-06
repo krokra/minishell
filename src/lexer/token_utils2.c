@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:43:47 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/05 15:49:42 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/06 18:26:43 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	set_token_type(t_token *token)
 {
 	if ((token->quotes == '"' || token->quotes == '\'')
 		&& token->content[1] != '$')
-	token->type = T_WORD;
+		token->type = T_WORD;
 	else if (ft_strncmp(token->content, "|", 1) == 0)
 		token->type = T_PIPE;
 	else if (ft_strncmp(token->content, "<", 2) == 0)
@@ -26,7 +26,13 @@ void	set_token_type(t_token *token)
 	else if (ft_strncmp(token->content, ">>", 3) == 0)
 		token->type = T_APPEND;
 	else if (ft_strncmp(token->content, "<<", 3) == 0)
+	{
 		token->type = T_HEREDOC;
+		if (token->next && (token->next->quotes == '\'' || token->next->quotes == '"'))
+			token->heredoc_delimiter_quoted = 1;
+		else
+			token->heredoc_delimiter_quoted = 0;
+	}
 	else if (ft_strncmp(token->content, "$", 1) == 0
 		|| ft_strncmp(token->content, "\"$", 2) == 0
 		|| ft_strncmp(token->content, "'$", 2) == 0)
