@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils3.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:26:21 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 12:05:16 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:51:09 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ int	ft_setenv(char **env, const char *name, const char *value, int overwrite)
 		return (0);
 	new_entry = ft_strjoin(name, "=");
 	new_entry = strjoin_and_free_s1(new_entry, value);
+	if (!new_entry)
+		return (-1);
 	i = 0;
 	while (env[i])
 		i++;

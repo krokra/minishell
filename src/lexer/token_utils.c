@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/05 15:50:56 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:50:52 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ char	**build_argv_from_tokens(t_token *cmd, int argc, int i)
 		tmp = tmp->next;
 	}
 	argv = malloc((argc + 1) * sizeof(char *));
+	if (!argv)
+		return (NULL);
 	tmp = cmd;
 	return (build_argv_loop(tmp, argv, i));
 }

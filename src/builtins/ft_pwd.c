@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 20:57:48 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:50:32 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,8 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 		{
 			free(env[i]);
 			env[i] = ft_strdup(pwd);
+			if (!env[i])
+				return ;
 			free(pwd);
 			return ;
 		}
@@ -65,8 +67,10 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 	while (env[++i] != NULL)
 		i++;
 	env[i] = ft_strdup(pwd);
-	env[i + 1] = NULL;
 	free(pwd);
+	if (!env[i])
+		return ;
+	env[i + 1] = NULL;
 }
 
 void	ft_pwd(t_data *data)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils4.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 13:25:53 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 18:31:56 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:44:19 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,8 @@ char    *replace_vars_in_str(t_token *tok, char *str, char **envp, t_data *data)
 	int		i;
 
     vars = (t_vars *)malloc(sizeof(t_vars));
+	if (!vars)
+		return (NULL);
     vars->result = ft_strdup("");
     vars->in_quote = 0;
     vars->quote_char = 0;
@@ -98,6 +100,8 @@ char    *replace_vars_in_str(t_token *tok, char *str, char **envp, t_data *data)
         vars->tmp = vars->result;
         vars->result = ft_strjoin(vars->result, (char []){*str, '\0'});
         free(vars->tmp);
+		if (!vars->result)
+			return (free_replace_vars(vars), NULL);
         str++;
     }
     return (free_replace_vars(vars));

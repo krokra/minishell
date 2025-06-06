@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:18:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 15:55:07 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:38:38 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,19 @@ char	*merge_token_list(t_token *head)
 	if (!head || !head->content)
 		return (NULL);
 	result = ft_strdup(head->content);
+	if (!result)
+		return (NULL);
 	current = head->next;
 	while (current)
 	{
 		tmp = ft_strjoin(result, " ");
 		free(result);
+		if (!tmp)
+			return (NULL);
 		result = ft_strjoin(tmp, current->content);
 		free(tmp);
+		if (!result)
+			return (NULL);
 		current = current->next;
 	}
 	return (result);
