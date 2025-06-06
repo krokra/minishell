@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:18:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 15:47:16 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/06 15:55:07 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ static void	expanded_handling(char *exp, t_token *new_tokens, t_token *current)
 	(void)new_tokens;
 	if (!exp)
 		return;
-	if (current->quotes == '"')
+	if (current->quotes == '"' || current->quotes == '\'')
 	{
 		free(current->content);
 		current->content = exp;
