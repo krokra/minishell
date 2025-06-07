@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 17:47:10 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 19:00:43 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,15 +226,14 @@ void	setup_fds_and_redirections(t_execmeta *meta, char **env, t_data *data)
 
 	if (meta->has_next && !is_stdout_redirected(meta->cmds[meta->i]))
 		dup2_and_close(meta->pipefd[1], STDOUT_FILENO);
-	if (meta->has_next)
-		close(meta->pipefd[0]);
+
 	if (meta->prev_pipe_read != -1)
-		close(meta->prev_pipe_read);
+		dup2_and_close(meta->prev_pipe_read, STDIN_FILENO);
+
 	fd = get_heredoc_fd_from_segment(meta->cmds[meta->i]);
 	if (fd != -1)
 		dup2_and_close(fd, STDIN_FILENO);
-	else if (meta->prev_pipe_read != -1)
-		dup2_and_close(meta->prev_pipe_read, STDIN_FILENO);
+
 	if (handle_pipe_redirections(meta->cmds[meta->i], &meta->prev_pipe_read, env, data) == -1)
 	{
 		free(meta->cmds);
@@ -282,26 +281,32 @@ void	while_exec(t_execmeta *meta, t_data *data, char **envp)
 {
 	while (meta->i < meta->n_cmds)
 	{
-		if (meta->i < meta->n_cmds - 1)
-			meta->has_next = 1;
-		else
-			meta->has_next = 0;
+		meta->has_next = (meta->i < meta->n_cmds - 1);
 		if (meta->has_next && pipe(meta->pipefd) < 0)
 			perror_exit("minishell: pipe");
+
 		signal(SIGINT, SIG_IGN);
 		meta->pid = fork();
 		if (meta->pid < 0)
 			perror_exit("minishell: fork");
-		if (meta->pid == 0)
+
+		if (meta->pid == 0) // CHILD
 			handle_child_exec(meta, data, envp);
+
+		// PARENT
 		meta->pids[meta->i] = meta->pid;
-		if (meta->has_next)
-			close(meta->pipefd[1]);
+
+		// Ferme l'ancien pipe read (plus utilisé)
 		if (meta->prev_pipe_read != -1)
 			close(meta->prev_pipe_read);
-		meta->prev_pipe_read = -1;
+
+		// Ferme l'écriture actuelle (child l'a déjà utilisé)
 		if (meta->has_next)
-			meta->prev_pipe_read = meta->pipefd[0];
+			close(meta->pipefd[1]);
+
+		// Prépare le prochain pipe read
+		meta->prev_pipe_read = (meta->has_next) ? meta->pipefd[0] : -1;
+
 		meta->i++;
 	}
 }
