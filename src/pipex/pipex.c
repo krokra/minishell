@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 13:21:51 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:08:23 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,8 @@ void	cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 		}
 		tokens = NULL;
 	}
+	if (tokens)
+		free_tokens(tokens);
 }
 
 static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
@@ -152,7 +154,6 @@ static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 	char	*path;
 
 	path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
-	printf("\n\n%s\n\n", path);
 	close_all_except_std();
 	if (path == NULL || ft_strchr(path, '/') == 0)
 	{
@@ -246,7 +247,6 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 		exit(status);
 	}
 	start = find_command_start_from_segment(meta->cmds[meta->i]);
-	print_tokens(data->tokens);
 	argv = build_argv_from_tokens(start, 0, 0);
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
@@ -299,6 +299,8 @@ void	exec_cmd_tokens(t_data *data, char **envp)
 	meta.prev_pipe_read = -1;
 	meta.n_cmds = 0;
 	meta.cmds = split_tokens_by_pipe(data->tokens, &meta.n_cmds, 0, 1);
+	if (!meta.cmds)
+    	return ;
 	while_exec(&meta, data, envp);
 	wait_for_children(meta.pids, meta.n_cmds, data);
 	signal(SIGINT, sigint_prompt);

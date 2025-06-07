@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils3.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:44:36 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 10:56:13 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:14:47 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ t_token	**split_tokens_by_pipe(t_token *tokens, int *count, int i, int n)
 		tmp = tmp->next;
 	}
 	cmds = malloc((n + 1) * sizeof(t_token *));
+	if (!cmds)
+		return (NULL);
 	tmp = tokens;
 	cmds[i++] = tmp;
 	while (tmp)

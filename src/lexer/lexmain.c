@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexmain.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 13:03:25 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:12:34 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ static char	*read_until_quote_closed(char *line, char *old_line, int *quote)
 	return (line);
 }
 
-void	quote_and_token_handling(char *line, int quote, t_data **data)
+int	quote_and_token_handling(char *line, int quote, t_data **data)
 {
 	char	*result;
 
@@ -92,10 +92,16 @@ void	quote_and_token_handling(char *line, int quote, t_data **data)
 	{
 		result = read_until_quote_closed(line, line, &quote);
 		if (!result)
-			return ;
+			return (0);
 		line = result;
 	}
 	(*data)->tokens = lexer(line, quote);
+	if (!(*data)->tokens)
+	{
+		free(result);
+    	return (0);
+	}
 	if (result)
 		free(result);
+	return (1);
 }

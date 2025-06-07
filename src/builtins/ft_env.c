@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_env.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:49 by psirault          #+#    #+#             */
-/*   Updated: 2025/05/29 14:26:41 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 14:50:43 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,11 @@ char	**env_dup(char **envp)
 	while (envp[i] != NULL)
 	{
 		new_env[i] = ft_strdup(envp[i]);
-		if (new_env[i] == NULL || i >= MAX_ENV_VARS - 1)
+		if (!new_env[i])
 		{
-			ft_free(new_env);
+			while (i > 0)
+				free(new_env[--i]);
+			free(new_env);
 			return (NULL);
 		}
 		i++;

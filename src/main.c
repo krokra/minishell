@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 13:04:28 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:12:05 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	disable_ctrl_backslash(void)
 		exit(EXIT_FAILURE);
 	}
 	term.c_cc[VQUIT] = 0;
-    term.c_cc[VSUSP] = 0;
+	term.c_cc[VSUSP] = 0;
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
 	{
 		perror("tcsetattr");
@@ -189,14 +189,13 @@ void	mainloop(char *str, char **envp, t_data *data)
 		}
 		add_history(str);
 		if (str[0] == '\n' || str[0] == '\0')
+			continue ;
+		data->tokens = NULL;
+		if (!quote_and_token_handling(str, find_first_quote(str), &data))
 		{
 			free(str);
 			continue ;
 		}
-		data->tokens = NULL;
-		quote_and_token_handling(str, find_first_quote(str), &data);
-		if (!data->tokens)
-			continue ;
 		if (syntax_checker(data->tokens, data))
 		{
 			free(str);
@@ -226,6 +225,11 @@ int	main(int argc, char **argv, char **envp)
 	data->exit_status = 0;
 	data->status_getter = 0;
 	env_cpy = env_dup(envp);
+	if (!env_cpy)
+	{
+		free(data);
+		return (1);
+	}
 	disable_ctrl_backslash();
 	signal_handler();
 	str = NULL;
