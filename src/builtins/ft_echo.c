@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_echo.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 13:30:23 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 13:59:32 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,13 @@ void	ft_echo(t_token *token, t_data *data)
 	while (token != NULL && (token->type == T_WORD || token->type == T_ENVVAR))
 	{
 		ft_putstr_fd(token->content, 1);
+		if (token->type == T_ENVVAR && (token->content[0] == '\0' && token->quotes == 0) && token->next)
+		{
+			token = token->next;
+			continue;
+		}
+		else if (!token->next)
+			break;
 		if (token->has_space_after == 1 && (token->next->type == T_WORD
 				|| token->next->type == T_ENVVAR) && token->next)
 			ft_putchar_fd(' ', 1);
