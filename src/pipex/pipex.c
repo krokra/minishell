@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:08:23 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:46:22 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,18 +216,21 @@ void	setup_fds_and_redirections(t_execmeta *meta)
 {
 	int	fd;
 
-	fd = get_heredoc_fd_from_segment(meta->cmds[meta->i]);
-	if (fd != -1)
-		dup2_and_close(fd, STDIN_FILENO);
-	else if (meta->prev_pipe_read != -1)
-		dup2_and_close(meta->prev_pipe_read, STDIN_FILENO);
-	handle_pipe_redirections(meta->cmds[meta->i], &meta->prev_pipe_read);
+	// D'abord les pipes
 	if (meta->has_next && !is_stdout_redirected(meta->cmds[meta->i]))
 		dup2_and_close(meta->pipefd[1], STDOUT_FILENO);
 	if (meta->has_next)
 		close(meta->pipefd[0]);
 	if (meta->prev_pipe_read != -1)
 		close(meta->prev_pipe_read);
+
+	// Ensuite les redirections
+	fd = get_heredoc_fd_from_segment(meta->cmds[meta->i]);
+	if (fd != -1)
+		dup2_and_close(fd, STDIN_FILENO);
+	else if (meta->prev_pipe_read != -1)
+		dup2_and_close(meta->prev_pipe_read, STDIN_FILENO);
+	handle_pipe_redirections(meta->cmds[meta->i], &meta->prev_pipe_read);
 }
 
 void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)

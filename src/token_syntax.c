@@ -25,8 +25,6 @@ int	verify_syntax_refactor(t_token *tokens, int after_pipe)
 				|| tokens->next->type == T_ENVVAR)
 				return (1);
 		}
-		if (after_pipe && tokens->type == T_HEREDOC)
-			return (1);
 		if ((tokens->type == T_REDIR_IN || tokens->type == T_REDIR_OUT
 				|| tokens->type == T_APPEND)
 			&& (!tokens->next || (tokens->next->type != T_WORD

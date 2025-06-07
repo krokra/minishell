@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 18:19:55 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 18:32:06 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:48:01 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,20 @@ int	handle_heredocs(t_token *tokens, char **env, t_data *data)
 					return (-1);
 				}
 				if (hdoc_loop(current_token, pipe_fds, env, data) == -1)
+				{
+					// En cas de CTRL+D, on ferme tous les pipes des heredocs précédents
+					t_token *tmp = tokens;
+					while (tmp != current_token)
+					{
+						if (tmp->type == T_HEREDOC && tmp->heredoc_pipe_read_fd != -1)
+						{
+							close(tmp->heredoc_pipe_read_fd);
+							tmp->heredoc_pipe_read_fd = -1;
+						}
+						tmp = tmp->next;
+					}
 					return (-1);
+				}
 				close(pipe_fds[1]);
 			}
 		}
