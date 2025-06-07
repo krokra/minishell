@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils3.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:26:21 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 16:03:03 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 19:07:28 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ void	handle_shlvl(char **envp)
 			ft_setenv(envp, "SHLVL", new_value, 0);
 		free(new_value);
 	}
+	else
+        return ;
 }
 
 static int	setenv_loop(char **env, const char *name, const char *value, int ow)
