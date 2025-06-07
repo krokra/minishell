@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 11:04:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 13:58:10 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:25:34 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,27 @@ char	*strjoin_and_free_s1(char *s1, const char *s2)
 	char	*joined_str;
 
 	if (!s1 && !s2)
-		return (ft_strdup(""));
+	{
+		joined_str = ft_strdup("");
+		if (!joined_str)
+			return (NULL);
+		return (joined_str);
+	}
 	if (!s1)
-		return (ft_strdup(s2));
+	{
+		joined_str = ft_strdup(s2);
+		if (!joined_str)
+			return (NULL);
+		return (joined_str);
+	}
 	if (!s2)
+	{
 		return (s1);
+	}
 	joined_str = ft_strjoin(s1, s2);
 	free(s1);
+	if (!joined_str)
+		return (NULL);
 	return (joined_str);
 }
 

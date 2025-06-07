@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:12:05 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:21:03 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,10 @@ void	mainloop(char *str, char **envp, t_data *data)
 		}
 		add_history(str);
 		if (str[0] == '\n' || str[0] == '\0')
+		{
+			free(str);
 			continue ;
+		}
 		data->tokens = NULL;
 		if (!quote_and_token_handling(str, find_first_quote(str), &data))
 		{

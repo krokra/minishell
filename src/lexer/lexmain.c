@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:12:34 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:23:12 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,11 @@ static char	*read_until_quote_closed(char *line, char *old_line, int *quote)
 		else
 			input = readline("quote> ");
 		if (!input)
+		{
+			if (line != old_line)
+				free(line);
 			return (NULL);
+		}
 		tmp = malloc(ft_strlen(line) + ft_strlen(input) + 2);
 		ft_memset(tmp, 0, ft_strlen(line) + ft_strlen(input) + 2);
 		ft_memcpy(tmp, line, ft_strlen(line));
@@ -99,7 +103,7 @@ int	quote_and_token_handling(char *line, int quote, t_data **data)
 	if (!(*data)->tokens)
 	{
 		free(result);
-    	return (0);
+		return (0);
 	}
 	if (result)
 		free(result);
