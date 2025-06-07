@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 21:13:14 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 12:44:43 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,14 +55,6 @@ static char	*join_path(char *dir, char *cmd)
 	free(tmp);
 	return (full);
 }
-
-// static char	*is_access_possible(char *cmd)
-// {
-// 	if (access(cmd, F_OK | X_OK) == 0)
-// 		return (ft_strdup(cmd));
-// 	else
-// 		return (NULL);
-// }
 
 char	*path_of_cmd(char *cmd, char **paths)
 {

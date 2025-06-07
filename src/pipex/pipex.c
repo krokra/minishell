@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 18:52:57 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 12:57:33 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,6 +243,7 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 		exit(status);
 	}
 	start = find_command_start_from_segment(meta->cmds[meta->i]);
+	print_tokens(data->tokens);
 	argv = build_argv_from_tokens(start, 0, 0);
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);

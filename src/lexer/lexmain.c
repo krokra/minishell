@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 10:34:55 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 13:03:25 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,7 @@ void	quote_and_token_handling(char *line, int quote, t_data **data)
 	{
 		result = read_until_quote_closed(line, line, &quote);
 		if (!result)
-		{
-			free(line);
 			return ;
-		}
 		line = result;
 	}
 	(*data)->tokens = lexer(line, quote);

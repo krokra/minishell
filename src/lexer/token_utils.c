@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 17:50:52 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 12:55:29 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static char	**build_argv_loop(t_token *tmp, char **argv, int i)
 {
 	while (tmp && tmp->type != T_PIPE)
 	{
-		if (tmp->type == T_WORD || tmp->type == T_ENVVAR)
+		if ((tmp->type == T_WORD || tmp->type == T_ENVVAR) && ft_strncmp(tmp->content, "", 2) != 0) 
 			argv[i++] = ft_strdup(tmp->content);
 		if ((tmp->type == T_REDIR_OUT || tmp->type == T_APPEND
 				|| tmp->type == T_REDIR_IN
