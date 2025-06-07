@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils4.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 13:25:53 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 17:20:08 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 18:16:20 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ char    *replace_vars_in_str(t_token *tok, char *str, char **envp, t_data *data)
     {
         if (quote_helper(&str, vars) || quote_helper2(&str, vars))
             continue;
-        if (ft_strncmp(str, "$", 2) == 0 && tok && tok->has_space_after == 0)
+        if (ft_strncmp(str, "$", 2) == 0 && tok && tok->has_space_after == 0 && tok->next != NULL)
             return (free_replace_vars(vars));
 		i = quote_helper3(&str, vars, envp, data);
         if (i == 2)

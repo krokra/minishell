@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:43:47 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 12:58:54 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 18:20:35 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,9 @@ void	merge_tokens_without_space(t_token **tokens)
 	cur = *tokens;
 	while (cur && cur->next)
 	{
-		if (!cur->has_space_after && (((cur->type == T_WORD || cur->quotes != 0)
-			&& (cur->next->type == T_WORD || cur->next->quotes != 0)) || cur->type == T_ENVVAR))
+		if (!cur->has_space_after && 
+			((cur->type == T_WORD || cur->quotes != 0 || cur->type == T_ENVVAR) &&
+			(cur->next->type == T_WORD || cur->next->quotes != 0 || cur->next->type == T_ENVVAR)))
 		{
 			merged = ft_strjoin(cur->content, cur->next->content);
 			free(cur->content);
