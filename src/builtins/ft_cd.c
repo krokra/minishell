@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:58 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 21:03:04 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 13:41:29 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,7 @@ void	ft_cd(char *str, char **env, t_data *data)
 		data->exit_status = 0;
 		return ;
 	}
+	printf("cd :no such file or directory : %s\n", str);
+	free(pwd);
 	data->exit_status = 1;
 }

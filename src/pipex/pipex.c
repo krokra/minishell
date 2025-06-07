@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 12:57:33 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/07 13:21:51 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,11 +152,14 @@ static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 	char	*path;
 
 	path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
+	printf("\n\n%s\n\n", path);
 	close_all_except_std();
-	if (path == NULL)
+	if (path == NULL || ft_strchr(path, '/') == 0)
 	{
 		ft_putstr_fd("minishell: command not found: ", 2);
 		ft_putstr_fd_nl(cmdtab[0], 2);;
+		if (path)
+			free(path);
 		cleanup(cmdtab, env, data->tokens, data);
 		exit(127);
 	}
