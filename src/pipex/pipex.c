@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:46:22 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 17:47:10 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void	handle_stdout_redirection(t_token *current)
 	}
 	close(fd);
 }
-static void	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
+static int	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read, char **env, t_data *data)
 {
 	t_token	*current;
 
@@ -77,8 +77,11 @@ static void	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
 	{
 		if (current->type == T_REDIR_IN && current->next)
 		{
-			if (handle_input_redirection(current) < 0)
-				exit(1);
+			if (handle_input_redirection(current) == -1)
+			{
+				cleanup(NULL, env, data->tokens, data);
+				return (-1);
+			}
 			if (prev_pipe_read && *prev_pipe_read != -1)
 			{
 				close(*prev_pipe_read);
@@ -92,6 +95,7 @@ static void	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read)
 		}
 		current = current->next;
 	}
+	return (0);
 }
 
 static t_token	*find_command_start_from_segment(t_token *current_segment_token)
@@ -155,13 +159,17 @@ static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 
 	path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
 	close_all_except_std();
-	if (path == NULL || ft_strchr(path, '/') == 0)
+	if (path == NULL || ft_strchr(path, '/') == 0 || (path != NULL && access(path, X_OK) == -1))
 	{
-		ft_putstr_fd("minishell: command not found: ", 2);
-		ft_putstr_fd_nl(cmdtab[0], 2);;
+		if (path != NULL && access(path, X_OK) == -1)
+			printf("minishell: permission denied: %s\n", cmdtab[0]);
+		else
+			printf("minishell: command not found: %s\n", cmdtab[0]);
 		if (path)
 			free(path);
 		cleanup(cmdtab, env, data->tokens, data);
+		if (path != NULL && access(path, X_OK) == -1)
+			exit(126);
 		exit(127);
 	}
 	else if (execve(path, cmdtab, env) == -1)
@@ -212,28 +220,29 @@ void	wait_for_children(pid_t *pids, int n_cmds, t_data *data)
 	}
 }
 
-void	setup_fds_and_redirections(t_execmeta *meta)
+void	setup_fds_and_redirections(t_execmeta *meta, char **env, t_data *data)
 {
 	int	fd;
 
-	// D'abord les pipes
 	if (meta->has_next && !is_stdout_redirected(meta->cmds[meta->i]))
 		dup2_and_close(meta->pipefd[1], STDOUT_FILENO);
 	if (meta->has_next)
 		close(meta->pipefd[0]);
 	if (meta->prev_pipe_read != -1)
 		close(meta->prev_pipe_read);
-
-	// Ensuite les redirections
 	fd = get_heredoc_fd_from_segment(meta->cmds[meta->i]);
 	if (fd != -1)
 		dup2_and_close(fd, STDIN_FILENO);
 	else if (meta->prev_pipe_read != -1)
 		dup2_and_close(meta->prev_pipe_read, STDIN_FILENO);
-	handle_pipe_redirections(meta->cmds[meta->i], &meta->prev_pipe_read);
+	if (handle_pipe_redirections(meta->cmds[meta->i], &meta->prev_pipe_read, env, data) == -1)
+	{
+		free(meta->cmds);
+		exit(1);
+	}
 }
 
-void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
+int	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 {
 	t_token	*cmd;
 	t_token	*start;
@@ -251,6 +260,8 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 	}
 	start = find_command_start_from_segment(meta->cmds[meta->i]);
 	argv = build_argv_from_tokens(start, 0, 0);
+	if (!argv)
+		return (-1);
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	free(meta->cmds);
@@ -262,8 +273,9 @@ void	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 
 void	handle_child_exec(t_execmeta *meta, t_data *data, char **envp)
 {
-	setup_fds_and_redirections(meta);
-	exec_or_builtin(meta, data, envp);
+	setup_fds_and_redirections(meta, envp, data);
+	if (exec_or_builtin(meta, data, envp) == -1)
+		return ;
 }
 
 void	while_exec(t_execmeta *meta, t_data *data, char **envp)

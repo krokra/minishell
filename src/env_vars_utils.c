@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:18:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 17:38:38 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 15:56:26 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	free_token_list(t_token *token)
 		token = tmp;
 	}
 }
+
 char	*merge_token_list(t_token *head)
 {
 	char	*result;
@@ -53,26 +54,27 @@ char	*merge_token_list(t_token *head)
 
 static void	expanded_handling(char *exp, t_token *new_tokens, t_token *current)
 {
-	t_token	*tmp_tokens;
 	char	*merged;
-	(void)new_tokens;
+
 	if (!exp)
 		return;
 	if (current->quotes == '"' || current->quotes == '\'')
 	{
 		free(current->content);
 		current->content = exp;
-		return;
+		return ;
 	}
 	if (ft_strchr(exp, ' '))
 	{
-		tmp_tokens = lexer(exp, 0);
-		if (!tmp_tokens)
+		new_tokens = lexer(exp, 0);
+		if (!new_tokens)
 			return;
-		merged = merge_token_list(tmp_tokens);
+		merged = merge_token_list(new_tokens);
+		if (!merged)
+			return ;
 		free(current->content);
 		current->content = merged;
-		free_token_list(tmp_tokens); // ← à écrire si pas fait
+		free_token_list(new_tokens);
 		free(exp);
 	}
 	else

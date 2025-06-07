@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:43:38 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 17:39:12 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ void	mainloop(char *str, char **envp, t_data *data)
 			free(str);
 			continue ;
 		}
-		if (syntax_checker(data->tokens, data))
+		if (syntax_checker(data->tokens, data) == 1)
 		{
 			free(str);
 			free_tokens(data->tokens->first);

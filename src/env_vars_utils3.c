@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils3.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:26:21 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 17:51:09 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 16:03:03 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ static int	setenv_loop(char **env, const char *name, const char *value, int ow)
 				return (0);
 			new_entry = ft_strjoin(name, "=");
 			new_entry = strjoin_and_free_s1(new_entry, value);
+			if (!new_entry)
+				return (-1);
 			free(env[i]);
 			env[i] = new_entry;
 			return (0);
@@ -88,6 +90,8 @@ int	ft_setenv(char **env, const char *name, const char *value, int overwrite)
 		return (-1);
 	if (setenv_loop(env, name, value, overwrite) == 0)
 		return (0);
+	else if (setenv_loop(env, name, value, overwrite) == -1)
+		return (-1);
 	new_entry = ft_strjoin(name, "=");
 	new_entry = strjoin_and_free_s1(new_entry, value);
 	if (!new_entry)

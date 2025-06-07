@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils4.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 13:25:53 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 18:43:56 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/07 17:20:08 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,11 @@ static int	quote_helper3(char **str, t_vars *vars, char **envp, t_data *data)
 		vars->value = get_env_value(vars->var_name, envp, data);
 		free(vars->var_name);
 		if (!vars->value)
-			return (2);
+			return (free(vars->value), 2);
 		vars->tmp = vars->result;
 		vars->result = ft_strjoin(vars->result, vars->value);
-		free(vars->tmp);
-		free(vars->value);
 		if (!vars->result)
-			return (2);
+			return (free(vars->tmp), free(vars->value), 2);
 		(*str) += get_var_name_len(*str);
 		return (1);
 	}
