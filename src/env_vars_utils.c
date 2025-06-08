@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:18:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:56:26 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/08 11:32:17 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ static void	expanded_handling(char *exp, t_token *new_tokens, t_token *current)
 	{
 		new_tokens = lexer(exp, 0);
 		if (!new_tokens)
-			return;
+			return ;
 		merged = merge_token_list(new_tokens);
 		if (!merged)
 			return ;

@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/08 10:07:03 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/08 14:15:41 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	handle_stdout_redirection(t_token *current)
 	}
 	close(fd);
 }
+
 static int	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read, char **env, t_data *data)
 {
 	t_token	*current;
@@ -175,7 +176,7 @@ static void    exec_cmd_common(char **cmdtab, char **env, t_data *data)
 			free(path);
         exit(127);
     }
-    else if (execve(path, cmdtab, env) == -1)
+    if (execve(path, cmdtab, env) == -1)
     {
         ft_putstr_fd("minishell: error executing command: ", 2);
         ft_putstr_fd_nl(cmdtab[0], 2);
@@ -201,15 +202,16 @@ static void	perror_exit(const char *msg)
 	exit(1);
 }
 
-void	wait_for_children(pid_t *pids, int n_cmds, t_data *data)
+void	wait_for_children(t_execmeta *meta, t_data *data)
 {
 	int	i;
 	int	sig;
 
 	i = 0;
-	while (i < n_cmds)
+	free(meta->cmds);
+	while (i < meta->n_cmds)
 	{
-		waitpid(pids[i], &data->status_getter, 0);
+		waitpid(meta->pids[i], &data->status_getter, 0);
 		if (WIFEXITED(data->status_getter))
 			data->exit_status = WEXITSTATUS(data->status_getter);
 		else if (WIFSIGNALED(data->status_getter))
@@ -253,11 +255,12 @@ int	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 
 	cmd = find_command_start_from_segment(meta->cmds[meta->i]);
 	close_all_except_std();
-	if (cmd && handle_builtins(envp, cmd, data))
+	if (cmd && is_builtin(cmd->content))
 	{
+		free(meta->cmds);
+		handle_builtins(envp, cmd, data);
 		status = data->exit_status;
 		cleanup(NULL, envp, data->tokens, data);
-		free(meta->cmds);
 		exit(status);
 	}
 	start = find_command_start_from_segment(meta->cmds[meta->i]);
@@ -267,8 +270,7 @@ int	exec_or_builtin(t_execmeta *meta, t_data *data, char **envp)
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	free(meta->cmds);
-	if (argv[0])
-		exec_cmd_common(argv, envp, data);
+	exec_cmd_common(argv, envp, data);
 	cleanup(argv, envp, data->tokens, data);
 	exit(1);
 }
@@ -325,9 +327,8 @@ void	exec_cmd_tokens(t_data *data, char **envp)
 	if (!meta.cmds)
     	return ;
 	while_exec(&meta, data, envp);
-	wait_for_children(meta.pids, meta.n_cmds, data);
+	wait_for_children(&meta, data);
 	signal(SIGINT, sigint_prompt);
-	free(meta.cmds);
 	if (meta.prev_pipe_read != -1)
 		close(meta.prev_pipe_read);
 }

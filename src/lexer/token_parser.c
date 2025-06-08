@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/03 15:10:02 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/08 13:54:28 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,15 @@ t_token	*get_token_operator(char *input, int *i, int *quote, int start)
 	(*i)++;
 	*quote = 0;
 	content = create_token_string(input, start, *i);
+	if (!content)
+		return (NULL);
 	token = create_token(content, *quote);
+	if (!token)
+	{
+		if (content)
+			free(content);
+		return (NULL);
+	}
 	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
 	return (token);
 }
@@ -53,8 +61,20 @@ t_token	*get_token_general(char *input, int *i, int *quote, int start)
 	char		*content;
 
 	content = create_token_string(input, start, *i);
+	if (!content)
+		return (NULL);
 	token = create_token(content, *quote);
-	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
+	if (!token)
+	{
+		if (content)
+			free(content);
+		return (NULL);
+	}
+	while (input[*i] == ' ' || input[*i] == '\t')
+	{
+		token->has_space_after = 1;
+		(*i)++;
+	}
 	return (token);
 }
 
@@ -63,9 +83,17 @@ t_token	*get_token_end(char *input, int *i, int *quote, int start)
 	t_token		*token;
 	char		*content;
 
+	if (start == *i)
+		return (NULL);
 	content = create_token_string(input, start, *i);
+	if (!content)
+		return (NULL);
 	token = create_token(content, *quote);
-	token->has_space_after = (input[*i] == ' ' || input[*i] == '\t');
+	if (!token)
+		return (NULL);
+	while (input[*i] == ' ' || input[*i] == '\t')
+		(*i)++;
+	token->has_space_after = 0;
 	*quote = 0;
 	return (token);
 }

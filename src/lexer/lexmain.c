@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexmain.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:23:12 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/08 12:40:19 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,13 +66,15 @@ static char	*read_until_quote_closed(char *line, char *old_line, int *quote)
 			input = readline("dquote> ");
 		else
 			input = readline("quote> ");
-		if (!input)
+		tmp = malloc(ft_strlen(line) + ft_strlen(input) + 2);
+		if (!tmp || !input)
 		{
+			if (input)
+				free(input);
 			if (line != old_line)
 				free(line);
 			return (NULL);
 		}
-		tmp = malloc(ft_strlen(line) + ft_strlen(input) + 2);
 		ft_memset(tmp, 0, ft_strlen(line) + ft_strlen(input) + 2);
 		ft_memcpy(tmp, line, ft_strlen(line));
 		tmp[ft_strlen(line)] = '\0';
@@ -100,6 +102,7 @@ int	quote_and_token_handling(char *line, int quote, t_data **data)
 		line = result;
 	}
 	(*data)->tokens = lexer(line, quote);
+	print_tokens((*data)->tokens);
 	if (!(*data)->tokens)
 	{
 		free(result);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:43:47 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 18:20:35 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/08 13:51:37 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	set_token_type(t_token *token)
 {
+	if (!token || !token->content)
+		return ;
 	if ((token->quotes == '"' || token->quotes == '\'')
 		&& token->content[1] != '$')
 		token->type = T_WORD;
@@ -45,9 +47,11 @@ t_token	*create_token(char *content, char quote)
 {
 	t_token	*new;
 
+	if (!content || !*content)
+		return (NULL);
 	new = malloc(sizeof(t_token));
 	if (!new)
-		return (NULL);
+		return (free(content), NULL);
 	new->content = content;
 	new->quotes = quote;
 	new->heredoc_pipe_read_fd = -1;

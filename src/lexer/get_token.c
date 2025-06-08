@@ -64,7 +64,12 @@ t_token	*get_token(char *input, int *i, int *quote)
 	while (input[*i])
 	{
 		if (!state.in_quote && is_token_delim(input[*i]))
-			break ;
+		{
+			t_token *token = get_token_general(input, i, quote, state.start);
+			if (token)
+				return token;
+			break;
+		}
 		if (!state.in_quote && (input[*i] == '\"' || input[*i] == '\''))
 		{
 			if (*i > state.start)

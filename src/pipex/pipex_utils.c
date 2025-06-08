@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 19:08:06 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/08 12:13:04 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ char	*path_of_cmd(char *cmd, char **paths)
 		return (NULL);
 	if (ft_strchr(cmd, '/'))
 	{
-		if (access(cmd, F_OK) == 0)
+		if (access(cmd, F_OK | X_OK) == 0)
 			return (ft_free(paths), ft_strdup(cmd));
 	}
 	while (paths[i])
