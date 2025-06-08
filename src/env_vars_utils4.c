@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils4.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 13:25:53 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 18:16:20 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/08 10:42:04 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,11 +68,13 @@ static int	quote_helper3(char **str, t_vars *vars, char **envp, t_data *data)
 		vars->value = get_env_value(vars->var_name, envp, data);
 		free(vars->var_name);
 		if (!vars->value)
-			return (free(vars->value), 2);
+			return (2);
 		vars->tmp = vars->result;
 		vars->result = ft_strjoin(vars->result, vars->value);
+		free(vars->value);
+		free(vars->tmp);
 		if (!vars->result)
-			return (free(vars->tmp), free(vars->value), 2);
+			return (free(vars->tmp), 2);
 		(*str) += get_var_name_len(*str);
 		return (1);
 	}
@@ -105,7 +107,7 @@ char    *replace_vars_in_str(t_token *tok, char *str, char **envp, t_data *data)
     while (*str)
     {
         if (quote_helper(&str, vars) || quote_helper2(&str, vars))
-            continue;
+            continue ;
         if (ft_strncmp(str, "$", 2) == 0 && tok && tok->has_space_after == 0 && tok->next != NULL)
             return (free_replace_vars(vars));
 		i = quote_helper3(&str, vars, envp, data);

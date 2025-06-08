@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:26:25 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 18:58:25 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/08 10:10:38 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,11 @@ char	*get_env_value(char *var_name, char **envp, t_data *data)
 {
 	char	*value;
 
-	
 	if (var_name[0] == '?' && var_name[1] == '$')
-		return (strjoin_and_free_s1(ft_itoa(data->exit_status), "$"));
+	{
+		value = ft_itoa(data->exit_status);
+		return (strjoin_and_free_s1(value, "$"));
+	}
 	else if (var_name[0] == '?' && var_name[1] == '\0')
 		return (ft_itoa(data->exit_status));
 	value = ft_getenv(envp, var_name);
