@@ -14,11 +14,10 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
-
 void	*ft_realloc(void *dst, size_t old_size, size_t new_size)
 {
-	void *new_ptr;
-	size_t copy_size;
+	void	*new_ptr;
+	size_t	copy_size;
 
 	if (new_size == 0)
 	{

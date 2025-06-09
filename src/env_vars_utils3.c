@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:26:21 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 11:15:48 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 12:43:05 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,15 +94,14 @@ int	ft_setenv(char **env, const char *name, const char *value, int overwrite)
 	int		i;
 	char	*new_entry;
 	char	**new_env;
+	int		result;
 
 	if (!name || !value)
 		return (-1);
-	if (setenv_loop(env, name, value, overwrite) == 0)
-		return (0);
-	else if (setenv_loop(env, name, value, overwrite) == -1)
-		return (-1);
-	new_entry = ft_strjoin(name, "=");
-	new_entry = strjoin_and_free_s1(new_entry, value);
+	result = setenv_loop(env, name, value, overwrite);
+	if (result == 0 || result == -1)
+		return (result);
+	new_entry = strjoin_and_free_s1(ft_strjoin(name, "="), value);
 	if (!new_entry)
 		return (-1);
 	i = 0;
@@ -111,10 +110,7 @@ int	ft_setenv(char **env, const char *name, const char *value, int overwrite)
 	new_env = ft_realloc(env, (i + 1) * sizeof(char *), (i + 2)
 			* sizeof(char *));
 	if (!new_env)
-	{
-		free(new_entry);
-		return (-1);
-	}
+		return (free(new_entry), -1);
 	add_env_var(new_env, new_entry, i);
 	free(new_entry);
 	return (0);

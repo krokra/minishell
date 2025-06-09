@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 11:41:52 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 13:11:07 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,9 @@ static int	is_n_flag(const char *str)
 
 void	ft_echo(t_token *token, t_data *data)
 {
-	int	skip_newline = 0;
+	int	skip_newline;
 
+	skip_newline = 0;
 	while (token && is_n_flag(token->content))
 	{
 		skip_newline = 1;
@@ -44,7 +45,7 @@ void	ft_echo(t_token *token, t_data *data)
 			&& token->quotes == 0 && token->next)
 		{
 			token = token->next;
-			continue;
+			continue ;
 		}
 		if (token->has_space_after && token->next
 			&& (token->next->type == T_WORD || token->next->type == T_ENVVAR))

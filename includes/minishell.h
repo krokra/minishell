@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 11:13:24 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 13:01:33 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ typedef struct s_append {
 	int	last_redir;
 	int	redir_applied;
 }					t_append;
+
+// Function declarations
 int		handle_heredocs(t_token *tokens, char **env, t_data *data);
 void	ft_pwd(t_data *data);
 int		is_builtin(char *cmd);
@@ -66,8 +68,7 @@ void	pwd_update(char **env, char *new_pwd);
 void	ft_export(char **env, t_token *token, t_data *data);
 void	ft_unset(t_token *token, char **env, t_data *data);
 char	*ft_getenv(char **env, char *name);
-int		ft_setenv(char **env, const char *name, const char *value,
-			int overwrite);
+int		ft_setenv(char **env, const char *name, const char *value, int overwrite);
 int		export_len(char *arg);
 void	*ft_realloc(void *dst, size_t old_size, size_t new_size);
 void	sigint_prompt(int sig);
@@ -89,5 +90,11 @@ int		is_valid_var_char(char c);
 char	*get_env_value(char *var_name, char **envp, t_data *data);
 void	handle_failed_redir(char *str, t_data *data, t_append *append);
 void	restore_stdout(t_data *data, t_append *append, int is_builtin);
+void	handle_out_redirections(t_data *data, t_append *append, t_token *redir);
+void	readline_loop(char *str, char **envp, t_data *data);
+void	redirection_exec(t_data *data, t_append *append, t_token *redir);
+int		gestion_heredocs(t_data *data, char **envp, char *str);
+int		check_pipe_syntax_error(t_token *current, t_data *data, char *str);
+void	exec_cmd_tokens(t_data *data, char **envp);
 
 #endif

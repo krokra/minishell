@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:58 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 11:43:39 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 13:10:18 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ static int	special_cases(char *str, char **env)
 	return (0);
 }
 
-static int cd_check(char *str, char **env)
+static int	cd_check(char *str, char **env)
 {
 	if ((str == NULL || ft_strncmp(str, "~", 1) == 0
 		|| ft_strncmp(str, "-", 1) == 0) && special_cases(str, env) != 0)
@@ -52,12 +52,13 @@ static int cd_check(char *str, char **env)
 static void	new_pwd(char **env, char *pwd, t_data *data)
 {
 	oldpwd_update(env, pwd);
-		free(pwd);
-		pwd = getcwd(NULL, 0);
-		pwd_update(env, pwd);
-		free(pwd);
-		data->exit_status = 0;
+	free(pwd);
+	pwd = getcwd(NULL, 0);
+	pwd_update(env, pwd);
+	free(pwd);
+	data->exit_status = 0;
 }
+
 void	ft_cd(char *str, char **env, t_data *data)
 {
 	char	*pwd;

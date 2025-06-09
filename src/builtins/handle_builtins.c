@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_builtins.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 11:18:48 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/08 14:08:16 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 13:17:15 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,19 @@
 
 int	is_builtin(char *cmd)
 {
-	if (ft_strncmp(cmd, "cd", 3 == 0) ||
-		ft_strncmp(cmd, "pwd", 4 == 0) ||
-		ft_strncmp(cmd, "export", 7) == 0 ||
-		ft_strncmp(cmd, "unset", 6) == 0 ||
-		ft_strncmp(cmd, "env", 4) == 0 ||
-		ft_strncmp(cmd, "pwd", 4) == 0 ||
-		ft_strncmp(cmd, "echo", 5) == 0 ||
-		ft_strncmp(cmd, "exit", 5) == 0)
+	if (ft_strncmp(cmd, "cd", 3 == 0) 
+		|| ft_strncmp(cmd, "pwd", 4 == 0) 
+		|| ft_strncmp(cmd, "export", 7) == 0
+		|| ft_strncmp(cmd, "unset", 6) == 0
+		|| ft_strncmp(cmd, "env", 4) == 0
+		|| ft_strncmp(cmd, "pwd", 4) == 0
+		|| ft_strncmp(cmd, "echo", 5) == 0
+		|| ft_strncmp(cmd, "exit", 5) == 0)
 		return (1);
 	else
 		return (0);
 }
+
 static int	handle_builtins2(char **envp, t_token *token, t_data *data)
 {
 	if (ft_strncmp(token->content, "pwd", 4) == 0)
