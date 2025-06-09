@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 18:19:55 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 15:48:01 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:15:10 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,9 @@ static char	*expand_line_heredoc(char *line, char **env, t_data *data)
 {
 	if (!line)
 		return (NULL);
-	t_token temp_token;
-	temp_token.type = T_HEREDOC;
-	temp_token.has_space_after = 0;
-	return (replace_vars_in_str(&temp_token, line, env, data));
+	if (ft_strchr(line, '$') == NULL)
+		return (ft_strdup(line));
+	return (replace_vars_in_str(NULL, line, env, data));
 }
 
 static int	processed_line_check(char *processed_line, int pipe_fds[2])
@@ -52,16 +51,16 @@ static int	processed_line_check(char *processed_line, int pipe_fds[2])
 
 int	hdoc_loop(t_token *current_token, int pipe_fds[2], char **env, t_data *data)
 {
-	char		*input_line;
-	char		*processed_line;
-	char		*delimiter_str;
+	char	*input_line;
+	char	*processed_line;
+	char	*delimiter_str;
 
 	current_token->heredoc_pipe_read_fd = pipe_fds[0];
 	delimiter_str = current_token->next->content;
 	while (1)
 	{
 		input_line = readline("> ");
-		if (!input_line)
+		if (input_line == NULL)
 		{
 			close(pipe_fds[0]);
 			close(pipe_fds[1]);
@@ -70,16 +69,9 @@ int	hdoc_loop(t_token *current_token, int pipe_fds[2], char **env, t_data *data)
 		if (strcmp(input_line, delimiter_str) == 0)
 		{
 			free(input_line);
-			break;
+			break ;
 		}
-		if (!current_token->heredoc_delimiter_quoted)
-			processed_line = expand_line_heredoc(input_line, env, data);
-		else
-			processed_line = ft_strdup(input_line);
-		free(input_line);
-
-		if (!processed_line)
-			return (-1);
+		processed_line = expand_line_heredoc(input_line, env, data);
 		if (processed_line_check(processed_line, pipe_fds) == 0)
 			return (-1);
 	}
@@ -88,8 +80,8 @@ int	hdoc_loop(t_token *current_token, int pipe_fds[2], char **env, t_data *data)
 
 int	handle_heredocs(t_token *tokens, char **env, t_data *data)
 {
-	t_token		*current_token;
-	int			pipe_fds[2];
+	t_token	*current_token;
+	int		pipe_fds[2];
 
 	current_token = tokens;
 	while (current_token)
@@ -104,20 +96,7 @@ int	handle_heredocs(t_token *tokens, char **env, t_data *data)
 					return (-1);
 				}
 				if (hdoc_loop(current_token, pipe_fds, env, data) == -1)
-				{
-					// En cas de CTRL+D, on ferme tous les pipes des heredocs précédents
-					t_token *tmp = tokens;
-					while (tmp != current_token)
-					{
-						if (tmp->type == T_HEREDOC && tmp->heredoc_pipe_read_fd != -1)
-						{
-							close(tmp->heredoc_pipe_read_fd);
-							tmp->heredoc_pipe_read_fd = -1;
-						}
-						tmp = tmp->next;
-					}
 					return (-1);
-				}
 				close(pipe_fds[1]);
 			}
 		}

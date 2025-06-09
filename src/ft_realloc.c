@@ -2,19 +2,23 @@
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ft_realloc.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
+/*                                                    +:+ +:+        
+	+:+     */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+      
+	+#+        */
+/*                                                +#+#+#+#+#+  
+	+#+           */
 /*   Created: 2025/04/18 15:11:57 by psirault          #+#    #+#             */
 /*   Updated: 2025/04/18 15:11:57 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
+
 void	*ft_realloc(void *dst, size_t old_size, size_t new_size)
 {
-	void	*new_ptr;
-	size_t	copy_size;
+	void *new_ptr;
+	size_t copy_size;
 
 	if (new_size == 0)
 	{

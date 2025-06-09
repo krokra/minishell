@@ -2,15 +2,19 @@
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   get_token.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
+/*                                                    +:+ +:+        
+	+:+     */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+      
+	+#+        */
+/*                                                +#+#+#+#+#+  
+	+#+           */
 /*   Created: 2025/06/03 15:07:07 by psirault          #+#    #+#             */
 /*   Updated: 2025/06/03 15:07:07 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/lexer.h"
+
 
 static int	skip_spaces(char *input, int *i)
 {
@@ -24,7 +28,8 @@ static int	is_token_delim(char c)
 	return (c == ' ' || c == '\t' || c == '|' || c == '<' || c == '>');
 }
 
-static int	handle_quotes(char *input, int *i, t_token_state *state, int *quote)
+static int	handle_quotes(char *input, int *i, t_token_state *state,
+		int *quote)
 {
 	if (input[*i] == '\'' && input[*i + 1] == '\'')
 	{
@@ -52,7 +57,7 @@ static int	close_quote(char *input, int *i, t_token_state *state)
 
 t_token	*get_token(char *input, int *i, int *quote)
 {
-	t_token_state	state;
+	t_token_state state;
 
 	state.in_quote = 0;
 	state.quote_char = 0;
@@ -64,12 +69,7 @@ t_token	*get_token(char *input, int *i, int *quote)
 	while (input[*i])
 	{
 		if (!state.in_quote && is_token_delim(input[*i]))
-		{
-			t_token *token = get_token_general(input, i, quote, state.start);
-			if (token)
-				return token;
-			break;
-		}
+			return (get_token_general(input, i, quote, state.start));
 		if (!state.in_quote && (input[*i] == '\"' || input[*i] == '\''))
 		{
 			if (*i > state.start)

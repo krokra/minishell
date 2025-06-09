@@ -3,21 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   token_utils2.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:43:47 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/08 13:51:37 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:35:14 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/lexer.h"
 
-void	set_token_type(t_token *token)
+int	set_token_2(t_token *token)
 {
-	if (!token || !token->content)
-		return ;
 	if ((token->quotes == '"' || token->quotes == '\'')
-		&& token->content[1] != '$')
+			&& token->content[1] != '$')
 		token->type = T_WORD;
 	else if (ft_strncmp(token->content, "|", 1) == 0)
 		token->type = T_PIPE;
@@ -30,14 +28,26 @@ void	set_token_type(t_token *token)
 	else if (ft_strncmp(token->content, "<<", 3) == 0)
 	{
 		token->type = T_HEREDOC;
-		if (token->next && (token->next->quotes == '\'' || token->next->quotes == '"'))
+		if (token->next && (token->next->quotes == '\''
+				|| token->next->quotes == '"'))
 			token->heredoc_delimiter_quoted = 1;
 		else
 			token->heredoc_delimiter_quoted = 0;
 	}
+	else
+		return (0);
+	return (1);
+}
+
+void	set_token_type(t_token *token)
+{
+	if (!token || !token->content)
+		return ;
+	if (set_token_2(token) == 1)
+		return ;
 	else if (ft_strncmp(token->content, "$", 1) == 0
 		|| ft_strncmp(token->content, "\"$", 2) == 0
-		|| ft_strncmp(token->content, "'$", 2) == 0)
+			|| ft_strncmp(token->content, "'$", 2) == 0)
 		token->type = T_ENVVAR;
 	else
 		token->type = T_WORD;
@@ -100,9 +110,9 @@ void	merge_tokens_without_space(t_token **tokens)
 	cur = *tokens;
 	while (cur && cur->next)
 	{
-		if (!cur->has_space_after && 
-			((cur->type == T_WORD || cur->quotes != 0 || cur->type == T_ENVVAR) &&
-			(cur->next->type == T_WORD || cur->next->quotes != 0 || cur->next->type == T_ENVVAR)))
+		if (!cur->has_space_after && ((cur->type == T_WORD || cur->quotes != 0
+					|| cur->type == T_ENVVAR) && (cur->next->type == T_WORD
+					|| cur->next->quotes != 0 || cur->next->type == T_ENVVAR)))
 		{
 			merged = ft_strjoin(cur->content, cur->next->content);
 			free(cur->content);

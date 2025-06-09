@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 13:59:32 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:41:52 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,31 +30,26 @@ static int	is_n_flag(const char *str)
 
 void	ft_echo(t_token *token, t_data *data)
 {
-	int	skip_newline;
+	int	skip_newline = 0;
 
-	skip_newline = 0;
 	while (token && is_n_flag(token->content))
 	{
 		skip_newline = 1;
 		token = token->next;
 	}
-	while (token != NULL && (token->type == T_WORD || token->type == T_ENVVAR))
+	while (token && (token->type == T_WORD || token->type == T_ENVVAR))
 	{
 		ft_putstr_fd(token->content, 1);
-		if (token->type == T_ENVVAR && (token->content[0] == '\0' && token->quotes == 0) && token->next)
+		if (token->type == T_ENVVAR && token->content[0] == '\0'
+			&& token->quotes == 0 && token->next)
 		{
 			token = token->next;
 			continue;
 		}
-		else if (!token->next)
-			break;
-		if (token->has_space_after == 1 && (token->next->type == T_WORD
-				|| token->next->type == T_ENVVAR) && token->next)
+		if (token->has_space_after && token->next
+			&& (token->next->type == T_WORD || token->next->type == T_ENVVAR))
 			ft_putchar_fd(' ', 1);
-		if (token->next)
-			token = token->next;
-		else
-			break;
+		token = token->next;
 	}
 	if (!skip_newline)
 		ft_putchar_fd('\n', 1);

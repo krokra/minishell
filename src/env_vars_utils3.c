@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils3.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:26:21 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/08 14:14:36 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:15:48 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	handle_shlvl(char **envp)
 		free(new_value);
 	}
 	else
-        return (free(new_value));
+		return (free(new_value));
 }
 
 static int	setenv_loop(char **env, const char *name, const char *value, int ow)
@@ -82,6 +82,13 @@ static int	setenv_loop(char **env, const char *name, const char *value, int ow)
 	return (1);
 }
 
+static void	add_env_var(char **new_env, char *new_entry, int i)
+{
+	new_env[i] = new_entry;
+	new_env[i + 1] = NULL;
+	free(new_entry);
+}
+
 int	ft_setenv(char **env, const char *name, const char *value, int overwrite)
 {
 	int		i;
@@ -101,15 +108,14 @@ int	ft_setenv(char **env, const char *name, const char *value, int overwrite)
 	i = 0;
 	while (env[i])
 		i++;
-	new_env = ft_realloc(env, (i + 1) * sizeof(char *),
-			(i + 2) * sizeof(char *));
+	new_env = ft_realloc(env, (i + 1) * sizeof(char *), (i + 2)
+			* sizeof(char *));
 	if (!new_env)
 	{
 		free(new_entry);
 		return (-1);
 	}
-	new_env[i] = new_entry;
-	new_env[i + 1] = NULL;
+	add_env_var(new_env, new_entry, i);
 	free(new_entry);
 	return (0);
 }

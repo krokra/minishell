@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/06 18:58:14 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:13:24 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,5 +87,7 @@ size_t	get_var_name_len(char *str);
 char	*strjoin_and_free_s1(char *s1, const char *s2);
 int		is_valid_var_char(char c);
 char	*get_env_value(char *var_name, char **envp, t_data *data);
+void	handle_failed_redir(char *str, t_data *data, t_append *append);
+void	restore_stdout(t_data *data, t_append *append, int is_builtin);
 
 #endif

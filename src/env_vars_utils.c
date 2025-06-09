@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_vars_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 11:18:50 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/08 11:32:17 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:15:55 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	free_token_list(t_token *token)
 {
-	t_token *tmp;
+	t_token	*tmp;
 
 	while (token)
 	{
@@ -52,12 +52,18 @@ char	*merge_token_list(t_token *head)
 	return (result);
 }
 
+static void	expand_token(char *exp, t_token *current)
+{
+	free(current->content);
+	current->content = exp;
+}
+
 static void	expanded_handling(char *exp, t_token *new_tokens, t_token *current)
 {
 	char	*merged;
 
 	if (!exp)
-		return;
+		return ;
 	if (current->quotes == '"' || current->quotes == '\'')
 	{
 		free(current->content);
@@ -78,10 +84,7 @@ static void	expanded_handling(char *exp, t_token *new_tokens, t_token *current)
 		free(exp);
 	}
 	else
-	{
-		free(current->content);
-		current->content = exp;
-	}
+		expand_token(exp, current);
 }
 
 void	replace_env_vars(t_token *tokens, char **envp, t_data *data)

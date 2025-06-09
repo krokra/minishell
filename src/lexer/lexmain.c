@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexmain.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:58:57 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/08 12:40:19 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:29:59 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,20 @@ static int	is_quote_closed(const char *str, char quote)
 	return (!found);
 }
 
+int	check_malloc_input(char *tmp, char *input, char *line, char *old_line)
+{
+	tmp = malloc(ft_strlen(line) + ft_strlen(input) + 2);
+	if (!tmp || !input)
+	{
+		if (input)
+			free(input);
+		if (line != old_line)
+			free(line);
+		return (0);
+	}
+	return (1);
+}
+
 static char	*read_until_quote_closed(char *line, char *old_line, int *quote)
 {
 	char	*input;
@@ -66,15 +80,9 @@ static char	*read_until_quote_closed(char *line, char *old_line, int *quote)
 			input = readline("dquote> ");
 		else
 			input = readline("quote> ");
-		tmp = malloc(ft_strlen(line) + ft_strlen(input) + 2);
-		if (!tmp || !input)
-		{
-			if (input)
-				free(input);
-			if (line != old_line)
-				free(line);
+		if (!check_malloc_input(tmp, input, line, old_line))
 			return (NULL);
-		}
+		tmp = malloc(ft_strlen(line) + ft_strlen(input) + 2);
 		ft_memset(tmp, 0, ft_strlen(line) + ft_strlen(input) + 2);
 		ft_memcpy(tmp, line, ft_strlen(line));
 		tmp[ft_strlen(line)] = '\0';

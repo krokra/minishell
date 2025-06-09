@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:58 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 13:41:29 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:43:39 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,15 @@ static int cd_check(char *str, char **env)
 		return (1);
 }
 
+static void	new_pwd(char **env, char *pwd, t_data *data)
+{
+	oldpwd_update(env, pwd);
+		free(pwd);
+		pwd = getcwd(NULL, 0);
+		pwd_update(env, pwd);
+		free(pwd);
+		data->exit_status = 0;
+}
 void	ft_cd(char *str, char **env, t_data *data)
 {
 	char	*pwd;
@@ -67,12 +76,7 @@ void	ft_cd(char *str, char **env, t_data *data)
 	}
 	else if (chdir(str) != -1 && str != NULL)
 	{
-		oldpwd_update(env, pwd);
-		free(pwd);
-		pwd = getcwd(NULL, 0);
-		pwd_update(env, pwd);
-		free(pwd);
-		data->exit_status = 0;
+		new_pwd(env, pwd, data);
 		return ;
 	}
 	printf("cd :no such file or directory : %s\n", str);

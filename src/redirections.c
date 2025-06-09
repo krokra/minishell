@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 13:24:30 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 17:34:50 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:15:03 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	handle_redirections(t_token *tokens)
 {
-	int		fd;
+	int	fd;
 
 	fd = 0;
 	if (tokens->next == NULL || tokens->next->type != T_WORD)

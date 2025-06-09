@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/08 14:15:41 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 11:20:57 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 #include "../../includes/minishell.h"
 #include "../../includes/pipex.h"
 
-void    close_all_except_std(void)
+void	close_all_except_std(void)
 {
-	int fd;
+	int	fd;
 
 	fd = 3;
-    while (fd < 1024)
+	while (fd < 1024)
 	{
 		close(fd);
 		fd++;
@@ -69,7 +69,8 @@ void	handle_stdout_redirection(t_token *current)
 	close(fd);
 }
 
-static int	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read, char **env, t_data *data)
+static int	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read,
+		char **env, t_data *data)
 {
 	t_token	*current;
 
@@ -91,9 +92,7 @@ static int	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read, char *
 		}
 		else if ((current->type == T_REDIR_OUT || current->type == T_APPEND)
 			&& current->next && current->next->type == T_WORD)
-		{
 			handle_stdout_redirection(current);
-		}
 		current = current->next;
 	}
 	return (0);
@@ -154,36 +153,33 @@ void	cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 		free_tokens(tokens);
 }
 
-static void    exec_cmd_common(char **cmdtab, char **env, t_data *data)
+static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 {
-    char    *path;
+	char	*path;
+	int		is_perm;
 
-    path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
-    close_all_except_std();
-    if (path == NULL || ft_strchr(path, '/') == 0 || (path != NULL && access(path, X_OK) == -1))
-    {
-        if (path != NULL && access(path, X_OK) == -1)
-            printf("minishell: permission denied: %s\n", cmdtab[0]);
-        else
-            printf("minishell: command not found: %s\n", cmdtab[0]);
-        cleanup(cmdtab, env, data->tokens, data);
-        if (path != NULL && access(path, X_OK) == -1)
-		{
+	path = path_of_cmd(cmdtab[0], ft_get_paths("PATH", env));
+	close_all_except_std();
+	is_perm = (path && access(path, X_OK) == -1);
+	if (!path || !ft_strchr(path, '/') || is_perm)
+	{
+		if (is_perm)
+			printf("minishell: permission denied: %s\n", cmdtab[0]);
+		else
+			printf("minishell: command not found: %s\n", cmdtab[0]);
+		cleanup(cmdtab, env, data->tokens, data);
+		if (path)
 			free(path);
-            exit(126);
-		}
-		else if (path)
-			free(path);
-        exit(127);
-    }
-    if (execve(path, cmdtab, env) == -1)
-    {
-        ft_putstr_fd("minishell: error executing command: ", 2);
-        ft_putstr_fd_nl(cmdtab[0], 2);
-        free(path);
-        cleanup(cmdtab, env, data->tokens, data);
-        exit(126);
-    }
+		exit(is_perm ? 126 : 127);
+	}
+	if (execve(path, cmdtab, env) == -1)
+	{
+		ft_putstr_fd("minishell: error executing command: ", 2);
+		ft_putstr_fd_nl(cmdtab[0], 2);
+		free(path);
+		cleanup(cmdtab, env, data->tokens, data);
+		exit(126);
+	}
 }
 
 static void	dup2_and_close(int oldfd, int newfd)
@@ -231,15 +227,13 @@ void	setup_fds_and_redirections(t_execmeta *meta, char **env, t_data *data)
 
 	if (meta->has_next && !is_stdout_redirected(meta->cmds[meta->i]))
 		dup2_and_close(meta->pipefd[1], STDOUT_FILENO);
-
 	if (meta->prev_pipe_read != -1)
 		dup2_and_close(meta->prev_pipe_read, STDIN_FILENO);
-
 	fd = get_heredoc_fd_from_segment(meta->cmds[meta->i]);
 	if (fd != -1)
 		dup2_and_close(fd, STDIN_FILENO);
-
-	if (handle_pipe_redirections(meta->cmds[meta->i], &meta->prev_pipe_read, env, data) == -1)
+	if (handle_pipe_redirections(meta->cmds[meta->i], &meta->prev_pipe_read,
+			env, data) == -1)
 	{
 		free(meta->cmds);
 		exit(1);
@@ -289,29 +283,18 @@ void	while_exec(t_execmeta *meta, t_data *data, char **envp)
 		meta->has_next = (meta->i < meta->n_cmds - 1);
 		if (meta->has_next && pipe(meta->pipefd) < 0)
 			perror_exit("minishell: pipe");
-
 		signal(SIGINT, SIG_IGN);
 		meta->pid = fork();
 		if (meta->pid < 0)
 			perror_exit("minishell: fork");
-
-		if (meta->pid == 0) // CHILD
+		if (meta->pid == 0)
 			handle_child_exec(meta, data, envp);
-
-		// PARENT
 		meta->pids[meta->i] = meta->pid;
-
-		// Ferme l'ancien pipe read (plus utilisé)
 		if (meta->prev_pipe_read != -1)
 			close(meta->prev_pipe_read);
-
-		// Ferme l'écriture actuelle (child l'a déjà utilisé)
 		if (meta->has_next)
 			close(meta->pipefd[1]);
-
-		// Prépare le prochain pipe read
 		meta->prev_pipe_read = (meta->has_next) ? meta->pipefd[0] : -1;
-
 		meta->i++;
 	}
 }
@@ -325,7 +308,7 @@ void	exec_cmd_tokens(t_data *data, char **envp)
 	meta.n_cmds = 0;
 	meta.cmds = split_tokens_by_pipe(data->tokens, &meta.n_cmds, 0, 1);
 	if (!meta.cmds)
-    	return ;
+		return ;
 	while_exec(&meta, data, envp);
 	wait_for_children(&meta, data);
 	signal(SIGINT, sigint_prompt);
