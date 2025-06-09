@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:47:49 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 17:10:38 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,5 +107,7 @@ void	exec_cmd_common(char **cmdtab, char **env, t_data *data);
 void	dup2_and_close(int oldfd, int newfd);
 void	exec_cmd_tokens(t_data *data, char **envp);
 void	perror_exit(const char *msg);
+void	execute_simple_redirection(char *str, char **envp, t_data *data,
+		t_append *append);
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 12:53:24 by nbariol-          #+#    #+#             */
-/*   Updated: 2025/06/09 16:04:45 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 17:08:18 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	execute_simple_redirection(char *str, char **envp, t_data *data,
 	append->redir_applied = 0;
 	redir = data->tokens->first;
 	handle_out_redirections(data, append, redir);
-	if (append->last_redir < 0)
+	if (append->last_redir == 1)
 	{
 		handle_failed_redir(str, data, append);
 		return ;
@@ -70,33 +70,4 @@ void	execute_simple_redirection(char *str, char **envp, t_data *data,
 	}
 	if (data->tokens->heredoc_pipe_read_fd != -1)
 		close(data->tokens->heredoc_pipe_read_fd);
-}
-
-void	readline_loop(char *str, char **envp, t_data *data)
-{
-	t_append	append;
-	t_token		*current;
-
-	if (gestion_heredocs(data, envp, str) == -1)
-		return ;
-	current = data->tokens->first;
-	if (check_pipe_syntax_error(current, data, str) > 0)
-	{
-		data->saved_stdout = dup(STDOUT_FILENO);
-		if (data->saved_stdout != -1)
-		{
-			dup2(data->saved_stdout, STDOUT_FILENO);
-			close(data->saved_stdout);
-		}
-		exec_cmd_tokens(data, envp);
-		dup2(data->saved_stdout, STDOUT_FILENO);
-		close(data->saved_stdout);
-		if (data->tokens->heredoc_pipe_read_fd != -1)
-			close(data->tokens->heredoc_pipe_read_fd);
-	}
-	else
-		execute_simple_redirection(str, envp, data, &append);
-	free(str);
-	free_tokens(data->tokens->first);
-	data->tokens = NULL;
 }
