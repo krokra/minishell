@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 13:18:55 by nbariol-          #+#    #+#             */
-/*   Updated: 2025/06/09 15:41:04 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:59:56 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,17 @@ void	while_exec(t_execmeta *meta, t_data *data, char **envp)
 			close(meta->prev_pipe_read);
 		if (meta->has_next)
 			close(meta->pipefd[1]);
-		meta->prev_pipe_read = (meta->has_next) ? meta->pipefd[0] : -1;
+		if (meta->has_next)
+			meta->prev_pipe_read = meta->pipefd[0];
+		else
+			meta->prev_pipe_read = -1;
 		meta->i++;
 	}
 }
 
 void	exec_cmd_tokens(t_data *data, char **envp)
 {
-	t_execmeta meta;
+	t_execmeta	meta;
 
 	meta.i = 0;
 	meta.prev_pipe_read = -1;

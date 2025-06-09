@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:34:28 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 13:04:33 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 16:10:02 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,8 @@ int	check_pipe_syntax_error(t_token *current, t_data *data, char *str)
 			pipe_count++;
 			if (!current->next || current->next->type == T_PIPE)
 			{
-				ft_putstr_fd("minishell: syntax error unexpected token '|'\n",2);
+				ft_putstr_fd("minishell: syntax error unexpected token '|'\n",
+					2);
 				free(str);
 				free_tokens(data->tokens->first);
 				data->tokens = NULL;
@@ -102,4 +103,3 @@ void	redirection_exec(t_data *data, t_append *append, t_token *redir)
 	}
 	append->redir_applied = 1;
 }
-

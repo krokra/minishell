@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex5.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 13:22:25 by nbariol-          #+#    #+#             */
-/*   Updated: 2025/06/09 15:40:26 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 16:04:32 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,19 @@ void	cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 		free_tokens(tokens);
 }
 
+static void	exec_cmd_common_exec(char **cmdtab, char **env,
+	t_data *data, char *path)
+{
+	if (execve(path, cmdtab, env) == -1)
+	{
+		ft_putstr_fd("minishell: error executing command: ", 2);
+		ft_putstr_fd_nl(cmdtab[0], 2);
+		free(path);
+		cleanup(cmdtab, env, data->tokens, data);
+		exit(126);
+	}
+}
+
 void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 {
 	char	*path;
@@ -58,16 +71,13 @@ void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 		cleanup(cmdtab, env, data->tokens, data);
 		if (path)
 			free(path);
-		exit(is_perm ? 126 : 127);
+		if (is_perm)
+			exit(126);
+		else
+			exit(127);
 	}
-	if (execve(path, cmdtab, env) == -1)
-	{
-		ft_putstr_fd("minishell: error executing command: ", 2);
-		ft_putstr_fd_nl(cmdtab[0], 2);
-		free(path);
-		cleanup(cmdtab, env, data->tokens, data);
-		exit(126);
-	}
+	else
+		exec_cmd_common_exec(cmdtab, env, data, path);
 }
 
 void	dup2_and_close(int oldfd, int newfd)

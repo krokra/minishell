@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 12:53:24 by nbariol-          #+#    #+#             */
-/*   Updated: 2025/06/09 12:54:48 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 16:04:45 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ void	handle_failed_redir(char *str, t_data *data, t_append *append)
 	free_tokens(data->tokens->first);
 	data->tokens = NULL;
 }
+
 void	restore_stdout(t_data *data, t_append *append, int is_builtin)
 {
 	if (append->redir_applied && data->saved_stdout != -1)

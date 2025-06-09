@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:26 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:24:50 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:58:53 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	close_all_except_std(void)
 	}
 }
 
-int		is_stdout_redirected(t_token *tokens)
+int	is_stdout_redirected(t_token *tokens)
 {
 	t_token	*current;
 
@@ -69,7 +69,7 @@ void	handle_stdout_redirection(t_token *current)
 	close(fd);
 }
 
-int		handle_pipe_redirections(t_token *tokens, int *prev_pipe_read,
+int	handle_pipe_redirections(t_token *tokens, int *prev_pipe_read,
 		char **env, t_data *data)
 {
 	t_token	*current;
@@ -98,7 +98,7 @@ int		handle_pipe_redirections(t_token *tokens, int *prev_pipe_read,
 	return (0);
 }
 
-t_token		*find_command_start_from_segment(t_token *current_segment_token)
+t_token	*find_command_start_from_segment(t_token *current_segment_token)
 {
 	t_token	*current;
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:33:36 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 16:19:13 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	pwd_update(char **env, char *new_pwd)
 
 int	while_oldpwd(char **env, char *pwd, int *i)
 {
-	while (env[*++i] != NULL)
+	while (env[*i] != NULL)
 	{
 		if (ft_strncmp(env[*i], "OLDPWD=", 7) == 0)
 		{
@@ -53,6 +53,7 @@ int	while_oldpwd(char **env, char *pwd, int *i)
 			free(pwd);
 			return (1);
 		}
+		(*i)++;
 	}
 	return (0);
 }
@@ -62,7 +63,7 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 	char	*pwd;
 	int		i;
 
-	i = -1;
+	i = 0;
 	pwd = (char *)malloc(ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);
 	if (!pwd)
 		return ;

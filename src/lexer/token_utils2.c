@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:43:47 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:54:51 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:58:15 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	set_token_type(t_token *token)
 		return ;
 	else if (ft_strncmp(token->content, "$", 1) == 0
 		|| ft_strncmp(token->content, "\"$", 2) == 0
-			|| ft_strncmp(token->content, "'$", 2) == 0)
+		|| ft_strncmp(token->content, "'$", 2) == 0)
 		token->type = T_ENVVAR;
 	else
 		token->type = T_WORD;
