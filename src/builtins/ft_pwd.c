@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 16:19:13 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 16:29:35 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@ void	pwd_update(char **env, char *new_pwd)
 	char	*pwd;
 	int		i;
 
-	i = -1;
+	i = 0;
 	pwd = (char *)malloc(ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
 	if (!pwd)
 		return ;
 	ft_strlcpy(pwd, "PWD=", 5);
 	ft_strlcat(pwd, new_pwd, ft_strlen("PWD=") + ft_strlen(new_pwd) + 1);
-	while (env[++i] != NULL)
+	while (env[i] != NULL)
 	{
 		if (ft_strncmp(env[i], "PWD=", 4) == 0)
 		{
@@ -32,9 +32,8 @@ void	pwd_update(char **env, char *new_pwd)
 			free(pwd);
 			return ;
 		}
-	}
-	while (env[++i] != NULL)
 		i++;
+	}
 	env[i] = ft_strdup(pwd);
 	env[i + 1] = NULL;
 	free(pwd);
@@ -72,8 +71,7 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 		+ 1);
 	if (while_oldpwd(env, pwd, &i) == 1)
 		return ;
-	while (env[++i] != NULL)
-		i++;
+
 	env[i] = ft_strdup(pwd);
 	free(pwd);
 	if (!env[i])
