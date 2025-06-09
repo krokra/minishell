@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main4.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 13:04:48 by nbariol-          #+#    #+#             */
-/*   Updated: 2025/06/09 17:08:51 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 17:35:47 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,8 @@ void	readline_loop(char *str, char **envp, t_data *data)
         close_heredoc_fd(data);
     }
     else
-    {
+	{
         execute_simple_redirection(str, envp, data, &append);
-        return;
-    }
-    cleanup_and_free(str, data);
+	}
+	cleanup_and_free(str, data);
 }
