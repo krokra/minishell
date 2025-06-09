@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_builtins.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 11:18:48 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 13:17:15 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:52:16 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	is_builtin(char *cmd)
 {
-	if (ft_strncmp(cmd, "cd", 3 == 0) 
-		|| ft_strncmp(cmd, "pwd", 4 == 0) 
+	if (ft_strncmp(cmd, "cd", 3 == 0)
+		|| ft_strncmp(cmd, "pwd", 4 == 0)
 		|| ft_strncmp(cmd, "export", 7) == 0
 		|| ft_strncmp(cmd, "unset", 6) == 0
 		|| ft_strncmp(cmd, "env", 4) == 0

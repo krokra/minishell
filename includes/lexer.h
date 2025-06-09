@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:27:26 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:47:14 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ t_token				*create_token(char *content, char quote);
 void				add_token(t_token **tokens, t_token *new);
 t_token				*get_token(char *input, int *i, int *quote);
 void				set_token_type(t_token *token);
-int				quote_and_token_handling(char *line, int quote,
+int					quote_and_token_handling(char *line, int quote,
 						t_data **data);
 int					find_first_quote(const char *str);
 void				set_index(t_token *tokens);

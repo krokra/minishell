@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:27:58 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 13:10:18 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:51:40 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static int	special_cases(char *str, char **env)
 static int	cd_check(char *str, char **env)
 {
 	if ((str == NULL || ft_strncmp(str, "~", 1) == 0
-		|| ft_strncmp(str, "-", 1) == 0) && special_cases(str, env) != 0)
+			|| ft_strncmp(str, "-", 1) == 0) && special_cases(str, env) != 0)
 		return (0);
 	else
 		return (1);

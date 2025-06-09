@@ -15,7 +15,7 @@
 
 #include "../includes/minishell.h"
 
-int     verify_syntax_refactor(t_token *tokens)
+int	verify_syntax_refactor(t_token *tokens)
 {
 	while (tokens)
 	{
@@ -23,12 +23,19 @@ int     verify_syntax_refactor(t_token *tokens)
 			return (1);
 		if (tokens->type == T_PIPE)
 		{
-			if (!tokens->next || tokens->next->type == T_REDIR_OUT|| tokens->next->type == T_PIPE || tokens->next->type == T_APPEND)
+			if (!tokens->next || tokens->next->type == T_REDIR_OUT
+				|| tokens->next->type == T_PIPE
+				|| tokens->next->type == T_APPEND)
 				return (1);
 		}
-		if ((tokens->type == T_REDIR_IN || tokens->type == T_REDIR_OUT || tokens->type == T_APPEND) && (!tokens->next || (tokens->next->type != T_WORD && tokens->next->type != T_ENVVAR)))
+		if ((tokens->type == T_REDIR_IN || tokens->type == T_REDIR_OUT
+				|| tokens->type == T_APPEND) && (!tokens->next
+				|| (tokens->next->type != T_WORD
+					&& tokens->next->type != T_ENVVAR)))
 			return (1);
-		if (tokens->type == T_HEREDOC && (!tokens->next || (tokens->next->type != T_WORD && tokens->next->type != T_ENVVAR)))
+		if (tokens->type == T_HEREDOC && (!tokens->next
+				|| (tokens->next->type != T_WORD
+					&& tokens->next->type != T_ENVVAR)))
 			return (1);
 		tokens = tokens->next;
 	}
@@ -37,7 +44,7 @@ int     verify_syntax_refactor(t_token *tokens)
 
 int	verify_syntax(t_token *tokens)
 {
-	t_token *current;
+	t_token	*current;
 
 	current = tokens;
 	if (tokens->type == T_PIPE)

@@ -15,7 +15,6 @@
 
 #include "../../includes/lexer.h"
 
-
 static int	skip_spaces(char *input, int *i)
 {
 	while (input[*i] && (input[*i] == ' ' || input[*i] == '\t'))
@@ -57,7 +56,7 @@ static int	close_quote(char *input, int *i, t_token_state *state)
 
 t_token	*get_token(char *input, int *i, int *quote)
 {
-	t_token_state state;
+	t_token_state	state;
 
 	state.in_quote = 0;
 	state.quote_char = 0;

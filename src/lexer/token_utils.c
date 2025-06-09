@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 07:59:09 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/07 17:09:21 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:54:06 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ static char	**build_argv_loop(t_token *tmp, char **argv, int i)
 {
 	while (tmp && tmp->type != T_PIPE)
 	{
-		if ((tmp->type == T_WORD || tmp->type == T_ENVVAR) && ft_strncmp(tmp->content, "", 2) != 0) 
+		if ((tmp->type == T_WORD || tmp->type == T_ENVVAR)
+			&& ft_strncmp(tmp->content, "", 2) != 0)
 		{
 			argv[i++] = ft_strdup(tmp->content);
 			if (!argv[i - 1])

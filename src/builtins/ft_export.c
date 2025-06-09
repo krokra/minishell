@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:27 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 13:11:32 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:51:56 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ static void	export_loop(char **env, t_token *token, t_data *data)
 
 void	ft_export(char **env, t_token *token, t_data *data)
 {
-	if (!token || token->type == T_PIPE || token->type == T_REDIR_OUT 
+	if (!token || token->type == T_PIPE || token->type == T_REDIR_OUT
 		|| token->type == T_APPEND)
 	{
 		ft_env(env, data);
