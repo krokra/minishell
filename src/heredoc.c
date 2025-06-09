@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 18:19:55 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 11:15:10 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 18:15:07 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int	hdoc_loop(t_token *current_token, int pipe_fds[2], char **env, t_data *data)
 			close(pipe_fds[1]);
 			return (-1);
 		}
-		if (strcmp(input_line, delimiter_str) == 0)
+		if (ft_strcmp(input_line, delimiter_str) == 0)
 		{
 			free(input_line);
 			break ;
