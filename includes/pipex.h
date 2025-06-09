@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/27 08:16:11 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/04 13:37:03 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:42:00 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,7 @@ void	exec_parent(int *fd, char **argv, char **env);
 void	exec_cmd(char *cmd, char **env);
 void	exec_cmd_tokens(t_data *data, char **env);
 void	pipex(int argc, char **argv, char **env);
+void	while_exec(t_execmeta *meta, t_data *data, char **envp);
+void	wait_for_children(t_execmeta *meta, t_data *data);
+
 #endif

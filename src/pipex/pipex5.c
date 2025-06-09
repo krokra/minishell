@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 13:22:25 by nbariol-          #+#    #+#             */
-/*   Updated: 2025/06/09 13:22:33 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:40:26 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	cleanup(char **cmdtab, char **env, t_token *tokens, t_data *data)
 		free_tokens(tokens);
 }
 
-static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
+void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 {
 	char	*path;
 	int		is_perm;
@@ -70,7 +70,7 @@ static void	exec_cmd_common(char **cmdtab, char **env, t_data *data)
 	}
 }
 
-static void	dup2_and_close(int oldfd, int newfd)
+void	dup2_and_close(int oldfd, int newfd)
 {
 	if (dup2(oldfd, newfd) < 0)
 	{
@@ -80,7 +80,7 @@ static void	dup2_and_close(int oldfd, int newfd)
 	close(oldfd);
 }
 
-static void	perror_exit(const char *msg)
+void	perror_exit(const char *msg)
 {
 	perror(msg);
 	exit(1);

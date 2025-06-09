@@ -6,6 +6,9 @@ SRC_DIR := src/
 SRCS := src/Main/main.c \
 		src/Main/main2.c \
 		src/Main/main3.c \
+		src/Main/main_start.c \
+		src/pipex/pipex5.c \
+		src/pipex/pipex2.c \
 		src/pipex/pipex.c \
 		src/pipex/pipex_utils.c \
 		src/builtins/ft_pwd.c \

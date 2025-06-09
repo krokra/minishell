@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:33:51 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:41:52 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ typedef struct s_append {
 }					t_append;
 
 // Function declarations
+void	disable_ctrl_backslash(void);
+void	mainloop(char *str, char **envp, t_data *data);
 int		handle_heredocs(t_token *tokens, char **env, t_data *data);
 void	ft_pwd(t_data *data);
 int		is_builtin(char *cmd);
@@ -99,5 +101,9 @@ void	exec_cmd_tokens(t_data *data, char **envp);
 int		is_stdout_redirected(t_token *tokens);
 int		handle_pipe_redirections(t_token *tokens, int *prev_pipe_read, char **env, t_data *data);
 t_token *find_command_start_from_segment(t_token *current_segment_token);
+void	exec_cmd_common(char **cmdtab, char **env, t_data *data);
+void	dup2_and_close(int oldfd, int newfd);
+void	exec_cmd_tokens(t_data *data, char **envp);
+void	perror_exit(const char *msg);
 
 #endif
