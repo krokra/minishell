@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 10:43:47 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:58:15 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 17:46:43 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,31 +99,4 @@ void	add_token(t_token **tokens, t_token *new)
 	while (current->next)
 		current = current->next;
 	current->next = new;
-}
-
-void	merge_tokens_without_space(t_token **tokens)
-{
-	t_token	*cur;
-	char	*merged;
-	t_token	*to_free;
-
-	cur = *tokens;
-	while (cur && cur->next)
-	{
-		if (!cur->has_space_after && ((cur->type == T_WORD || cur->quotes != 0
-					|| cur->type == T_ENVVAR) && (cur->next->type == T_WORD
-					|| cur->next->quotes != 0 || cur->next->type == T_ENVVAR)))
-		{
-			merged = ft_strjoin(cur->content, cur->next->content);
-			free(cur->content);
-			cur->content = merged;
-			cur->has_space_after = cur->next->has_space_after;
-			to_free = cur->next;
-			cur->next = to_free->next;
-			free(to_free->content);
-			free(to_free);
-			continue ;
-		}
-		cur = cur->next;
-	}
 }

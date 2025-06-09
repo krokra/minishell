@@ -8,6 +8,7 @@ SRCS := src/Main/main.c \
 		src/Main/main3.c \
 		src/Main/main4.c \
 		src/Main/main_start.c \
+		src/pipex/pipex243.c \
 		src/pipex/pipex5.c \
 		src/pipex/pipex2.c \
 		src/pipex/pipex.c \
@@ -37,6 +38,7 @@ SRCS := src/Main/main.c \
 		src/env_vars_utils2.c \
 		src/env_vars_utils3.c \
 		src/env_vars_utils4.c \
+		src/env_vars_utils5.c \
 		src/heredoc.c \
 		src/redirections.c \
 		src/lexer/get_token.c

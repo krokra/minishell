@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 13:25:53 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 15:56:45 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 17:52:23 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,25 +75,6 @@ static int	quote_helper3(char **str, t_vars *vars, char **envp, t_data *data)
 		(*str) += get_var_name_len(*str);
 		return (1);
 	}
-	return (0);
-}
-
-static char	*free_replace_vars(t_vars *vars)
-{
-	char	*res;
-
-	res = vars->result;
-	free(vars);
-	return (res);
-}
-
-static int	str_result(t_vars *vars, char c)
-{
-	vars->tmp = vars->result;
-	vars->result = ft_strjoin(vars->result, (char []){c, 0});
-	if (!vars->result)
-		return (1);
-	free(vars->tmp);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 16:29:35 by psirault         ###   ########.fr       */
+/*   Updated: 2025/06/09 17:47:10 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	oldpwd_update(char **env, char *new_oldpwd)
 		+ 1);
 	if (while_oldpwd(env, pwd, &i) == 1)
 		return ;
-
 	env[i] = ft_strdup(pwd);
 	free(pwd);
 	if (!env[i])

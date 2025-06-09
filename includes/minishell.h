@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
+/*   By: psirault <psirault@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 09:36:04 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 17:10:38 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 17:51:02 by psirault         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ typedef struct s_append {
 	int	redir_applied;
 }					t_append;
 
-// Function declarations
 void	disable_ctrl_backslash(void);
 void	mainloop(char *str, char **envp, t_data *data);
 int		handle_heredocs(t_token *tokens, char **env, t_data *data);
@@ -108,6 +107,7 @@ void	dup2_and_close(int oldfd, int newfd);
 void	exec_cmd_tokens(t_data *data, char **envp);
 void	perror_exit(const char *msg);
 void	execute_simple_redirection(char *str, char **envp, t_data *data,
-		t_append *append);
-
+			t_append *append);
+int		str_result(t_vars *vars, char c);
+char	*free_replace_vars(t_vars *vars);
 #endif
