@@ -6,7 +6,7 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 09:28:00 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 13:15:28 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:33:36 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,16 +40,16 @@ void	pwd_update(char **env, char *new_pwd)
 	free(pwd);
 }
 
-int		while_oldpwd(char **env, char *pwd, int i)
+int	while_oldpwd(char **env, char *pwd, int *i)
 {
-	while (env[++i] != NULL)
+	while (env[*++i] != NULL)
 	{
-		if (ft_strncmp(env[i], "OLDPWD=", 7) == 0)
+		if (ft_strncmp(env[*i], "OLDPWD=", 7) == 0)
 		{
-			free(env[i]);
-			env[i] = ft_strdup(pwd);
-			if (!env[i])
-				return ;
+			free(env[*i]);
+			env[*i] = ft_strdup(pwd);
+			if (!env[*i])
+				return (0);
 			free(pwd);
 			return (1);
 		}
@@ -57,7 +57,7 @@ int		while_oldpwd(char **env, char *pwd, int i)
 	return (0);
 }
 
-void	oldpwd_update(char **env, char *new_oldpwd, int i)
+void	oldpwd_update(char **env, char *new_oldpwd)
 {
 	char	*pwd;
 	int		i;
@@ -67,9 +67,9 @@ void	oldpwd_update(char **env, char *new_oldpwd, int i)
 	if (!pwd)
 		return ;
 	ft_strlcpy(pwd, "OLDPWD=", 8);
-	ft_strlcat(pwd, new_oldpwd,
-		ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd) + 1);
-	if (while_oldpwd(env, pwd, i) == 1)
+	ft_strlcat(pwd, new_oldpwd, ft_strlen("OLDPWD=") + ft_strlen(new_oldpwd)
+		+ 1);
+	if (while_oldpwd(env, pwd, &i) == 1)
 		return ;
 	while (env[++i] != NULL)
 		i++;

@@ -6,20 +6,20 @@
 /*   By: nbariol- <nassimbariol@student.42.fr>>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:11:14 by psirault          #+#    #+#             */
-/*   Updated: 2025/06/09 13:01:58 by nbariol-         ###   ########.fr       */
+/*   Updated: 2025/06/09 15:27:26 by nbariol-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LEXER_H
 # define LEXER_H
 
+# include <readline/history.h>
+# include <readline/readline.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
 # include <stdbool.h>
-# include <readline/history.h>
-# include <readline/readline.h>
 # include "minishell.h"
 
 typedef struct s_data	t_data;
